@@ -1,22 +1,23 @@
 #include "fileio.h"
 
-void load_file(const char *path, Editor_State *state) {
+void load_file(const char* path, Text_Buffer *buffer) {
     FILE *fp = fopen(path, "r");
 
     if (fp == NULL) {
         perror("Error opening file");
-        return;
+        endwin();
+        exit(0);
     }
 
     size_t len = 0;
-    while (fgets(state->text, sizeof(state->text), fp)) {
-        len += strlen(state->text) + len;
+    while (fgets(buffer->Text, sizeof(buffer->Text), fp)) {
+        len += strlen(buffer->Text) + len;
     }
 
     fclose(fp);
 }
 
-void save_file(const char *path, const Editor_State *state) {
+void save_file(const char* path, const Text_Buffer *buffer) {
     FILE *fp = fopen(path, "w");
 
     if (fp == NULL) {
@@ -24,6 +25,6 @@ void save_file(const char *path, const Editor_State *state) {
         return;
     }
 
-    fprintf(fp, "%s", state->text);
+    fprintf(fp, "%s", buffer->Text);
     fclose(fp);
 }

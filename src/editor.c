@@ -38,7 +38,7 @@ void move_cursor(int key, int x, int y, Editor_State *state) {
         case KEY_LEFT:
             if (x > 0) {
                 state->cursor_x--;
-            } else if (x == 0 && y != 0) {
+            } else if (x >= 0 && y > 0) {
                 state->cursor_y--;
             }
             break;
