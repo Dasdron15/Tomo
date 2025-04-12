@@ -23,7 +23,6 @@ void draw_editor(Editor_State *state) {
     }
 
     refresh();
-
 }
 
 void move_cursor(int key, int x, int y, Editor_State *state) {
@@ -39,7 +38,7 @@ void move_cursor(int key, int x, int y, Editor_State *state) {
         case KEY_LEFT:
             if (x > 0) {
                 state->cursor_x--;
-            } else {
+            } else if (x == 0 && y != 0) {
                 state->cursor_y--;
             }
             break;
