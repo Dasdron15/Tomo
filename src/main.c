@@ -13,4 +13,6 @@ int main(int argc, char* argv[]) {
         move_cursor(key, state.cursor_x, state.cursor_y, &state);
         handle_key(key, &state);
     }
+
+    return 0;
 }

@@ -55,6 +55,7 @@ void handle_key(int key, Editor_State *state) {
     switch (key) {
         case 27:
             endwin();
+            exit(0);
             break;
     }
 }

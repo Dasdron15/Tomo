@@ -3,6 +3,7 @@
 
 #include <curses.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_LINES 1000
 #define MAX_LINE_LENGTH 1024
