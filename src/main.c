@@ -3,18 +3,22 @@
 #include "fileio.h"
 
 int main(int argc, char* argv[]) {
-    Editor_State state;
+    if (argc != 2) {
+        printf("Usage: %s <file>\n", argv[0]);
+        return 1;
+    }
 
+    Editor_State state;
     init_editor(&state);
     load_file(argv[1], &state);
-    draw_editor(&state);
-
+    
     while (1) {
+        draw_editor(&state);
         int key = getch();
-
         move_cursor(key, state.cursor_x, state.cursor_y, &state);
         handle_key(key, &state);
     }
 
+    endwin();
     return 0;
 }
