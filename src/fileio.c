@@ -1,6 +1,6 @@
 #include "fileio.h"
 
-void load_file(const char* path, Text_Buffer *buffer) {
+void load_file(const char* path, Editor_State *state) {
     FILE *fp = fopen(path, "r");
 
     if (fp == NULL) {
@@ -9,15 +9,12 @@ void load_file(const char* path, Text_Buffer *buffer) {
         exit(0);
     }
 
-    size_t len = 0;
-    while (fgets(buffer->Text, sizeof(buffer->Text), fp)) {
-        len += strlen(buffer->Text) + len;
-    }
+    state->text_len = fread(state->text, 1, sizeof(state->text), fp);
 
     fclose(fp);
 }
 
-void save_file(const char* path, const Text_Buffer *buffer) {
+void save_file(const char* path, const Editor_State *state) {
     FILE *fp = fopen(path, "w");
 
     if (fp == NULL) {
@@ -25,6 +22,6 @@ void save_file(const char* path, const Text_Buffer *buffer) {
         return;
     }
 
-    fprintf(fp, "%s", buffer->Text);
+    fprintf(fp, "%s", state->text);
     fclose(fp);
 }

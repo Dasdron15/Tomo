@@ -3,7 +3,8 @@
 void init_editor(Editor_State *state) {
     state->cursor_x = 0;
     state->cursor_y = 0;
-    state->num_lines = 0;
+    
+    memset(state->lines_len, 1, sizeof(state->lines_len));
 
     initscr();
     set_escdelay(25);
@@ -18,10 +19,19 @@ void init_editor(Editor_State *state) {
 void draw_editor(Editor_State *state) {
     clear();
 
-    for (int i = 0; i < state->num_lines; i++) {
-        mvprintw(i, 0, "%s", state->lines[i]);
+    int x = 0, y = 0;
+
+    for (int i = 0; i < state->text_len; i++) {
+        if (state->text[i] == '\n') {
+            y++;
+            x = 0;
+        } else {
+            mvprintw(y, x, "%c", state->text[i]);
+            x++;
+        }
     }
 
+    move(state->cursor_y, state->cursor_x);
     refresh();
 }
 
