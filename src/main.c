@@ -1,26 +1,16 @@
 #include <curses.h>
-#include <stdio.h>
+#include "editor.h"
 
 int main(int argc, char* argv[]) {
-    FILE* fp = fopen(argv[1], "r");
-    char code[sizeof(fp)];
-    initscr();
-    noecho();
-    curs_set(1);
+    Editor_State state;
 
-    if (fp == NULL) {
-        printw("File cannot be opened\n");
-        return 1;
-    }
+    init_editor(&state);
+    draw_editor(&state);
 
     while (1) {
-        int ch = getch();
-        if (ch == 27) {
-            break;
-        }
-        
-    }
-    endwin();
+        int key = getch();
 
-    return 0;
+        move_cursor(key, state.cursor_x, state.cursor_y, &state);
+        handle_key(key, &state);
+    }
 }
