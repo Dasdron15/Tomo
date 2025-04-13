@@ -1,6 +1,6 @@
 #include <curses.h>
 #include "editor.h"
-#include "fileio.h"
+#include "utils/fileio.h"
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {

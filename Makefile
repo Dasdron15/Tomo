@@ -1,2 +1,2 @@
-cobalt.out: src/main.c src/editor.c src/fileio.c
-	gcc src/main.c src/editor.c src/fileio.c -o cobalt.out -lcurses
+cobalt.out: src/main.c src/editor.c src/utils/fileio.c src/utils/common.c
+	gcc src/main.c src/editor.c src/utils/fileio.c src/utils/common.c -o cobalt.out -lcurses
