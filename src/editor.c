@@ -44,7 +44,7 @@ void update_lines(Editor_State *state) {
         state->lines_len[line++] = len;
     }
 
-    state->total_lines = line;
+    state->total_lines = line + 1;
 }
 
 void draw_editor(Editor_State* state) {
