@@ -77,11 +77,25 @@ void draw_editor(Editor_State* state) {
 void move_cursor(int key, Editor_State *state) {
     switch (key) {
         case KEY_UP:
-            if (state->cursor_y > 0) state->cursor_y--;
+            if (state->cursor_y > 0) {
+                state->cursor_y--;
+                int line_len = state->lines_len[state->cursor_y + 1];
+                if (state->cursor_x - 3 > line_len) {
+                    state->cursor_x = line_len + 3;
+                }
+            }
+
             break;
 
         case KEY_DOWN:
-            if (state->cursor_y < state->total_lines - 1) state->cursor_y++;
+            if (state->cursor_y < state->total_lines - 1) {
+                state->cursor_y++;
+                int line_len = state->lines_len[state->cursor_y + 1];
+                if (state->cursor_x - 3 > line_len) {
+                    state->cursor_x = line_len + 3;
+                }
+            }
+
             break;
 
         case KEY_LEFT:
@@ -92,9 +106,16 @@ void move_cursor(int key, Editor_State *state) {
             }
             break;
 
-        case KEY_RIGHT:
-            if (state->cursor_x < state->lines_len[state->cursor_x]) state->cursor_x++;
+        case KEY_RIGHT: {
+            int line_len = state->lines_len[state->cursor_y + 1];
+            if (state->cursor_x - 3 < line_len) {
+                state->cursor_x++;
+            } else if (state->cursor_y < state->total_lines - 1) {
+                state->cursor_y++;
+                state->cursor_x = 3;
+            }
             break;
+        }
     }
     move(state->cursor_y, state->cursor_x);
 }
