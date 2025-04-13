@@ -1,7 +1,7 @@
 #include "editor.h"
 
 void init_editor(Editor_State *state) {
-    state->cursor_x = 0;
+    state->cursor_x = 3;
     state->cursor_y = 0;
 
     initscr();
@@ -61,8 +61,8 @@ void draw_editor(Editor_State* state) {
         attron(COLOR_PAIR(1));
 
         if (state->text[i] == '\n') {
-            state->lines_len[row] = col;
             row++;
+            state->lines_len[row] = col;
             col = 0;
         } else {
             mvprintw(row, 3 + col++, "%c", state->text[i]);
@@ -74,26 +74,26 @@ void draw_editor(Editor_State* state) {
 }
 
 
-void move_cursor(int key, int x, int y, Editor_State *state) {
+void move_cursor(int key, Editor_State *state) {
     switch (key) {
         case KEY_UP:
-            if (y > 0) state->cursor_y--;
+            if (state->cursor_y > 0) state->cursor_y--;
             break;
 
         case KEY_DOWN:
-            if (y < LINES - 1) state->cursor_y++;
+            if (state->cursor_y < state->total_lines - 1) state->cursor_y++;
             break;
 
         case KEY_LEFT:
-            if (x > 0) {
+            if (state->cursor_x > 3) {
                 state->cursor_x--;
-            } else if (x >= 0 && y > 0) {
+            } else if (state->cursor_x >= 3 && state->cursor_y > 0) {
                 state->cursor_y--;
             }
             break;
 
         case KEY_RIGHT:
-            if (x < COLS - 1) state->cursor_x++;
+            if (state->cursor_x < state->lines_len[state->cursor_x]) state->cursor_x++;
             break;
     }
     move(state->cursor_y, state->cursor_x);
