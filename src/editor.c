@@ -3,7 +3,6 @@
 void init_editor(Editor_State *state) {
     state->cursor_x = 0;
     state->cursor_y = 0;
-    memset(state->lines_len, 0, sizeof(state->lines_len));
 
     initscr();
     set_escdelay(25);
@@ -20,10 +19,9 @@ void init_editor(Editor_State *state) {
 
     start_color();
 
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    init_pair(2, COLOR_BLACK, COLOR_BLACK);
-
-    init_color(COLOR_BLACK, 500, 500, 500);
+    init_color(COLOR_BLUE, 339, 339, 339);
+    init_pair(1, COLOR_WHITE, use_default_colors()); // Active line color
+    init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line color
 
     move(state->cursor_y, state->cursor_x);
 }
@@ -50,21 +48,24 @@ void update_lines(Editor_State *state) {
 void draw_editor(Editor_State* state) {
     clear();
 
-    int i = 0, row = 0, col = 0;
-    for (int idx = 0; idx < state->text_len; idx++) {
-        char ch = state->text[idx];
-        if (ch == '\n') {
+    int row = 0, col = 0;
+    for (int i = 0; i < state->text_len; i++) {
+        attroff(COLOR_PAIR(1));
+        attron(COLOR_PAIR(2));
+        if (row == state->cursor_y) {
+            attroff(COLOR_PAIR(2));
+            attron(COLOR_PAIR(1));
+        }
+        mvprintw(row, 0, "%d  ", row + 1);
+        attroff(COLOR_PAIR(2));
+        attron(COLOR_PAIR(1));
+
+        if (state->text[i] == '\n') {
+            state->lines_len[row] = col;
             row++;
             col = 0;
         } else {
-            if (row == state->cursor_y) { // If statement to highlight current line
-                attron(COLOR_PAIR(2));
-                mvprintw(row, col++, "%d", row + 1);
-                attron(COLOR_PAIR(1));
-                mvprintw(row, col++, "%s", state->text[i]);
-            } else {
-
-            }
+            mvprintw(row, 3 + col++, "%c", state->text[i]);
         }
     }
 
