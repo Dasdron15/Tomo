@@ -4,6 +4,7 @@ void init_editor(Editor_State *state) {
     int line_number_width = (int)floor(log10(state->total_lines)) + 1;
     state->cursor_x = line_number_width + 4;
     state->cursor_y = 0;
+    state->scroll_offset = 0;
 
     initscr();
     set_escdelay(25);
@@ -53,7 +54,7 @@ void draw_editor(Editor_State* state) {
     int line_number_width = (int)floor(log10(abs(state->total_lines))) + 1;
     int text_start_x = line_number_width + 3;
 
-    int first_visible_line;
+    int first_visible_line = getmaxy(stdscr);
     int last_visible_line;
 
     int row = 0;
@@ -79,6 +80,7 @@ void draw_editor(Editor_State* state) {
         }
     }
 
+    debug_draw(state);
     move(state->cursor_y, state->cursor_x);
     refresh();
 }
@@ -145,4 +147,12 @@ void handle_key(int key, Editor_State *state) {
             exit(0);
             break;
     }
+}
+
+void debug_draw(Editor_State *state) {
+    int max_y, max_x;
+    getmaxyx(stdscr, max_y, max_x);
+
+    mvprintw(0, max_x - 25, "First visible line: %d", state->scroll_offset + 1);
+    mvprintw(1, max_x - 25, "Last visible line: %d", max_y);
 }
