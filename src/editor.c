@@ -31,10 +31,12 @@ void init_editor(Editor_State *state) {
 void update_lines(Editor_State *state) {
     int line = 0;
     int len = 0;
+    int index = 0;
 
     for (int i = 0; i < state->text_len; i++) {
         if (state->text[i] == '\n') {
             state->lines_len[line++] = len;
+            state->words_start[index++] = i;
             len = 0;
         } else {
             len++;
@@ -67,7 +69,7 @@ void draw_editor(Editor_State* state) {
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ",mult_char(' ', line_number_width - (floor(log10(abs(row + 1))) + 1)) ,row + 1 + state->scroll_offset);
+        mvprintw(row, 0, "%s%d  ",mult_char(' ', line_number_width - (floor(log10(abs(row + 1))) + 1)) ,row + 1);
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
@@ -76,7 +78,7 @@ void draw_editor(Editor_State* state) {
             state->lines_len[row] = col;
             col = 0;
         } else {
-            mvprintw(row, text_start_x + col++, "%c", state->text[i]);
+            mvprintw(row, text_start_x + col++, "%c", state->text[state->words_start[state->scroll_offset] + i]);
         }
     }
 

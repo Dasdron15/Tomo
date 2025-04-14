@@ -15,6 +15,8 @@ typedef struct {
     char text[MAX_LINE_LENGTH * MAX_LINES];
     int text_len;
 
+    int words_start[MAX_LINES];
+
     int lines_len[MAX_LINES];
     int total_lines;
     int scroll_offset;
