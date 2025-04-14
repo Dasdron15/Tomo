@@ -7,7 +7,7 @@ void init_editor(Editor_State *state) {
     state->scroll_offset = 0;
 
     initscr();
-    set_escdelay(25);
+    set_escdelay(0);
     raw();
     keypad(stdscr, true);
     noecho();
@@ -67,7 +67,7 @@ void draw_editor(Editor_State* state) {
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ",mult_char(' ', line_number_width - (floor(log10(abs(row + 1))) + 1)) ,row + 1);
+        mvprintw(row, 0, "%s%d  ",mult_char(' ', line_number_width - (floor(log10(abs(row + 1))) + 1)) ,row + 1 + state->scroll_offset);
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
@@ -90,6 +90,7 @@ void move_cursor(int key, Editor_State *state) {
     int line_number_width = (int)floor(log10(abs(state->total_lines))) + 1;
     int text_start_x = line_number_width + 3;
     int cursor_x_in_line = state->cursor_x - text_start_x;
+    int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr);
 
     switch (key) {
         case KEY_UP:
@@ -103,11 +104,16 @@ void move_cursor(int key, Editor_State *state) {
             break;
 
         case KEY_DOWN:
+
             if (state->cursor_y < state->total_lines - 1) {
-                state->cursor_y++;
-                int len = state->lines_len[state->cursor_y + 1];
-                if (cursor_x_in_line > len) {
-                    state->cursor_x = len + text_start_x;
+                if (state->cursor_y > last_line - 5) {
+                    state->scroll_offset++;
+                } else {
+                    state->cursor_y++;
+                    int len = state->lines_len[state->cursor_y + 1];
+                    if (cursor_x_in_line > len) {
+                        state->cursor_x = len + text_start_x;
+                    }
                 }
             }
             break;
@@ -154,5 +160,5 @@ void debug_draw(Editor_State *state) {
     getmaxyx(stdscr, max_y, max_x);
 
     mvprintw(0, max_x - 25, "First visible line: %d", state->scroll_offset + 1);
-    mvprintw(1, max_x - 25, "Last visible line: %d", max_y);
+    mvprintw(1, max_x - 25, "Last visible line: %d", max_y > state->total_lines ? state->total_lines : max_y);
 }
