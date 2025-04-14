@@ -53,6 +53,9 @@ void draw_editor(Editor_State* state) {
     int line_number_width = (int)floor(log10(abs(state->total_lines))) + 1;
     int text_start_x = line_number_width + 3;
 
+    int first_visible_line;
+    int last_visible_line;
+
     int row = 0;
     int col = 0;
 
