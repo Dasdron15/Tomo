@@ -73,12 +73,14 @@ void draw_editor(Editor_State* state) {
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
-        if (state->text[i] == '\n') {
+        int text_index = (state->scroll_offset > 0) ? state->words_start[state->scroll_offset - 1] + i - 1 : i; 
+
+        if (state->text[text_index] == '\n') {
             row++;
             state->lines_len[row] = col;
             col = 0;
         } else {
-            mvprintw(row, text_start_x + col++, "%c", state->text[state->words_start[state->scroll_offset] + i]);
+            mvprintw(row, text_start_x + col++, "%c", state->text[text_index]);
         }
     }
 
@@ -161,6 +163,5 @@ void debug_draw(Editor_State *state) {
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
 
-    mvprintw(0, max_x - 25, "First visible line: %d", state->scroll_offset + 1);
-    mvprintw(1, max_x - 25, "Last visible line: %d", max_y > state->total_lines ? state->total_lines : max_y);
+    mvprintw(0, max_x - 25, "Last line: %d", getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr));
 }
