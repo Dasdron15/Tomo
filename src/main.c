@@ -8,15 +8,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Editor_State state;
-    init_editor(&state);
-    load_file(argv[1], &state);
+    Editor_State* state = malloc(sizeof(Editor_State));
+    init_editor(state);
+    load_file(argv[1], state);
     
     while (1) {
-        draw_editor(&state);
+        draw_editor(state);
         int key = getch();
-        move_cursor(key, &state);
-        handle_key(key, &state);
+        handle_key(key, state);
     }
 
     endwin();

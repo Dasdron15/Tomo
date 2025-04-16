@@ -17,3 +17,7 @@ int load_file(const char* path, Editor_State *state) {
     fclose(fp);
     return i;
 }
+
+void save_file(char *path, Editor_State *state) {
+
+}

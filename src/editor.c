@@ -1,7 +1,7 @@
 #include "editor.h"
 
 void init_editor(Editor_State *state) {
-    state->cursor_x = 4;
+    state->cursor_x = 0;
     state->cursor_y = 0;
     state->scroll_offset = 0;
 
@@ -29,102 +29,10 @@ void init_editor(Editor_State *state) {
 
 void draw_editor(Editor_State* state) {
     clear();
-
-    int line_number_width = (int)floor(log10(abs(state->total_lines))) + 1;
-    int text_start_x = line_number_width + 3;
-
-    int first_visible_line = getmaxy(stdscr);
-    int last_visible_line;
-
-    int row = 0;
-    int col = 0;
-
-    for (int i = 0; i < state->text_len + 1; i++) {
-        attroff(COLOR_PAIR(1));
-        attron(COLOR_PAIR(2));
-        if (row == state->cursor_y) {
-            attroff(COLOR_PAIR(2));
-            attron(COLOR_PAIR(1));
-        }
-        mvprintw(row, 0, "%s%d  ",mult_char(' ', line_number_width - (floor(log10(abs(row + 1))) + 1)) ,row + 1);
-        attroff(COLOR_PAIR(2));
-        attron(COLOR_PAIR(1));
-
-        int text_index = (state->scroll_offset > 0) ? state->words_start[state->scroll_offset - 1] + i - 1 : i; 
-
-        if (state->text[text_index] == '\n') {
-            row++;
-            state->lines_len[row] = col;
-            col = 0;
-        } else {
-            mvprintw(row, text_start_x + col++, "%c", state->text[text_index]);
-        }
+    for (int col = 0; col < state->total_lines; col++) {
+        mvprintw(col, 0, "%s", state->lines[col]);
     }
-
-    debug_draw(state);
-    move(state->cursor_y, state->cursor_x);
     refresh();
-}
-
-
-void move_cursor(int key, Editor_State *state) {
-    int line_number_width = (int)floor(log10(abs(state->total_lines))) + 1;
-    int text_start_x = line_number_width + 3;
-    int cursor_x_in_line = state->cursor_x - text_start_x;
-    int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr);
-
-    switch (key) {
-        case KEY_UP:
-            if (state->cursor_y > 0) {
-                state->cursor_y--;
-                int len = state->lines_len[state->cursor_y + 1];
-                if (cursor_x_in_line > len) {
-                    state->cursor_x = len + text_start_x;
-                }
-            }
-            break;
-
-        case KEY_DOWN:
-
-            if (state->cursor_y < state->total_lines - 1) {
-                if (state->cursor_y > last_line - 5) {
-                    state->scroll_offset++;
-                } else {
-                    state->cursor_y++;
-                    int len = state->lines_len[state->cursor_y + 1];
-                    if (cursor_x_in_line > len) {
-                        state->cursor_x = len + text_start_x;
-                    }
-                }
-            }
-            break;
-
-        case KEY_LEFT:
-            if (state->cursor_x > text_start_x) {
-                state->cursor_x--;
-            } else if (state->cursor_y > 0) {
-                state->cursor_y--;
-                int len = state->lines_len[state->cursor_y + 1];
-                if (cursor_x_in_line > 0) {
-                    state->cursor_x = len + text_start_x;
-                } else {
-                    state->cursor_x = text_start_x;
-                }
-            }
-            break;
-
-        case KEY_RIGHT: {
-            int len = state->lines_len[state->cursor_y + 1];
-            if (cursor_x_in_line < len) {
-                state->cursor_x++;
-            } else if (state->cursor_y < state->total_lines - 1) {
-                state->cursor_y++;
-                state->cursor_x = text_start_x;
-            }
-            break;
-        }
-    }
-    move(state->cursor_y, state->cursor_x);
 }
 
 void handle_key(int key, Editor_State *state) {
@@ -133,12 +41,29 @@ void handle_key(int key, Editor_State *state) {
             endwin();
             exit(0);
             break;
+
+        case KEY_UP:
+            state->cursor_y--;
+            break;
+            
+        case KEY_DOWN:
+            state->cursor_y++;
+            break;
+            
+        case KEY_LEFT:
+            state->cursor_x--;
+            break;
+            
+        case KEY_RIGHT: 
+            state->cursor_x++;
+            break;
     }
+    move(state->cursor_y, state->cursor_x);
 }
 
-void debug_draw(Editor_State *state) {
-    int max_y, max_x;
-    getmaxyx(stdscr, max_y, max_x);
+// void debug_draw(Editor_State *state) {
+//     int max_y, max_x;
+//     getmaxyx(stdscr, max_y, max_x);
 
-    mvprintw(0, max_x - 25, "Last line: %d", getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr));
-}
+//     mvprintw(0, max_x - 25, "Last line: %d", getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr));
+// }

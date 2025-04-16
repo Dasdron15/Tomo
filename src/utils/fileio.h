@@ -7,5 +7,6 @@
 #include "../editor.h"
 
 int load_file(const char* path, Editor_State* state);
+void save_file(char* path, Editor_State* state);
 
 #endif
