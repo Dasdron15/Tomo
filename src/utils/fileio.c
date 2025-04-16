@@ -6,8 +6,7 @@ int load_file(const char* path, Editor_State *state) {
     FILE *fp = fopen(path, "r");
 
     if (!fp) {
-        endwin();
-        printf("Error cannot open file\n");
+        printf("Error: cannot open file\n");
         exit(1);
     }
 

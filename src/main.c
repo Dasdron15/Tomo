@@ -9,8 +9,8 @@ int main(int argc, char* argv[]) {
     }
 
     Editor_State* state = malloc(sizeof(Editor_State));
-    init_editor(state);
     load_file(argv[1], state);
+    init_editor(state);
     
     while (1) {
         draw_editor(state);

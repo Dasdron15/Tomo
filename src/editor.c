@@ -1,7 +1,7 @@
 #include "editor.h"
 
 void init_editor(Editor_State *state) {
-    state->cursor_x = 4;
+    state->cursor_x = int_len(state->total_lines) + 2;
     state->cursor_y = 0;
     state->scroll_offset = 0;
 
@@ -62,21 +62,25 @@ void move_cursor(int key, Editor_State *state) {
             break;
             
         case KEY_LEFT:
-            if (state->cursor_x > 0) {
+            if (state->cursor_x > int_len(state->total_lines) + 2) {
                 state->cursor_x--;
-            } else if (state->cursor_x < 1 && state->cursor_y > 0) {
+            } else if (state->cursor_x < int_len(state->total_lines) + 2 && state->cursor_y > 0) {
                 state->cursor_y--;
             }
             break;
             
         case KEY_RIGHT:
-            if (state->cursor_x < strlen(state->lines[state->cursor_y]) - 1) {
+            if (state->cursor_x < int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1) {
                 state->cursor_x++;
             } else if (state->cursor_y != state->total_lines - 1) {
                 state->cursor_y++;
-                state->cursor_x = 0;
+                state->cursor_x = int_len(state->total_lines) + 2;
             }
             break;
+    }
+
+    if (state->cursor_x > int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1) {
+        state->cursor_x = int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1;
     }
 }
 
