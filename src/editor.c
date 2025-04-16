@@ -44,6 +44,7 @@ void draw_editor(Editor_State* state) {
         mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row]);
     }
 
+    debug_draw(state);
     move(state->cursor_y, state->cursor_x);
     refresh();
 }
@@ -69,8 +70,9 @@ void move_cursor(int key, Editor_State *state) {
         case KEY_LEFT: {
             if (state->cursor_x > margin) {
                 state->cursor_x--;
-            } else if (state->cursor_x < margin && state->cursor_y > 0) {
+            } else if (state->cursor_x <= margin && state->cursor_y > 0) {
                 state->cursor_y--;
+                state->cursor_x = margin + strlen(state->lines[state->cursor_y]);
             }
             state->max_char = state->cursor_x;
             break;
@@ -99,4 +101,11 @@ void handle_key(int key, Editor_State *state) {
             exit(0);
             break;
     }
+}
+
+void debug_draw(Editor_State *state) {
+    int y = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr);
+
+    mvprintw(0, getmaxx(stdscr) - 30, "First visible line: %d", state->scroll_offset + 1);
+    mvprintw(1, getmaxx(stdscr) - 30, "Last visible line: %d", y);
 }
