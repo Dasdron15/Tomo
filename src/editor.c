@@ -1,4 +1,5 @@
 #include "editor.h"
+#include "utils/common.h"
 
 void init_editor(Editor_State *state) {
     state->cursor_x = 0;
@@ -27,8 +28,10 @@ void init_editor(Editor_State *state) {
 
 void draw_editor(Editor_State* state) {
     clear();
-    for (int col = 0; col < state->total_lines; col++) {
-        mvprintw(col, 0, "%s", state->lines[col]);
+    for (int row = 0; row < state->total_lines; row++) {
+        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row)), row + 1);
+
+        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row]);
     }
 
     move(state->cursor_y, state->cursor_x);
