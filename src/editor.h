@@ -22,6 +22,7 @@ typedef struct {
 
 void init_editor(Editor_State* state);
 void draw_editor(Editor_State* state);
+void move_cursor(int key, Editor_State* state);
 void handle_key(int key, Editor_State* state);
 void debug_draw(Editor_State* state);
 

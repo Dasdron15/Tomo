@@ -23,8 +23,6 @@ void init_editor(Editor_State *state) {
     init_color(COLOR_BLUE, 339, 339, 339);
     init_pair(1, COLOR_WHITE, use_default_colors()); // Active line number color
     init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line number color
-
-    move(state->cursor_y, state->cursor_x);
 }
 
 void draw_editor(Editor_State* state) {
@@ -32,16 +30,13 @@ void draw_editor(Editor_State* state) {
     for (int col = 0; col < state->total_lines; col++) {
         mvprintw(col, 0, "%s", state->lines[col]);
     }
+
+    move(state->cursor_y, state->cursor_y);
     refresh();
 }
 
-void handle_key(int key, Editor_State *state) {
+void move_cursor(int key, Editor_State *state) {
     switch (key) {
-        case 27:
-            endwin();
-            exit(0);
-            break;
-
         case KEY_UP:
             state->cursor_y--;
             break;
@@ -58,7 +53,15 @@ void handle_key(int key, Editor_State *state) {
             state->cursor_x++;
             break;
     }
-    move(state->cursor_y, state->cursor_x);
+}
+
+void handle_key(int key, Editor_State *state) {
+    switch (key) {
+        case 27:
+            endwin();
+            exit(0);
+            break;
+    }
 }
 
 // void debug_draw(Editor_State *state) {
