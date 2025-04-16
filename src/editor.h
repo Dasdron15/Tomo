@@ -15,6 +15,7 @@ typedef struct {
     char total_lines;
 
     int scroll_offset; // Thing that is needed for proper text scrolling
+    int max_char;
 
     int cursor_x;
     int cursor_y;

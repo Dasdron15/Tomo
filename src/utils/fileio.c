@@ -11,6 +11,7 @@ int load_file(const char* path, Editor_State *state) {
     }
 
     while (fgets(buffer, 1024, fp)) {
+        buffer[strcspn(buffer, "\n")] = '\0';
         state->lines[i++] = strdup(buffer);
     }
     fclose(fp);

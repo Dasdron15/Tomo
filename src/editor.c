@@ -4,6 +4,7 @@ void init_editor(Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
     state->cursor_y = 0;
     state->scroll_offset = 0;
+    state->max_char = int_len(state->total_lines) + 2;
 
     initscr();
     set_escdelay(0);
@@ -48,39 +49,46 @@ void draw_editor(Editor_State* state) {
 }
 
 void move_cursor(int key, Editor_State *state) {
+    int margin = int_len(state->total_lines) + 2;
+
     switch (key) {
         case KEY_UP:
             if (state->cursor_y > 0) {
                 state->cursor_y--;
+                state->cursor_x = state->max_char;
             }
             break;
             
         case KEY_DOWN:
             if (state->cursor_y != state->total_lines - 1) {
                 state->cursor_y++;
+                state->cursor_x = state->max_char;
             }
             break;
             
-        case KEY_LEFT:
-            if (state->cursor_x > int_len(state->total_lines) + 2) {
+        case KEY_LEFT: {
+            if (state->cursor_x > margin) {
                 state->cursor_x--;
-            } else if (state->cursor_x < int_len(state->total_lines) + 2 && state->cursor_y > 0) {
+            } else if (state->cursor_x < margin && state->cursor_y > 0) {
                 state->cursor_y--;
             }
+            state->max_char = state->cursor_x;
             break;
+        }
             
         case KEY_RIGHT:
-            if (state->cursor_x < int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1) {
+            if (state->cursor_x < margin + strlen(state->lines[state->cursor_y])) {
                 state->cursor_x++;
             } else if (state->cursor_y != state->total_lines - 1) {
                 state->cursor_y++;
-                state->cursor_x = int_len(state->total_lines) + 2;
+                state->cursor_x = margin;
             }
+            state->max_char = state->cursor_x;
             break;
     }
 
-    if (state->cursor_x > int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1) {
-        state->cursor_x = int_len(state->total_lines) + 2 + strlen(state->lines[state->cursor_y]) - 1;
+    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y])) {
+        state->cursor_x = margin + strlen(state->lines[state->cursor_y]);
     }
 }
 
