@@ -51,6 +51,7 @@ void draw_editor(Editor_State* state) {
 
 void move_cursor(int key, Editor_State *state) {
     int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : state->scroll_offset + getmaxy(stdscr);
+    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
     int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
@@ -77,14 +78,14 @@ void move_cursor(int key, Editor_State *state) {
                 state->cursor_x--;
             } else if (state->cursor_x <= margin && state->cursor_y > 0) {
                 state->cursor_y--;
-                state->cursor_x = margin + strlen(state->lines[state->cursor_y]);
+                state->cursor_x = margin + line_len;
             }
             state->max_char = state->cursor_x;
             break;
         }
             
         case KEY_RIGHT:
-            if (state->cursor_x < margin + strlen(state->lines[state->cursor_y])) {
+            if (state->cursor_x < margin + line_len) {
                 state->cursor_x++;
             } else if (state->cursor_y != state->total_lines - 1) {
                 state->cursor_y++;
@@ -94,8 +95,8 @@ void move_cursor(int key, Editor_State *state) {
             break;
     }
 
-    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y])) { // Check if cursor is out of line
-        state->cursor_x = margin + strlen(state->lines[state->cursor_y]);
+    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { // Check if cursor is out of line
+        state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
     }
 }
 
