@@ -29,7 +29,7 @@ void init_editor(Editor_State *state) {
 void draw_editor(Editor_State* state) {
     clear();
     for (int row = 0; row < state->total_lines; row++) {
-        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row)), row + 1);
+        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1)), row + 1);
 
         mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row]);
     }
@@ -61,6 +61,9 @@ void move_cursor(int key, Editor_State *state) {
         case KEY_RIGHT:
             if (state->cursor_x < strlen(state->lines[state->cursor_y]) - 1) {
                 state->cursor_x++;
+            } else {
+                state->cursor_y++;
+                state->cursor_x = 0;
             }
             break;
     }
