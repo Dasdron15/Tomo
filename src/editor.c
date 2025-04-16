@@ -29,7 +29,17 @@ void init_editor(Editor_State *state) {
 void draw_editor(Editor_State* state) {
     clear();
     for (int row = 0; row < state->total_lines; row++) {
+        attroff(COLOR_PAIR(1)); // Change color to gray
+        attron(COLOR_PAIR(2));
+
+        if (row == state->cursor_y) { // If cursor is on the line then that line number will be white
+            attroff(COLOR_PAIR(2));
+            attron(COLOR_PAIR(1));
+        }
         mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1)), row + 1);
+
+        attroff(COLOR_PAIR(2));
+        attron(COLOR_PAIR(1));
 
         mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row]);
     }
