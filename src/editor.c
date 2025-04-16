@@ -31,14 +31,16 @@ void draw_editor(Editor_State* state) {
         mvprintw(col, 0, "%s", state->lines[col]);
     }
 
-    move(state->cursor_y, state->cursor_y);
+    move(state->cursor_y, state->cursor_x);
     refresh();
 }
 
 void move_cursor(int key, Editor_State *state) {
     switch (key) {
         case KEY_UP:
-            state->cursor_y--;
+            if (state->cursor_y > 0) {
+                state->cursor_y--;
+            }
             break;
             
         case KEY_DOWN:
@@ -46,7 +48,11 @@ void move_cursor(int key, Editor_State *state) {
             break;
             
         case KEY_LEFT:
-            state->cursor_x--;
+            if (state->cursor_x > 0) {
+                state->cursor_x--;
+            } else if (state->cursor_x < 1 && state->cursor_y > 0) {
+                state->cursor_y--;
+            }
             break;
             
         case KEY_RIGHT: 
