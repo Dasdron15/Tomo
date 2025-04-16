@@ -29,19 +29,19 @@ void init_editor(Editor_State *state) {
 void draw_editor(Editor_State* state) {
     clear();
     for (int row = 0; row < state->total_lines; row++) {
-        attroff(COLOR_PAIR(1)); // Change color to gray
-        attron(COLOR_PAIR(2));
+        attroff(COLOR_PAIR(1));
+        attron(COLOR_PAIR(2)); // Change color to gray
 
         if (row == state->cursor_y) { // If cursor is on the line then that line number will be white
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1)), row + 1);
+        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1)), state->scroll_offset + row + 1); // Print line numbers
 
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
-        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row]);
+        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row + state->scroll_offset]); // Print lines
     }
 
     debug_draw(state);
@@ -50,7 +50,8 @@ void draw_editor(Editor_State* state) {
 }
 
 void move_cursor(int key, Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
+    int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : state->scroll_offset + getmaxy(stdscr);
+    int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
         case KEY_UP:
@@ -61,9 +62,13 @@ void move_cursor(int key, Editor_State *state) {
             break;
             
         case KEY_DOWN:
-            if (state->cursor_y != state->total_lines - 1) {
-                state->cursor_y++;
-                state->cursor_x = state->max_char;
+            if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
+                if (state->cursor_y > last_line - 10 - state->scroll_offset && last_line != state->total_lines) {
+                    state->scroll_offset++;
+                } else {
+                    state->cursor_y++;
+                    state->cursor_x = state->max_char;
+                }
             }
             break;
             
@@ -89,7 +94,7 @@ void move_cursor(int key, Editor_State *state) {
             break;
     }
 
-    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y])) {
+    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y])) { // Check if cursor is out of line
         state->cursor_x = margin + strlen(state->lines[state->cursor_y]);
     }
 }
