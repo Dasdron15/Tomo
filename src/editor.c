@@ -1,8 +1,7 @@
 #include "editor.h"
 
 void init_editor(Editor_State *state) {
-    int line_number_width = (int)floor(log10(state->total_lines)) + 1;
-    state->cursor_x = line_number_width + 4;
+    state->cursor_x = 4;
     state->cursor_y = 0;
     state->scroll_offset = 0;
 
@@ -26,28 +25,6 @@ void init_editor(Editor_State *state) {
     init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line number color
 
     move(state->cursor_y, state->cursor_x);
-}
-
-void update_lines(Editor_State *state) {
-    int line = 0;
-    int len = 0;
-    int index = 0;
-
-    for (int i = 0; i < state->text_len; i++) {
-        if (state->text[i] == '\n') {
-            state->lines_len[line++] = len;
-            state->words_start[index++] = i;
-            len = 0;
-        } else {
-            len++;
-        }
-    }
-
-    if (len > 0 || line == 0) {
-        state->lines_len[line++] = len;
-    }
-
-    state->total_lines = line + 1;
 }
 
 void draw_editor(Editor_State* state) {
