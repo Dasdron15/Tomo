@@ -3,6 +3,7 @@
 
 #include "utils/common.h"
 #include <curses.h>
+#include <string.h>
 
 
 #define MAX_LINES 1024
@@ -13,6 +14,7 @@ typedef struct {
     char total_lines;
 
     int scroll_offset; // Thing that is needed for proper text scrolling
+    int max_line_num_len; // Variable that counts how long is the current max line number
 
     int cursor_x;
     int cursor_y;

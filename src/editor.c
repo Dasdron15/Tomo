@@ -55,8 +55,10 @@ void move_cursor(int key, Editor_State *state) {
             }
             break;
             
-        case KEY_RIGHT: 
-            state->cursor_x++;
+        case KEY_RIGHT:
+            if (state->cursor_x < strlen(state->lines[state->cursor_y]) - 1) {
+                state->cursor_x++;
+            }
             break;
     }
 }
@@ -69,10 +71,3 @@ void handle_key(int key, Editor_State *state) {
             break;
     }
 }
-
-// void debug_draw(Editor_State *state) {
-//     int max_y, max_x;
-//     getmaxyx(stdscr, max_y, max_x);
-
-//     mvprintw(0, max_x - 25, "Last line: %d", getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr));
-// }
