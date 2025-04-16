@@ -15,6 +15,7 @@ int load_file(const char* path, Editor_State *state) {
         state->lines[i++] = strdup(buffer);
     }
     fclose(fp);
+    state->total_lines = i;
     return i;
 }
 
