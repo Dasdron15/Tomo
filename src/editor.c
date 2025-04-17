@@ -36,7 +36,7 @@ void draw_editor(Editor_State* state) {
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1)), state->scroll_offset + row + 1); // Print line numbers
+        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset)), state->scroll_offset + row + 1); // Print line numbers
 
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
