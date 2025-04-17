@@ -28,7 +28,7 @@ void init_editor(Editor_State *state) {
 
 void draw_editor(Editor_State* state) {
     clear();
-    for (int row = 0; row < state->total_lines; row++) {
+    for (int row = 0; row < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
         attroff(COLOR_PAIR(1));
         attron(COLOR_PAIR(2)); // Change color to gray
 
@@ -68,15 +68,15 @@ void move_cursor(int key, Editor_State *state) {
                     state->scroll_offset++;
                 } else {
                     state->cursor_y++;
-                    state->cursor_x = state->max_char;
                 }
+                state->cursor_x = state->max_char;
             }
             break;
             
         case KEY_LEFT: {
             if (state->cursor_x > margin) {
                 state->cursor_x--;
-            } else if (state->cursor_x <= margin && state->cursor_y > 0) {
+            } else if (state->cursor_x <= margin) {
                 state->cursor_y--;
                 state->cursor_x = margin + line_len;
             }
@@ -87,7 +87,7 @@ void move_cursor(int key, Editor_State *state) {
         case KEY_RIGHT:
             if (state->cursor_x < margin + line_len) {
                 state->cursor_x++;
-            } else if (state->cursor_y != state->total_lines - 1) {
+            } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y < getmaxy(stdscr) - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;
             }
