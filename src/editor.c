@@ -57,7 +57,7 @@ void move_cursor(int key, Editor_State *state) {
     switch (key) {
         case KEY_UP:
             if (state->cursor_y > 0) {
-                if (!true) {
+                if (state->scroll_offset + 1 > 1 && state->cursor_y <= 3) {
                     state->scroll_offset--;
                 } else {
                     state->cursor_y--;
@@ -68,7 +68,7 @@ void move_cursor(int key, Editor_State *state) {
             
         case KEY_DOWN:
             if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
-                if (state->cursor_y > last_line - 7 - state->scroll_offset && last_line != state->total_lines) {
+                if (state->cursor_y > last_line - 5 - state->scroll_offset && last_line != state->total_lines) {
                     state->scroll_offset++;
                 } else {
                     state->cursor_y++;
