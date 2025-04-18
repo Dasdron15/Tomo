@@ -4,6 +4,7 @@
 #include "utils/common.h"
 #include <curses.h>
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 
 
@@ -29,6 +30,7 @@ void move_cursor(int key, Editor_State* state);
 void handle_key(int key, Editor_State* state);
 void insert_char(char c, Editor_State* state);
 void delete_char(Editor_State* state);
+void new_line(Editor_State* state);
 void debug_draw(Editor_State* state);
 
 #endif

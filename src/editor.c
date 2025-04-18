@@ -63,6 +63,9 @@ void move_cursor(int key, Editor_State* state) {
                     state->cursor_y--;
                 }
                 state->cursor_x = state->max_char;
+            } else {
+                state->cursor_x = margin;
+                beep();
             }
             break;
             
@@ -74,6 +77,9 @@ void move_cursor(int key, Editor_State* state) {
                     state->cursor_y++;
                 }
                 state->cursor_x = state->max_char;
+            } else {
+                state->cursor_x = margin + line_len;
+                beep();
             }
             break;
             
@@ -83,6 +89,8 @@ void move_cursor(int key, Editor_State* state) {
             } else if (state->cursor_x <= margin && state->cursor_y + state->scroll_offset >= 1) {
                 state->cursor_y--;
                 state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
+            } else {
+                beep();
             }
             state->max_char = state->cursor_x;
             break;
@@ -94,6 +102,8 @@ void move_cursor(int key, Editor_State* state) {
             } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y + state->scroll_offset + 1 < state->total_lines) {
                 state->cursor_y++;
                 state->cursor_x = margin;
+            } else {
+                beep();
             }
             state->max_char = state->cursor_x;
             break;
@@ -136,14 +146,14 @@ void insert_char(char c, Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 
-    char* old = state->lines[state->cursor_y];
+    char* old = state->lines[state->cursor_y + state->scroll_offset];
     char* new = malloc(strlen(old) + 2);
 
     strncpy(new, old, pos);
     new[pos] = c;
     strcpy(new + pos + 1, old + pos);
 
-    state->lines[state->cursor_y] = new;
+    state->lines[state->cursor_y + state->scroll_offset] = new;
     free(old);
     state->cursor_x++;
 }
@@ -154,9 +164,24 @@ void delete_char(Editor_State* state) {
 
     int len = strlen(state->lines[state->cursor_y]);
 
-    for (int i = pos - 3; i < len; i++) {
-        if (pos >= margin) {
-            state->lines[state->cursor_y][i] = state->lines[state->cursor_y][i + 1];
+    if (pos >= margin) {
+        for (int i = pos - 3; i < len; i++) {
+            state->lines[state->cursor_y + state->scroll_offset][i] = state->lines[state->cursor_y + state->scroll_offset][i + 1];
+        }
+    } else {
+        if (state->cursor_y + state->scroll_offset >= 1) {
+            int size = strlen(state->lines[state->cursor_y - 1]) + strlen(state->lines[state->cursor_y]) + 1;
+            char* buf = (char*)malloc(size);
+
+            strcpy(buf, state->lines[state->cursor_y - 1]);
+            strcat(buf, state->lines[state->cursor_y]);
+
+            state->lines[state->cursor_y - 1] = buf;
+
+            state->cursor_y--;
+            state->cursor_x = strlen(state->lines[state->cursor_y]) + margin;
+        } else {
+            beep();
         }
     }
 
@@ -165,9 +190,12 @@ void delete_char(Editor_State* state) {
     }
 }
 
-void debug_draw(Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+void new_line(Editor_State* state) {
 
-    mvprintw(2, getmaxx(stdscr) - 15, "Col %d", pos);
+}
+
+void debug_draw(Editor_State *state) {
+    mvprintw(0, getmaxx(stdscr) - 10, "%d", state->cursor_y + state->scroll_offset + 1);
+    mvprintw(1, getmaxx(stdscr) - 10, "%d", state->total_lines);
+    mvprintw(2, getmaxx(stdscr) - 10, "%d", state->cursor_y + state->scroll_offset + 1 >= state->total_lines);
 }
