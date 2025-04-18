@@ -131,7 +131,20 @@ void handle_key(int key, Editor_State* state) {
 }
 
 void insert_char(char c, Editor_State* state) {
+    int margin = int_len(state->total_lines) + 2;
+    int pos = state->cursor_x - margin;
 
+    char* old = state->lines[state->cursor_y];
+    char* new = malloc(strlen(old) + 2);
+
+    strncpy(new, old, pos);
+    new[pos] = c;
+    strcpy(new + pos + 1, old + pos);
+
+    state->lines[state->cursor_y] = new;
+    free(old);
+    
+    state->cursor_x++;
 }
 
 void delete_char(Editor_State* state) {
@@ -139,6 +152,8 @@ void delete_char(Editor_State* state) {
 }
 
 void debug_draw(Editor_State *state) {
-    mvprintw(0, getmaxx(stdscr) - 30, "%d", state->cursor_y + state->scroll_offset + 1);
-    mvprintw(1, getmaxx(stdscr) - 30, "%d", state->total_lines);
+    int margin = int_len(state->total_lines) + 2;
+    int pos = state->cursor_x - margin;
+
+    mvprintw(2, getmaxx(stdscr) - 15, "Col %d", pos);
 }
