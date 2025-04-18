@@ -170,14 +170,14 @@ void insert_char(char c, Editor_State* state) {
 }
 
 void delete_char(Editor_State* state) {
-    int margin = int_len(state->total_lines);
+    int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     int y_pos = state->scroll_offset + state->cursor_y;
 
     int len = strlen(state->lines[state->cursor_y]);
 
-    if (pos > margin) {
-        for (int i = pos - 3; i < len; i++) {
+    if (pos > 0) {
+        for (int i = pos - 1; i < len; i++) {
             state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
         state->cursor_x--;
@@ -185,14 +185,22 @@ void delete_char(Editor_State* state) {
         if (y_pos >= 1) {
             int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1;
             char* buf = (char*)malloc(size);
+            int previous_len = strlen(state->lines[y_pos - 1]) + margin;
 
             strcpy(buf, state->lines[y_pos - 1]);
             strcat(buf, state->lines[y_pos]);
             
-            state->cursor_x = size; // TODO: Make this shit work
-            state->cursor_y--;
-
+            
+            free(state->lines[y_pos - 1]);
             state->lines[y_pos - 1] = buf;
+
+            for (int i = state->cursor_y; i < state->total_lines; i++) {
+                state->lines[i] = state->lines[i + 1];
+            }
+            state->total_lines--;
+
+            state->cursor_x = previous_len;
+            state->cursor_y--;
         } else {
             beep();
         }
@@ -204,7 +212,8 @@ void new_line(Editor_State* state) {
 }
 
 void debug_draw(Editor_State *state) {
-    mvprintw(0, getmaxx(stdscr) - 10, "%d", state->cursor_y + state->scroll_offset + 1);
-    mvprintw(1, getmaxx(stdscr) - 10, "%d", state->total_lines);
-    mvprintw(2, getmaxx(stdscr) - 10, "%d", state->cursor_y + state->scroll_offset + 1 >= state->total_lines);
+    int margin = int_len(state->total_lines) + 2;
+    int pos = state->cursor_x - margin;
+
+    mvprintw(0, getmaxx(stdscr) - 10, "%d", pos);
 }
