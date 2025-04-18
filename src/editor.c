@@ -143,12 +143,24 @@ void insert_char(char c, Editor_State* state) {
 
     state->lines[state->cursor_y] = new;
     free(old);
-    
     state->cursor_x++;
 }
 
 void delete_char(Editor_State* state) {
+    int margin = int_len(state->total_lines);
+    int pos = state->cursor_x - margin;
 
+    int len = strlen(state->lines[state->cursor_y]);
+
+    for (int i = pos - 3; i < len; i++) {
+        if (pos >= margin) {
+            state->lines[state->cursor_y][i] = state->lines[state->cursor_y][i + 1];
+        }
+    }
+
+    if (pos >= margin) {
+        state->cursor_x--;
+    }
 }
 
 void debug_draw(Editor_State *state) {
