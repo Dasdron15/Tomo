@@ -121,11 +121,13 @@ void handle_key(int key, Editor_State* state) {
 
     if (key >= 32 && key <= 126) {
         insert_char((char)key, state);
+        state->max_char = state->cursor_x;
         return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
         delete_char(state);
+        state->max_char = state->cursor_x;
         return;
     }
 }
