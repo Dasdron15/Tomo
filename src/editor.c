@@ -29,6 +29,8 @@ void init_editor(Editor_State *state) {
 void draw_editor(Editor_State* state) {
     clear();
     for (int row = 0; row < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
+        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
+
         attroff(COLOR_PAIR(1));
         attron(COLOR_PAIR(2)); // Change color to gray
 
@@ -36,12 +38,15 @@ void draw_editor(Editor_State* state) {
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset)), state->scroll_offset + row + 1); // Print line numbers
+        mvprintw(row, 0, "%s%d  ", spaces, state->scroll_offset + row + 1); // Print line numbers
 
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
         mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row + state->scroll_offset]); // Print lines
+
+        free(spaces);
+        spaces = NULL;
     }
 
     debug_draw(state);
@@ -154,39 +159,46 @@ void insert_char(char c, Editor_State* state) {
     strcpy(new + pos + 1, old + pos);
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
+
     free(old);
+    free(new);
+
+    old = NULL;
+    new = NULL;
+
     state->cursor_x++;
 }
 
 void delete_char(Editor_State* state) {
     int margin = int_len(state->total_lines);
     int pos = state->cursor_x - margin;
+    int y_pos = state->scroll_offset + state->cursor_y;
 
     int len = strlen(state->lines[state->cursor_y]);
 
-    if (pos >= margin) {
+    if (pos > margin) {
         for (int i = pos - 3; i < len; i++) {
-            state->lines[state->cursor_y + state->scroll_offset][i] = state->lines[state->cursor_y + state->scroll_offset][i + 1];
+            state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
+        state->cursor_x--;
     } else {
-        if (state->cursor_y + state->scroll_offset >= 1) {
-            int size = strlen(state->lines[state->cursor_y - 1]) + strlen(state->lines[state->cursor_y]) + 1;
+        if (y_pos >= 1) {
+            int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1;
             char* buf = (char*)malloc(size);
 
-            strcpy(buf, state->lines[state->cursor_y - 1]);
-            strcat(buf, state->lines[state->cursor_y]);
-
-            state->lines[state->cursor_y - 1] = buf;
-
+            strcpy(buf, state->lines[y_pos - 1]);
+            strcat(buf, state->lines[y_pos]);
+            
+            state->cursor_x = strlen(state->lines[y_pos - 1]) + margin;
             state->cursor_y--;
-            state->cursor_x = strlen(state->lines[state->cursor_y]) + margin;
+
+            state->lines[y_pos - 1] = buf;
+
+            free(buf);
+            buf = NULL;
         } else {
             beep();
         }
-    }
-
-    if (pos >= margin) {
-        state->cursor_x--;
     }
 }
 
