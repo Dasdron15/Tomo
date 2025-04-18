@@ -49,7 +49,7 @@ void draw_editor(Editor_State* state) {
     refresh();
 }
 
-void move_cursor(int key, Editor_State *state) {
+void move_cursor(int key, Editor_State* state) {
     int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr) + state->scroll_offset;
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
     int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
@@ -112,13 +112,30 @@ void move_cursor(int key, Editor_State *state) {
     }
 }
 
-void handle_key(int key, Editor_State *state) {
-    switch (key) {
-        case 27:
-            endwin();
-            exit(0);
-            break;
+void handle_key(int key, Editor_State* state) {
+    if (key == 27) {
+        endwin();
+        exit(0);
+        return;
     }
+
+    if (key >= 32 && key <= 126) {
+        insert_char((char)key, state);
+        return;
+    }
+
+    if (key == KEY_BACKSPACE || key == 127) {
+        delete_char(state);
+        return;
+    }
+}
+
+void insert_char(char c, Editor_State* state) {
+
+}
+
+void delete_char(Editor_State* state) {
+
 }
 
 void debug_draw(Editor_State *state) {
