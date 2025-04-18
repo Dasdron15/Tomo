@@ -80,9 +80,9 @@ void move_cursor(int key, Editor_State *state) {
         case KEY_LEFT: {
             if (state->cursor_x > margin) {
                 state->cursor_x--;
-            } else if (state->cursor_x <= margin) {
+            } else if (state->cursor_x <= margin && state->cursor_y + state->scroll_offset >= 1) {
                 state->cursor_y--;
-                state->cursor_x = margin + line_len;
+                state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
             }
             state->max_char = state->cursor_x;
             break;
@@ -91,7 +91,7 @@ void move_cursor(int key, Editor_State *state) {
         case KEY_RIGHT:
             if (state->cursor_x < margin + line_len) {
                 state->cursor_x++;
-            } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y + state->scroll_offset < state->total_lines) {
+            } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y + state->scroll_offset + 1 < state->total_lines) {
                 state->cursor_y++;
                 state->cursor_x = margin;
             }
@@ -122,8 +122,6 @@ void handle_key(int key, Editor_State *state) {
 }
 
 void debug_draw(Editor_State *state) {
-    int y = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr) + state->scroll_offset;
-
-    mvprintw(0, getmaxx(stdscr) - 30, "First visible line: %d", state->scroll_offset + 1);
-    mvprintw(1, getmaxx(stdscr) - 30, "Last visible line: %d", y);
+    mvprintw(0, getmaxx(stdscr) - 30, "%d", state->cursor_y + state->scroll_offset + 1);
+    mvprintw(1, getmaxx(stdscr) - 30, "%d", state->total_lines);
 }
