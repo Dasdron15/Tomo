@@ -189,13 +189,10 @@ void delete_char(Editor_State* state) {
             strcpy(buf, state->lines[y_pos - 1]);
             strcat(buf, state->lines[y_pos]);
             
-            state->cursor_x = strlen(state->lines[y_pos - 1]) + margin;
+            state->cursor_x = size; // TODO: Make this shit work
             state->cursor_y--;
 
             state->lines[y_pos - 1] = buf;
-
-            free(buf);
-            buf = NULL;
         } else {
             beep();
         }
