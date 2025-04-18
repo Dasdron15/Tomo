@@ -70,7 +70,6 @@ void move_cursor(int key, Editor_State* state) {
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin;
-                beep();
             }
             break;
             
@@ -84,7 +83,6 @@ void move_cursor(int key, Editor_State* state) {
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin + line_len;
-                beep();
             }
             break;
             
@@ -94,8 +92,6 @@ void move_cursor(int key, Editor_State* state) {
             } else if (state->cursor_x <= margin && state->cursor_y + state->scroll_offset >= 1) {
                 state->cursor_y--;
                 state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
-            } else {
-                beep();
             }
             state->max_char = state->cursor_x;
             break;
@@ -107,8 +103,6 @@ void move_cursor(int key, Editor_State* state) {
             } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y + state->scroll_offset + 1 < state->total_lines) {
                 state->cursor_y++;
                 state->cursor_x = margin;
-            } else {
-                beep();
             }
             state->max_char = state->cursor_x;
             break;
@@ -187,6 +181,10 @@ void delete_char(Editor_State* state) {
             char* buf = (char*)malloc(size);
             int previous_len = strlen(state->lines[y_pos - 1]) + margin;
 
+            if (!buf) {
+                return;
+            }
+
             strcpy(buf, state->lines[y_pos - 1]);
             strcat(buf, state->lines[y_pos]);
             
@@ -194,15 +192,17 @@ void delete_char(Editor_State* state) {
             free(state->lines[y_pos - 1]);
             state->lines[y_pos - 1] = buf;
 
-            for (int i = state->cursor_y; i < state->total_lines; i++) {
+            free(state->lines[y_pos]);
+            state->lines[y_pos] = NULL;
+
+            for (int i = state->cursor_y; i < state->total_lines - 1; i++) {
                 state->lines[i] = state->lines[i + 1];
             }
-            state->total_lines--;
+            state->lines[state->total_lines - 1] = NULL;
 
+            state->total_lines--;
             state->cursor_x = previous_len;
             state->cursor_y--;
-        } else {
-            beep();
         }
     }
 }
