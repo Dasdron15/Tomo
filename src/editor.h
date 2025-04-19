@@ -27,6 +27,7 @@ typedef struct {
 void init_editor(Editor_State* state);
 void draw_editor(Editor_State* state);
 void move_cursor(int key, Editor_State* state);
+void clamp_cursor(Editor_State* state); // Check if cursor is out of bounds
 void handle_key(int key, Editor_State* state);
 void insert_char(char c, Editor_State* state);
 void delete_char(Editor_State* state);

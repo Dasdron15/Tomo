@@ -124,6 +124,10 @@ void move_cursor(int key, Editor_State* state) {
     }
 }
 
+void clamp_cursor(Editor_State* state) {
+    
+}
+
 void handle_key(int key, Editor_State* state) {
     if (key == 27) {
         endwin();
