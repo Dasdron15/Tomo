@@ -121,8 +121,6 @@ void clamp_cursor(Editor_State* state) { /* Check if cursor is out of editor win
 }
 
 void handle_key(int key, Editor_State* state) {
-    clamp_cursor(state);
-
     if (key == 27) {
         endwin();
         exit(0);
@@ -152,7 +150,17 @@ void insert_char(char c, Editor_State* state) {
     int pos = state->cursor_x - margin;
 
     char* old = state->lines[state->cursor_y + state->scroll_offset];
+
+    if (old == NULL) {
+        old = malloc(1);
+        old[0] = '\0';
+    }
+
     char* new = malloc(strlen(old) + 2);
+
+    if (new == NULL) {
+        return;
+    }
 
     strncpy(new, old, pos);
     new[pos] = c;
@@ -160,9 +168,9 @@ void insert_char(char c, Editor_State* state) {
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
 
-    free(old);
-
-    old = NULL;
+    if (old != new) {
+        free(old);
+    }
 
     state->cursor_x++;
 }
@@ -192,8 +200,6 @@ void delete_char(Editor_State* state) {
             strcpy(buf, state->lines[y_pos - 1]);
             strcat(buf, state->lines[y_pos]);
             
-            
-            free(state->lines[y_pos - 1]);
             state->lines[y_pos - 1] = buf;
 
             free(state->lines[y_pos]);
@@ -202,7 +208,6 @@ void delete_char(Editor_State* state) {
             for (int i = state->cursor_y; i < state->total_lines - 1; i++) {
                 state->lines[i] = state->lines[i + 1];
             }
-            state->lines[state->total_lines - 1] = NULL;
 
             state->total_lines--;
             state->cursor_x = previous_len;
@@ -227,6 +232,7 @@ void new_line(Editor_State* state) {
     state->lines[state->cursor_y] = buf;
 
     state->cursor_y++;
+    clamp_cursor(state);
     state->cursor_x = margin;
     state->total_lines++;
 }
