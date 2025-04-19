@@ -216,16 +216,30 @@ void new_line(Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     int y_pos = state->cursor_y + state->scroll_offset;
-    char* buf = (char*)malloc(strlen(state->lines[state->cursor_y]) - pos);
+    
+    char* current = state->lines[y_pos];
+    int current_len = strlen(current);
+
+    char* left = malloc(pos + 1);
+    char* right = malloc(current_len - pos + 1);
+
+    if (!left || !right) {
+        return;
+    }
+
+    strncpy(left, current, pos);
+    left[pos] = '\0';
+
+    strcpy(right, current + pos);
+
+    free(state->lines[y_pos]);
 
     for (int i = state->total_lines; i > y_pos; i--) {
         state->lines[i] = state->lines[i - 1];
     }
 
-    strncpy(buf, state->lines[state->cursor_y], pos);
-
-    state->lines[y_pos + 1] = state->lines[y_pos] + pos;
-    state->lines[state->cursor_y] = buf;
+    state->lines[y_pos] = left;
+    state->lines[y_pos + 1] = right;
 
     state->cursor_y++;
     clamp_cursor(state);
