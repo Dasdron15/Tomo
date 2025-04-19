@@ -163,10 +163,8 @@ void insert_char(char c, Editor_State* state) {
     state->lines[state->cursor_y + state->scroll_offset] = new;
 
     free(old);
-    free(new);
 
     old = NULL;
-    new = NULL;
 
     state->cursor_x++;
 }
