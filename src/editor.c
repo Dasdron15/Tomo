@@ -64,12 +64,8 @@ void move_cursor(int key, Editor_State* state) {
 
     switch (key) {
         case KEY_UP:
-            if (state->cursor_y > 0) {
-                if (state->scroll_offset + 1 > 1 && state->cursor_y <= 3) {
-                    state->scroll_offset--;
-                } else {
-                    state->cursor_y--;
-                }
+            if (state->cursor_y + state->scroll_offset > 0) {
+                state->cursor_y--;
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin;
@@ -78,11 +74,7 @@ void move_cursor(int key, Editor_State* state) {
             
         case KEY_DOWN:
             if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
-                if (state->cursor_y > last_line - 5 - state->scroll_offset && last_line != state->total_lines) {
-                    state->scroll_offset++;
-                } else {
-                    state->cursor_y++;
-                }
+                state->cursor_y++;
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin + line_len;
@@ -111,24 +103,26 @@ void move_cursor(int key, Editor_State* state) {
             break;
     }
 
-    if (state->cursor_y >= getmaxy(stdscr) && state->cursor_y + state->scroll_offset >= state->total_lines) {
-        state->cursor_y = getmaxy(stdscr) - 1;
-    } else if (state->cursor_y >= getmaxy(stdscr)) {
-        state->scroll_offset++;
-        state->cursor_y--;
-        state->cursor_x = margin;
-    }
+    clamp_cursor(state);
 
     if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { /* Check if cursor is out of line */
         state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
     }
 }
 
-void clamp_cursor(Editor_State* state) {
-    
+void clamp_cursor(Editor_State* state) { /* Check if cursor is out of editor window */
+    if (state->cursor_y >= getmaxy(stdscr)) {
+        state->scroll_offset++;
+        state->cursor_y--;
+    } else if (state->cursor_y < 0 && state->scroll_offset > 0) {
+        state->scroll_offset--;
+        state->cursor_y++;
+    }
 }
 
 void handle_key(int key, Editor_State* state) {
+    clamp_cursor(state);
+
     if (key == 27) {
         endwin();
         exit(0);
