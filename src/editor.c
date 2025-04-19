@@ -27,6 +27,8 @@ void init_editor(Editor_State *state) {
 }
 
 void draw_editor(Editor_State* state) {
+    int margin = int_len(state->total_lines) + 2;
+
     clear();
     for (int row = 0; row < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
@@ -50,6 +52,7 @@ void draw_editor(Editor_State* state) {
     }
 
     debug_draw(state);
+
     move(state->cursor_y, state->cursor_x);
     refresh();
 }
@@ -216,13 +219,16 @@ void new_line(Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     int y_pos = state->cursor_y + state->scroll_offset;
+    char* buf = (char*)malloc(strlen(state->lines[state->cursor_y]) - pos);
 
     for (int i = state->total_lines; i > y_pos; i--) {
         state->lines[i] = state->lines[i - 1];
     }
- 
+
+    strncpy(buf, state->lines[state->cursor_y], pos);
+
     state->lines[y_pos + 1] = state->lines[y_pos] + pos;
-    state->lines[state->cursor_y] = "";
+    state->lines[state->cursor_y] = buf;
 
     state->cursor_y++;
     state->cursor_x = margin;
