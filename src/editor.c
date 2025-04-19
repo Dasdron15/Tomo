@@ -2,9 +2,9 @@
 
 void init_editor(Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
+    state->max_char = state->cursor_x;
     state->cursor_y = 0;
     state->scroll_offset = 0;
-    state->max_char = int_len(state->total_lines) + 2;
 
     initscr();
     set_escdelay(0);
@@ -22,8 +22,8 @@ void init_editor(Editor_State *state) {
     start_color();
 
     init_color(COLOR_BLUE, 339, 339, 339);
-    init_pair(1, COLOR_WHITE, use_default_colors()); // Active line number color
-    init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line number color
+    init_pair(1, COLOR_WHITE, use_default_colors()); /* Active line number color */
+    init_pair(2, COLOR_BLUE, use_default_colors()); /* Unactive line number color */
 }
 
 void draw_editor(Editor_State* state) {
@@ -32,18 +32,18 @@ void draw_editor(Editor_State* state) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
         attroff(COLOR_PAIR(1));
-        attron(COLOR_PAIR(2)); // Change color to gray
+        attron(COLOR_PAIR(2)); /* Change color to gray */
 
-        if (row == state->cursor_y) { // If cursor is on the line then that line number will be white
+        if (row == state->cursor_y) { /* If cursor is on the line then that line number will be white */
             attroff(COLOR_PAIR(2));
             attron(COLOR_PAIR(1));
         }
-        mvprintw(row, 0, "%s%d  ", spaces, state->scroll_offset + row + 1); // Print line numbers
+        mvprintw(row, 0, "%s%d  ", spaces, state->scroll_offset + row + 1); /* Print line numbers */
 
         attroff(COLOR_PAIR(2));
         attron(COLOR_PAIR(1));
 
-        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row + state->scroll_offset]); // Print lines
+        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row + state->scroll_offset]); /* Print lines */
 
         free(spaces);
         spaces = NULL;
@@ -57,7 +57,7 @@ void draw_editor(Editor_State* state) {
 void move_cursor(int key, Editor_State* state) {
     int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr) + state->scroll_offset;
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
-    int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
+    int margin = int_len(state->total_lines) + 2; /* Line number length + 2 spaces */
 
     switch (key) {
         case KEY_UP:
@@ -116,7 +116,7 @@ void move_cursor(int key, Editor_State* state) {
         state->cursor_x = margin;
     }
 
-    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { // Check if cursor is out of line
+    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { /* Check if cursor is out of line */
         state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
     }
 }
@@ -137,6 +137,11 @@ void handle_key(int key, Editor_State* state) {
     if (key == KEY_BACKSPACE || key == 127) {
         delete_char(state);
         state->max_char = state->cursor_x;
+        return;
+    }
+
+    if (key == KEY_ENTER || key == 10) {
+        new_line(state);
         return;
     }
 }
@@ -208,7 +213,20 @@ void delete_char(Editor_State* state) {
 }
 
 void new_line(Editor_State* state) {
+    int margin = int_len(state->total_lines) + 2;
+    int pos = state->cursor_x - margin;
+    int y_pos = state->cursor_y + state->scroll_offset;
 
+    for (int i = state->total_lines; i > y_pos; i--) {
+        state->lines[i] = state->lines[i - 1];
+    }
+ 
+    state->lines[y_pos + 1] = state->lines[y_pos] + pos;
+    state->lines[state->cursor_y] = "";
+
+    state->cursor_y++;
+    state->cursor_x = margin;
+    state->total_lines++;
 }
 
 void debug_draw(Editor_State *state) {
