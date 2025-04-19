@@ -127,7 +127,7 @@ void handle_key(int key, Editor_State* state) {
         return;
     }
 
-    if (key >= 32 && key <= 126) {
+    if ((key >= 32 && key <= 126) || key == '\t') {
         insert_char((char)key, state);
         state->max_char = state->cursor_x;
         return;
@@ -168,7 +168,11 @@ void insert_char(char c, Editor_State* state) {
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
 
-    state->cursor_x++;
+    if (c == '\t') {
+        state->cursor_x += 4;
+    } else {
+        state->cursor_x++;
+    }
 }
 
 void delete_char(Editor_State* state) {
