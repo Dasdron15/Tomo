@@ -149,6 +149,10 @@ void handle_key(int key, Editor_State* state) {
         new_line(state);
         return;
     }
+
+    if (key == 15) {
+        
+    }
 }
 
 void insert_char(char c, Editor_State* state) {

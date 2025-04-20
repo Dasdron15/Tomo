@@ -21,7 +21,8 @@ typedef struct {
     int cursor_x;
     int cursor_y;
 
-    int debug_mode;
+    char* filename;
+    bool is_saved;
 } Editor_State;
 
 void init_editor(Editor_State* state);
