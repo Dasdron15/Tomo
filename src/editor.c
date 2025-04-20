@@ -8,6 +8,7 @@ void init_editor(struct Editor_State *state) {
     state->max_char = state->cursor_x;
     state->cursor_y = 0;
     state->scroll_offset = 0;
+    state->is_saved = true;
 
     initscr();
     set_escdelay(0);
@@ -25,8 +26,11 @@ void init_editor(struct Editor_State *state) {
     start_color();
 
     init_color(COLOR_BLUE, 339, 339, 339);
+    init_color(COLOR_CYAN, 187, 187, 187);
+
     init_pair(1, COLOR_WHITE, use_default_colors()); /* Active line number color */
     init_pair(2, COLOR_BLUE, use_default_colors()); /* Unactive line number color */
+    init_pair(3, COLOR_WHITE, COLOR_CYAN); /* Color for status bar */
 }
 
 void draw_editor(struct Editor_State* state) {
@@ -54,7 +58,13 @@ void draw_editor(struct Editor_State* state) {
         spaces = NULL;
     }
 
+    attroff(COLOR_PAIR(1));
+    attron(COLOR_PAIR(3));
+
     draw_status_bar(state);
+
+    attroff(COLOR_PAIR(3));
+    attron(COLOR_PAIR(1));
 
     move(state->cursor_y, state->cursor_x);
     refresh();
@@ -133,23 +143,27 @@ void handle_key(int key, struct Editor_State* state) {
     if ((key >= 32 && key <= 126)) {
         insert_char((char)key, state);
         state->max_char = state->cursor_x;
+        state->is_saved = false;
         return;
     }
 
     if (key == '\t') {
         add_tab(state);
         state->max_char = state->cursor_x;
+        state->is_saved = false;
         return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
         delete_char(state);
         state->max_char = state->cursor_x;
+        state->is_saved = false;
         return;
     }
 
     if (key == KEY_ENTER || key == 10) {
         new_line(state);
+        state->is_saved = false;
         return;
     }
 

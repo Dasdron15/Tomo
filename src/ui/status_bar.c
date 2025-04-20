@@ -9,15 +9,16 @@ void draw_status_bar(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     
+    char path[64];
     char cursor_info[64];
     char display_time[64];
 
     time_t sec = time(NULL);
     struct tm* current_time = localtime(&sec);
 
-    char* path = get_filename(state->filename);
+    sprintf(path, "%s%s", get_filename(state->filename), state->is_saved ? "" : "*");
 
-    sprintf(cursor_info, "Ln %d, Col %d", state->cursor_y + 1, pos);
+    sprintf(cursor_info, "Ln %d, Col %d", state->cursor_y + 1, pos + 1);
     sprintf(display_time, "%02d:%02d:%02d", current_time->tm_hour, current_time->tm_min, current_time->tm_sec);
 
     int space_length = max_x - strlen(path) - 2 - strlen(cursor_info) - strlen(display_time);
