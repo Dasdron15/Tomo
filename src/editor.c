@@ -33,7 +33,7 @@ void draw_editor(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
 
     clear();
-    for (int row = 0; row < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
+    for (int row = 0; row < getmaxy(stdscr) - 1 && state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
         attroff(COLOR_PAIR(1));
@@ -114,7 +114,7 @@ void move_cursor(int key, struct Editor_State* state) {
 }
 
 void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of editor window */
-    if (state->cursor_y >= getmaxy(stdscr)) {
+    if (state->cursor_y >= getmaxy(stdscr) - 1) {
         state->scroll_offset++;
         state->cursor_y--;
     } else if (state->cursor_y < 0 && state->scroll_offset > 0) {
