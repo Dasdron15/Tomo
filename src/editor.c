@@ -1,4 +1,5 @@
 #include "editor.h"
+#include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
 
@@ -53,7 +54,7 @@ void draw_editor(struct Editor_State* state) {
         spaces = NULL;
     }
 
-    debug_draw(state);
+    draw_status_bar(state);
 
     move(state->cursor_y, state->cursor_x);
     refresh();
