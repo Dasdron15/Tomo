@@ -127,10 +127,14 @@ void handle_key(int key, Editor_State* state) {
         return;
     }
 
-    if ((key >= 32 && key <= 126) || key == '\t') {
+    if ((key >= 32 && key <= 126)) {
         insert_char((char)key, state);
         state->max_char = state->cursor_x;
         return;
+    }
+
+    if (key == '\t') {
+
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
@@ -168,11 +172,11 @@ void insert_char(char c, Editor_State* state) {
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
 
-    if (c == '\t') {
-        state->cursor_x += 4;
-    } else {
-        state->cursor_x++;
-    }
+    state->cursor_x++;
+}
+
+void add_tab(Editor_State* state) {
+    
 }
 
 void delete_char(Editor_State* state) {
