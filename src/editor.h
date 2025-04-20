@@ -1,7 +1,6 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include "utils/common.h"
 #include <curses.h>
 #include <string.h>
 #include <stdlib.h>

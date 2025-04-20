@@ -1,4 +1,6 @@
 #include "editor.h"
+#include "utils/fileio.h"
+#include "utils/common.h"
 
 void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
@@ -151,7 +153,8 @@ void handle_key(int key, struct Editor_State* state) {
     }
 
     if (key == 15) {
-        
+        save_file(state);
+        return;
     }
 }
 
