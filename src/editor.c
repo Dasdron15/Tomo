@@ -134,7 +134,9 @@ void handle_key(int key, Editor_State* state) {
     }
 
     if (key == '\t') {
-
+        add_tab(state);
+        state->max_char = state->cursor_x;
+        return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
@@ -176,7 +178,28 @@ void insert_char(char c, Editor_State* state) {
 }
 
 void add_tab(Editor_State* state) {
-    
+    int margin = int_len(state->total_lines) + 2;
+    int pos = state->cursor_x - margin;
+
+    char* old = state->lines[state->cursor_y + state->scroll_offset];
+
+    if (old == NULL) {
+        old = malloc(1);
+        old[0] = '\0';
+    }
+
+    char* new = malloc(strlen(old) + 5);
+
+    if (new == NULL) {
+        return;
+    }
+
+    strncpy(new, old, pos);
+    memcpy(new + pos, "    ", 4);
+    strcpy(new + pos + 4, old + pos);
+
+    state->lines[state->cursor_y + state->scroll_offset] = new;
+    state->cursor_x += 4;
 }
 
 void delete_char(Editor_State* state) {
