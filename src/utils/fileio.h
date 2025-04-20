@@ -6,7 +6,9 @@
 #include <string.h>
 #include <curses.h>
 
-int load_file(const char* path, Editor_State* state);
-void save_file(char* path, Editor_State* state);
+struct Editor_State;
+
+int load_file(const char* path, struct Editor_State* state);
+void save_file(char* path, struct Editor_State* state);
 
 #endif

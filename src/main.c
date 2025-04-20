@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Editor_State* state = malloc(sizeof(Editor_State));
+    struct Editor_State* state = malloc(sizeof(struct Editor_State));
     state->filename = argv[1];
 
     load_file(argv[1], state);

@@ -1,6 +1,6 @@
 #include "fileio.h"
 
-int load_file(const char* path, Editor_State *state) {
+int load_file(const char* path, struct Editor_State *state) {
     char buffer[1024];
     int i = 0;
     FILE *fp = fopen(path, "r");
@@ -19,6 +19,6 @@ int load_file(const char* path, Editor_State *state) {
     return i;
 }
 
-void save_file(char *path, Editor_State *state) {
+void save_file(char *path, struct Editor_State *state) {
 
 }

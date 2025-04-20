@@ -1,6 +1,6 @@
 #include "editor.h"
 
-void init_editor(Editor_State *state) {
+void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
     state->max_char = state->cursor_x;
     state->cursor_y = 0;
@@ -26,7 +26,7 @@ void init_editor(Editor_State *state) {
     init_pair(2, COLOR_BLUE, use_default_colors()); /* Unactive line number color */
 }
 
-void draw_editor(Editor_State* state) {
+void draw_editor(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
 
     clear();
@@ -57,7 +57,7 @@ void draw_editor(Editor_State* state) {
     refresh();
 }
 
-void move_cursor(int key, Editor_State* state) {
+void move_cursor(int key, struct Editor_State* state) {
     int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr) + state->scroll_offset;
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
     int margin = int_len(state->total_lines) + 2; /* Line number length + 2 spaces */
@@ -110,7 +110,7 @@ void move_cursor(int key, Editor_State* state) {
     }
 }
 
-void clamp_cursor(Editor_State* state) { /* Check if cursor is out of editor window */
+void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of editor window */
     if (state->cursor_y >= getmaxy(stdscr)) {
         state->scroll_offset++;
         state->cursor_y--;
@@ -120,7 +120,7 @@ void clamp_cursor(Editor_State* state) { /* Check if cursor is out of editor win
     }
 }
 
-void handle_key(int key, Editor_State* state) {
+void handle_key(int key, struct Editor_State* state) {
     if (key == 27) {
         endwin();
         exit(0);
@@ -155,7 +155,7 @@ void handle_key(int key, Editor_State* state) {
     }
 }
 
-void insert_char(char c, Editor_State* state) {
+void insert_char(char c, struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 
@@ -181,7 +181,7 @@ void insert_char(char c, Editor_State* state) {
     state->cursor_x++;
 }
 
-void add_tab(Editor_State* state) {
+void add_tab(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 
@@ -206,7 +206,7 @@ void add_tab(Editor_State* state) {
     state->cursor_x += 4;
 }
 
-void delete_char(Editor_State* state) {
+void delete_char(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     int y_pos = state->scroll_offset + state->cursor_y;
@@ -247,7 +247,7 @@ void delete_char(Editor_State* state) {
     }
 }
 
-void new_line(Editor_State* state) {
+void new_line(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
     int y_pos = state->cursor_y + state->scroll_offset;
@@ -282,7 +282,7 @@ void new_line(Editor_State* state) {
     state->total_lines++;
 }
 
-void debug_draw(Editor_State *state) {
+void debug_draw(struct Editor_State *state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 

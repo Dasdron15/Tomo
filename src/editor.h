@@ -11,7 +11,7 @@
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024
 
-typedef struct {
+struct Editor_State {
     char* lines[MAX_LINES * MAX_LINE_LENGTH]; // Array that stores all the text from a file
     char total_lines;
 
@@ -23,17 +23,17 @@ typedef struct {
 
     char* filename;
     bool is_saved;
-} Editor_State;
+};
 
-void init_editor(Editor_State* state);
-void draw_editor(Editor_State* state);
-void move_cursor(int key, Editor_State* state);
-void clamp_cursor(Editor_State* state); // Check if cursor is out of bounds
-void handle_key(int key, Editor_State* state);
-void insert_char(char c, Editor_State* state);
-void add_tab(Editor_State* state);
-void delete_char(Editor_State* state);
-void new_line(Editor_State* state);
-void debug_draw(Editor_State* state);
+void init_editor(struct Editor_State* state);
+void draw_editor(struct Editor_State* state);
+void move_cursor(int key, struct Editor_State* state);
+void clamp_cursor(struct Editor_State* state); // Check if cursor is out of bounds
+void handle_key(int key, struct Editor_State* state);
+void insert_char(char c, struct Editor_State* state);
+void add_tab(struct Editor_State* state);
+void delete_char(struct Editor_State* state);
+void new_line(struct Editor_State* state);
+void debug_draw(struct Editor_State* state);
 
 #endif
