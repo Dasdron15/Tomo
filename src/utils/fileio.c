@@ -23,7 +23,7 @@ int load_file(const char* path, struct Editor_State *state) {
 void save_file(struct Editor_State *state) {
     FILE* fp = fopen(state->filename, "w");
 
-    for (int i = 0; i < sizeof(state->lines) && state->lines[i] != NULL; i++) {
+    for (int i = 0; i < state->total_lines && state->lines[i] != NULL; i++) {
         fprintf(fp, "%s\n", state->lines[i]);
     }
     fclose(fp);
