@@ -18,3 +18,16 @@ char* mult_char(char c, int count) {
 int int_len(int num) {
     return 1 + (int)log10(num);
 }
+
+char* get_filename(char* path) {
+    char* ptr;
+    ptr = path + strlen(path);
+
+    for (; ptr > path; ptr--) {
+        if ((*ptr == '\\') || (*ptr == '/')) {
+            ptr++;
+            break;
+        }
+    }
+    return ptr;
+}

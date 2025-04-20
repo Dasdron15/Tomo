@@ -1,6 +1,7 @@
 #ifndef STATUS_BAR_H
 #define STATUS_BAR_H
 
+#include <stdio.h>
 #include <curses.h>
 #include <time.h>
 
