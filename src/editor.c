@@ -1,3 +1,5 @@
+/* TODO: Fix not lines appearing */
+
 #include "editor.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
