@@ -1,23 +1,29 @@
 #include "fileio.h"
 #include "../editor.h"
 
-int load_file(const char* path, struct Editor_State *state) {
+void load_file(const char* path, struct Editor_State *state) {
+    FILE* fp = fopen(path, "r");
     char buffer[1024];
     int i = 0;
-    FILE *fp = fopen(path, "r");
+    bool was_last_newline = false;
 
-    if (!fp) {
-        printf("Error: cannot open file\n");
-        exit(1);
+    while (fgets(buffer, sizeof(buffer), fp)) {
+        state->lines[i++] = strdup(buffer);
+        size_t len = strlen(buffer);
+        was_last_newline = len > 0 && buffer[len - 1] == '\n';
     }
 
-    while (fgets(buffer, 1024, fp)) {
-        buffer[strcspn(buffer, "\n")] = '\0';
-        state->lines[i++] = strdup(buffer);
+    if (was_last_newline) {
+        int ch = getc(fp);
+        if (ch == EOF) {
+            state->lines[i++] = strdup("\n");
+        } else {
+            ungetc(ch, fp);
+        }
     }
     fclose(fp);
+
     state->total_lines = i;
-    return i;
 }
 
 void save_file(struct Editor_State *state) {

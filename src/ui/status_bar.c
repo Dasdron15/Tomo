@@ -17,8 +17,7 @@ void draw_status_bar(struct Editor_State* state) {
     struct tm* current_time = localtime(&sec);
 
     sprintf(path, "%s%s", get_filename(state->filename), state->is_saved ? "" : "*");
-
-    sprintf(cursor_info, "Ln %d, Col %d", state->cursor_y + 1, pos + 1);
+    sprintf(cursor_info, "Ln %d, Col %d", state->cursor_y + state->scroll_offset + 1, pos + 1);
     sprintf(display_time, "%02d:%02d:%02d", current_time->tm_hour, current_time->tm_min, current_time->tm_sec);
 
     int space_length = max_x - strlen(path) - 2 - strlen(cursor_info) - strlen(display_time);

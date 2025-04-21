@@ -37,7 +37,7 @@ void draw_editor(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
 
     clear();
-    for (int row = 0; row < getmaxy(stdscr) - 1 && state->lines[row + state->scroll_offset] != NULL; row++) {
+    for (int row = 0; row <= state->total_lines; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
         attroff(COLOR_PAIR(1));
