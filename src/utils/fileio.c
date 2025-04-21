@@ -7,6 +7,11 @@ void load_file(const char* path, struct Editor_State *state) {
     int i = 0;
 
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+        }
+
         state->lines[i++] = strdup(buffer);
     }
 
@@ -25,7 +30,11 @@ void save_file(struct Editor_State *state) {
     FILE* fp = fopen(state->filename, "w");
 
     for (int i = 0; i < state->total_lines && state->lines[i] != NULL; i++) {
-        fprintf(fp, "%s", state->lines[i]);
+        if (i != state->total_lines - 1) {
+            fprintf(fp, "%s\n", state->lines[i]);
+        } else {
+            fprintf(fp, "%s", state->lines[i]);
+        }
     }
     fclose(fp);
     state->is_saved = true;

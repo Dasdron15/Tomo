@@ -167,7 +167,7 @@ void handle_key(int key, struct Editor_State* state) {
         return;
     }
 
-    if (key == 15) {
+    if (key == 19) {
         save_file(state);
         return;
     }
