@@ -14,7 +14,7 @@ void load_file(const char* path, struct Editor_State *state) {
     char last;
     fread(&last, 1, 1, fp);
     if (last == '\n') {
-        state->lines[i++] = strdup("\n");
+        state->lines[i++] = strdup("");
     }
 
     fclose(fp);
