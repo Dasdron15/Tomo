@@ -1,4 +1,4 @@
-/* TODO: Fix not lines appearing */
+/* TODO: Fix not all lines appearing */
 
 #include "editor.h"
 #include "ui/status_bar.h"
