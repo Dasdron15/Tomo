@@ -5,24 +5,19 @@ void load_file(const char* path, struct Editor_State *state) {
     FILE* fp = fopen(path, "r");
     char buffer[1024];
     int i = 0;
-    bool was_last_newline = false;
 
-    while (fgets(buffer, sizeof(buffer), fp)) {
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         state->lines[i++] = strdup(buffer);
-        size_t len = strlen(buffer);
-        was_last_newline = len > 0 && buffer[len - 1] == '\n';
     }
 
-    if (was_last_newline) {
-        int ch = getc(fp);
-        if (ch == EOF) {
-            state->lines[i++] = strdup("\n");
-        } else {
-            ungetc(ch, fp);
-        }
+    fseek(fp, -1, SEEK_END);
+    char last;
+    fread(&last, 1, 1, fp);
+    if (last == '\n') {
+        state->lines[i++] = strdup("\n");
     }
+
     fclose(fp);
-
     state->total_lines = i;
 }
 
@@ -30,7 +25,7 @@ void save_file(struct Editor_State *state) {
     FILE* fp = fopen(state->filename, "w");
 
     for (int i = 0; i < state->total_lines && state->lines[i] != NULL; i++) {
-        fprintf(fp, "%s\n", state->lines[i]);
+        fprintf(fp, "%s", state->lines[i]);
     }
     fclose(fp);
     state->is_saved = true;
