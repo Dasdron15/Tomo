@@ -233,7 +233,7 @@ void delete_char(struct Editor_State* state) {
     int pos = state->cursor_x - margin;
     int y_pos = state->scroll_offset + state->cursor_y;
 
-    int len = strlen(state->lines[state->cursor_y]);
+    int len = strlen(state->lines[y_pos]);
 
     if (pos > 0) {
         for (int i = pos - 1; i < len; i++) {
