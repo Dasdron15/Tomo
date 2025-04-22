@@ -198,6 +198,7 @@ void insert_char(char c, struct Editor_State* state) {
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
 
+    free(old);
     state->cursor_x++;
 }
 
@@ -223,6 +224,7 @@ void add_tab(struct Editor_State* state) {
     strcpy(new + pos + 4, old + pos);
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
+    free(old);
     state->cursor_x += 4;
 }
 
