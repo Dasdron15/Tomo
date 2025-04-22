@@ -33,6 +33,5 @@ void insert_char(char c, struct Editor_State* state);
 void add_tab(struct Editor_State* state);
 void delete_char(struct Editor_State* state);
 void new_line(struct Editor_State* state);
-void debug_draw(struct Editor_State* state);
 
 #endif
