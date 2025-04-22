@@ -301,10 +301,3 @@ void new_line(struct Editor_State* state) {
     state->cursor_x = margin;
     state->total_lines++;
 }
-
-void debug_draw(struct Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
-
-    mvprintw(0, getmaxx(stdscr) - 10, "%d", pos);
-}
