@@ -89,7 +89,7 @@ void move_cursor(int key, struct Editor_State* state) {
             
         case KEY_DOWN:
             if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
-                state->cursor_y++;
+               state->cursor_y++;
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin + line_len;
@@ -97,7 +97,7 @@ void move_cursor(int key, struct Editor_State* state) {
             break;
             
         case KEY_LEFT: {
-            if (state->cursor_x > margin) {
+           if (state->cursor_x > margin) {
                 state->cursor_x--;
             } else if (state->cursor_x <= margin && state->cursor_y + state->scroll_offset >= 1) {
                 state->cursor_y--;

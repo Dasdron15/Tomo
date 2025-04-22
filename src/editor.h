@@ -12,13 +12,13 @@
 
 struct Editor_State {
     char* lines[MAX_LINES * MAX_LINE_LENGTH]; // Array that stores all the text from a file
-    char total_lines;
+    unsigned int total_lines;
 
-    int scroll_offset; // Thing that is needed for proper text scrolling
-    int max_char; // Last symbol X that you were on before pressing up or down arrow
+    unsigned int scroll_offset; // Thing that is needed for proper text scrolling
+    unsigned int max_char; // Last symbol X that you were on before pressing up or down arrow
 
-    int cursor_x;
-    int cursor_y;
+    unsigned int cursor_x;
+    unsigned int cursor_y;
 
     char* filename;
     bool is_saved;
