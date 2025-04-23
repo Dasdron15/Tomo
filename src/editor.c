@@ -1,5 +1,3 @@
-/* TODO: Fix not all lines appearing */
-
 #include "editor.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
@@ -229,19 +227,19 @@ void add_tab(struct Editor_State* state) {
 
 void delete_char(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+    int pos = state->cursor_x - margin; /* X axis of the cursor excluding the margin */
     int y_pos = state->scroll_offset + state->cursor_y;
 
-    int len = strlen(state->lines[y_pos]);
+    int len = strlen(state->lines[y_pos]); /* Current line length */
 
-    if (pos > 0) {
+    if (pos > 0) {  /* If not at the beggining of the line then delete character from an array of lines */
         for (int i = pos - 1; i < len; i++) {
             state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
         state->cursor_x--;
-    } else if (y_pos > 0) {
-        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1;
-        char* buf = (char*)malloc(size);
+    } else if (y_pos > 0) { /* If cursor is at the beggining of the line then delete current line */
+        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1; /* Size of the previous line + current line + \0 (1) */
+        char* buf = malloc(size);
         int previous_len = strlen(state->lines[y_pos - 1]) + margin;
 
         if (!buf) {
@@ -251,12 +249,9 @@ void delete_char(struct Editor_State* state) {
         strcpy(buf, state->lines[y_pos - 1]);
         strcat(buf, state->lines[y_pos]);
         
-        state->lines[y_pos] = buf;
+        state->lines[y_pos - 1] = buf;
 
-        free(state->lines[y_pos]);
-        state->lines[y_pos] = NULL;
-
-        for (int i = y_pos; i < state->total_lines - 1; i++) {
+        for (int i = y_pos; i < state->total_lines; i++) {
             state->lines[i] = state->lines[i + 1];
         }
 
