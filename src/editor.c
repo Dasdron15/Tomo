@@ -33,9 +33,9 @@ void init_editor(struct Editor_State *state) {
 }
 
 void draw_editor(struct Editor_State* state) {
+    erase();
     int margin = int_len(state->total_lines) + 2;
 
-    clear();
     for (int row = 0; state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
