@@ -77,8 +77,12 @@ void move_cursor(int key, struct Editor_State* state) {
     switch (key) {
         case KEY_UP:
             if (state->cursor_y + state->scroll_offset > 0) {
-                state->cursor_y--;
-                state->cursor_x = state->max_char;
+                if (state->cursor_y < 1 && state->scroll_offset > 0) {
+                    state->scroll_offset--;
+                } else {
+                    state->cursor_y--;
+                    state->cursor_x = state->max_char;
+                }
             } else {
                 state->cursor_x = margin;
             }
@@ -124,11 +128,8 @@ void move_cursor(int key, struct Editor_State* state) {
 
 void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of editor window */
     if (state->cursor_y >= getmaxy(stdscr) - 1) {
-        state->scroll_offset++;
         state->cursor_y--;
-    } else if (state->cursor_y < 0 && state->scroll_offset > 0) {
-        state->scroll_offset--;
-        state->cursor_y++;
+        state->scroll_offset++;
     }
 }
 
