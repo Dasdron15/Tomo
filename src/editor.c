@@ -1,3 +1,5 @@
+
+
 #include "editor.h"
 #include "config.h"
 #include "ui/status_bar.h"
@@ -38,7 +40,7 @@ void draw_editor(struct Editor_State* state) {
     erase();
     int margin = int_len(state->total_lines) + 2;
 
-    for (int row = 0; state->lines[row + state->scroll_offset] != NULL; row++) {
+    for (int row = 0; row + state->scroll_offset < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
         attroff(COLOR_PAIR(1));
@@ -136,7 +138,7 @@ void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
-    if (key == 17) {
+    if (key == 27) {
         endwin();
         exit(0);
         return;
@@ -184,6 +186,7 @@ void insert_char(char c, struct Editor_State* state) {
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
+        state->lines[state->cursor_y + state->scroll_offset] = old;
     }
 
     char* new = malloc(strlen(old) + 2);
@@ -211,6 +214,7 @@ void add_tab(struct Editor_State* state) {
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
+        state->lines[state->cursor_y + state->scroll_offset] = old;
     }
 
     char* tab_str = mult_char(' ', TAB_SIZE);
@@ -284,6 +288,10 @@ void new_line(struct Editor_State* state) {
     char* left = malloc(pos + 1);
     char* right = malloc(current_len - pos + 1);
 
+    if (pos > current_len) {
+        pos = current_len;
+    }
+
     if (!left || !right) {
         return;
     }
@@ -294,6 +302,7 @@ void new_line(struct Editor_State* state) {
     strcpy(right, current + pos);
 
     free(state->lines[y_pos]);
+    state->lines[y_pos] = NULL;
 
     for (int i = state->total_lines; i > y_pos; i--) {
         state->lines[i] = state->lines[i - 1];
