@@ -39,7 +39,7 @@ void draw_editor(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
 
     clear();
-    for (int row = 0; row < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
+    for (int row = 0; state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
 
         attroff(COLOR_PAIR(1));
@@ -240,32 +240,30 @@ void delete_char(struct Editor_State* state) {
             state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
         state->cursor_x--;
-    } else {
-        if (y_pos >= 1) {
-            int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1;
-            char* buf = (char*)malloc(size);
-            int previous_len = strlen(state->lines[y_pos - 1]) + margin;
+    } else if (y_pos > 0) {
+        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1;
+        char* buf = (char*)malloc(size);
+        int previous_len = strlen(state->lines[y_pos - 1]) + margin;
 
-            if (!buf) {
-                return;
-            }
-
-            strcpy(buf, state->lines[y_pos - 1]);
-            strcat(buf, state->lines[y_pos]);
-            
-            state->lines[y_pos - 1] = buf;
-
-            free(state->lines[y_pos]);
-            state->lines[y_pos] = NULL;
-
-            for (int i = state->cursor_y; i < state->total_lines - 1; i++) {
-                state->lines[i] = state->lines[i + 1];
-            }
-
-            state->total_lines--;
-            state->cursor_x = previous_len;
-            state->cursor_y--;
+        if (!buf) {
+            return;
         }
+
+        strcpy(buf, state->lines[y_pos - 1]);
+        strcat(buf, state->lines[y_pos]);
+        
+        state->lines[y_pos - 1] = buf;
+
+        free(state->lines[y_pos]);
+        state->lines[y_pos] = NULL;
+
+        for (int i = y_pos; i < state->total_lines - 1; i++) {
+            state->lines[i] = state->lines[i + 1];
+        }
+
+        state->total_lines--;
+        state->cursor_x = previous_len;
+        state->cursor_y--;
     }
 }
 
