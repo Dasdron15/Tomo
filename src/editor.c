@@ -1,4 +1,5 @@
 #include "editor.h"
+#include "config.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
@@ -119,11 +120,11 @@ void move_cursor(int key, struct Editor_State* state) {
             break;
     }
 
-    clamp_cursor(state);
-
     if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { /* Check if cursor is out of line */
         state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
     }
+
+    clamp_cursor(state);
 }
 
 void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of editor window */
@@ -218,8 +219,8 @@ void add_tab(struct Editor_State* state) {
     }
 
     strncpy(new, old, pos);
-    memcpy(new + pos, "    ", 4);
-    strcpy(new + pos + 4, old + pos);
+    memcpy(new + pos, mult_char(' ', TAB_SIZE), TAB_SIZE);
+    strcpy(new + pos + TAB_SIZE, old + pos);
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
     free(old);
