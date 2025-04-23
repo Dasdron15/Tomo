@@ -3,6 +3,7 @@
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
+#include <stdlib.h>
 
 void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
@@ -212,19 +213,28 @@ void add_tab(struct Editor_State* state) {
         old[0] = '\0';
     }
 
-    char* new = malloc(strlen(old) + 5);
+    char* tab_str = mult_char(' ', TAB_SIZE);
+
+    if (!tab_str) {
+        return;
+    }
+
+    char* new = malloc(strlen(old) + TAB_SIZE + 1);
 
     if (new == NULL) {
+        free(tab_str);
         return;
     }
 
     strncpy(new, old, pos);
-    memcpy(new + pos, mult_char(' ', TAB_SIZE), TAB_SIZE);
+    memcpy(new + pos, tab_str, TAB_SIZE);
     strcpy(new + pos + TAB_SIZE, old + pos);
 
     state->lines[state->cursor_y + state->scroll_offset] = new;
     free(old);
-    state->cursor_x += 4;
+    free(tab_str);
+
+    state->cursor_x += TAB_SIZE;
 }
 
 void delete_char(struct Editor_State* state) {
