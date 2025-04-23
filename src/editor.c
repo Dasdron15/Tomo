@@ -13,7 +13,6 @@ void init_editor(struct Editor_State *state) {
     state->is_saved = true;
 
     initscr();
-    set_escdelay(0);
     raw();
     keypad(stdscr, true);
     noecho();
@@ -136,7 +135,7 @@ void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
-    if (key == 27) {
+    if (key == 17) {
         endwin();
         exit(0);
         return;
@@ -252,7 +251,7 @@ void delete_char(struct Editor_State* state) {
         strcpy(buf, state->lines[y_pos - 1]);
         strcat(buf, state->lines[y_pos]);
         
-        state->lines[y_pos - 1] = buf;
+        state->lines[y_pos] = buf;
 
         free(state->lines[y_pos]);
         state->lines[y_pos] = NULL;
