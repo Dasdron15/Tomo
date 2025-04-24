@@ -1,9 +1,9 @@
+
 #include "editor.h"
 #include "config.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
-#include <stdlib.h>
 
 void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
@@ -36,40 +36,20 @@ void init_editor(struct Editor_State *state) {
 
 void draw_editor(struct Editor_State* state) {
     erase();
-    int margin = int_len(state->total_lines) + 2;
+    int screen_width = getmaxx(stdscr);
+    int screen_height = getmaxy(stdscr);
 
-    for (int row = 0; row + state->scroll_offset < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
-        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
+    for (int row = state->scroll_offset; row < screen_height; row++) {
+        char* line = state->lines[row];
+        if (line != NULL) {
+            int line_len = strlen(line);
 
-        if (!spaces) {
-            continue;
+            for (int col = 0; col < line_len && col < screen_width; col++) {
+                mvprintw(row, col, "%c", line[col]);
+            }
         }
-
-        attroff(COLOR_PAIR(1));
-        attron(COLOR_PAIR(2)); /* Change color to gray */
-
-        if (row == state->cursor_y) { /* If cursor is on the line then that line number will be white */
-            attroff(COLOR_PAIR(2));
-            attron(COLOR_PAIR(1));
-        }
-        mvprintw(row, 0, "%s%d  ", spaces, state->scroll_offset + row + 1); /* Print line numbers */
-
-        attroff(COLOR_PAIR(2));
-        attron(COLOR_PAIR(1));
-
-        mvprintw(row, 2 + int_len(state->total_lines), "%s", state->lines[row + state->scroll_offset]); /* Print lines */
-
-        free(spaces);
-        spaces = NULL;
     }
 
-    attroff(COLOR_PAIR(1));
-    attron(COLOR_PAIR(3));
-
-    draw_status_bar(state);
-
-    attroff(COLOR_PAIR(3));
-    attron(COLOR_PAIR(1));
 
     move(state->cursor_y, state->cursor_x);
     refresh();
