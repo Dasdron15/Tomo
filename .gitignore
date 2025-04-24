@@ -1,3 +1,6 @@
-cobalt.out
-tests/
 *.DS_Store
+*.out
+*.o
+*
+
+tests/
