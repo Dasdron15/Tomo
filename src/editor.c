@@ -1,5 +1,3 @@
-
-
 #include "editor.h"
 #include "config.h"
 #include "ui/status_bar.h"
@@ -42,6 +40,10 @@ void draw_editor(struct Editor_State* state) {
 
     for (int row = 0; row + state->scroll_offset < state->total_lines && state->lines[row + state->scroll_offset] != NULL; row++) {
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(row + 1 + state->scroll_offset));
+
+        if (!spaces) {
+            continue;
+        }
 
         attroff(COLOR_PAIR(1));
         attron(COLOR_PAIR(2)); /* Change color to gray */
@@ -138,7 +140,7 @@ void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
-    if (key == 27) {
+    if (key == 17) {
         endwin();
         exit(0);
         return;
@@ -190,6 +192,7 @@ void insert_char(char c, struct Editor_State* state) {
     }
 
     char* new = malloc(strlen(old) + 2);
+    memset(new, 0, strlen(old) + 2);
 
     if (new == NULL) {
         return;
