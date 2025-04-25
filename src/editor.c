@@ -1,4 +1,3 @@
-
 #include "editor.h"
 #include "config.h"
 #include "ui/status_bar.h"
@@ -38,18 +37,24 @@ void draw_editor(struct Editor_State* state) {
     erase();
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
+    
+    unsigned int col = 0;
+    unsigned int row = 0;
+    
+    for (int index = state->scroll_offset; index < screen_height - 1 && state->lines[index] != NULL; index++) {
+        char* line = state->lines[index];
+        unsigned int line_len = strlen(line);    
 
-    for (int row = state->scroll_offset; row < screen_height; row++) {
-        char* line = state->lines[row];
-        if (line != NULL) {
-            int line_len = strlen(line);
-
-            for (int col = 0; col < line_len && col < screen_width; col++) {
-                mvprintw(row, col, "%c", line[col]);
-            }
+        for (int symb = 0; symb < line_len; symb++) {
+            mvprintw(row, col++, "%c", line[symb]);
         }
+        row++;
+        col = 0;
     }
 
+    attron(COLOR_PAIR(3));
+    draw_status_bar(state);
+    attroff(COLOR_PAIR(3));
 
     move(state->cursor_y, state->cursor_x);
     refresh();
