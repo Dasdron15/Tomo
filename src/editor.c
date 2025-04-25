@@ -35,18 +35,23 @@ void init_editor(struct Editor_State *state) {
 
 void draw_editor(struct Editor_State* state) {
     erase();
-    int screen_width = getmaxx(stdscr);
-    int screen_height = getmaxy(stdscr);
+    unsigned int screen_width = getmaxx(stdscr);
+    unsigned int screen_height = getmaxy(stdscr);
     
     unsigned int col = 0;
     unsigned int row = 0;
     
-    for (int index = state->scroll_offset; index < screen_height - 1 && state->lines[index] != NULL; index++) {
+    for (int index = state->scroll_offset; index < state->scroll_offset + screen_height - 1 && state->lines[index] != NULL; index++) {
         char* line = state->lines[index];
-        unsigned int line_len = strlen(line);    
+        unsigned int line_len = strlen(line);
 
         for (int symb = 0; symb < line_len; symb++) {
-            mvprintw(row, col++, "%c", line[symb]);
+            if (symb % screen_width == 0 && symb != 0) {
+                row++;
+                col = 0;
+            }
+            mvprintw(row, col, "%c", line[symb]);
+            col++;
         }
         row++;
         col = 0;
