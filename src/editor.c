@@ -1,3 +1,5 @@
+// Todo: Fix lines weirdly displaying
+
 #include "editor.h"
 #include "config.h"
 #include "ui/status_bar.h"
@@ -37,24 +39,29 @@ void draw_editor(struct Editor_State* state) {
     erase();
     unsigned int screen_width = getmaxx(stdscr);
     unsigned int screen_height = getmaxy(stdscr);
-    
-    unsigned int col = 0;
-    unsigned int row = 0;
+
+    unsigned int col;
+    unsigned int row;
+    unsigned int line_num = 1;
     
     for (int index = state->scroll_offset; index < state->scroll_offset + screen_height - 1 && state->lines[index] != NULL; index++) {
         char* line = state->lines[index];
         unsigned int line_len = strlen(line);
+        unsigned int margin = int_len(state->total_lines) - int_len(line_num) + 2;
+        col = margin;
 
-        for (int symb = 0; symb < line_len; symb++) {
+        mvprintw(index, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(line_num)), line_num);
+        line_num++;
+        for (int symb = margin; symb < line_len; symb++) {
             if (symb % screen_width == 0 && symb != 0) {
                 row++;
-                col = 0;
+                col = margin;
             }
             mvprintw(row, col, "%c", line[symb]);
             col++;
         }
         row++;
-        col = 0;
+        col = margin;
     }
 
     attron(COLOR_PAIR(3));
@@ -92,7 +99,6 @@ void move_cursor(int key, struct Editor_State* state) {
                 state->cursor_x = margin + line_len;
             }
             break;
-            
         case KEY_LEFT: {
            if (state->cursor_x > margin) {
                 state->cursor_x--;
