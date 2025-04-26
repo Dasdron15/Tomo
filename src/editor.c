@@ -11,6 +11,11 @@ void init_editor(struct Editor_State *state) {
     state->scroll_offset = 0;
     state->is_saved = true;
 
+    if (state->total_lines == 0) {
+        state->lines[0] = strdup("");
+        state->total_lines = 1;
+    }
+
     initscr();
     raw();
     keypad(stdscr, true);
