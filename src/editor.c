@@ -47,15 +47,15 @@ void draw_editor(struct Editor_State* state) {
     for (int index = state->scroll_offset; index < state->scroll_offset + screen_height - 1 && state->lines[index] != NULL; index++) {
         char* line = state->lines[index];
         unsigned int line_len = strlen(line);
-        unsigned int margin = int_len(state->total_lines) - int_len(line_num) + 2;
+        unsigned int margin = int_len(state->total_lines) + 2;
         col = margin;
 
         mvprintw(index, 0, "%s%d  ", mult_char(' ', int_len(state->total_lines) - int_len(line_num)), line_num);
         line_num++;
-        for (int symb = margin; symb < line_len; symb++) {
+        for (int symb = 0; symb < line_len; symb++) {
             if (symb % screen_width == 0 && symb != 0) {
                 row++;
-                col = margin;
+                col = 0;
             }
             mvprintw(row, col, "%c", line[symb]);
             col++;
