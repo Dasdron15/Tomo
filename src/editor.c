@@ -43,7 +43,7 @@ void draw_editor(struct Editor_State* state) {
 
     for (int index = state->scroll_offset; index < state->scroll_offset + screen_height - 1 && state->lines[index] != NULL; index++) {
         char* line = state->lines[index];
-        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(line_num));
+        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(line_num + state->scroll_offset));
 
         unsigned int line_len = strlen(line);
         unsigned int margin = int_len(state->total_lines) + 2;
