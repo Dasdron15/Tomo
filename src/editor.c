@@ -40,6 +40,7 @@ void init_editor(struct Editor_State *state) {
 
 void draw_editor(struct Editor_State* state) {
     erase();
+
     unsigned int screen_width = getmaxx(stdscr);
     unsigned int screen_height = getmaxy(stdscr);
 
@@ -56,7 +57,14 @@ void draw_editor(struct Editor_State* state) {
         unsigned int col = margin;
         unsigned int row = line_num_pos;
 
+        if (line_num - 1 != state->cursor_y) {
+            attron(COLOR_PAIR(2));
+        }
+
+
         mvprintw(row, 0, "%s%d  ", spaces, line_num + state->scroll_offset);
+        attron(COLOR_PAIR(1));
+
         line_num++;
         for (int symb = 0; symb < line_len; symb++) {
             if (symb % screen_width == 0 && symb != 0) {
@@ -78,7 +86,6 @@ void draw_editor(struct Editor_State* state) {
 }
 
 void move_cursor(int key, struct Editor_State* state) {
-    int last_line = getmaxy(stdscr) > state->total_lines ? state->total_lines : getmaxy(stdscr) + state->scroll_offset;
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
     int margin = int_len(state->total_lines) + 2; /* Line number length + 2 spaces */
 
