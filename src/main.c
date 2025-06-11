@@ -1,7 +1,6 @@
 #include "editor.h"
 #include "utils/fileio.h"
 #include <curses.h>
-#include <pthread.h>
 #include <unistd.h>
 
 struct Editor_State* state;
