@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <curses.h>
-#include <time.h>
 
 struct Editor_State;
 
