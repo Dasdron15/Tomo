@@ -33,63 +33,90 @@ void init_editor(struct Editor_State *state) {
     init_color(COLOR_BLUE, 339, 339, 339);
     init_color(COLOR_CYAN, 187, 187, 187);
 
-    init_pair(1, COLOR_WHITE, use_default_colors()); /* Active line number color */
-    init_pair(2, COLOR_BLUE, use_default_colors()); /* Unactive line number color */
-    init_pair(3, COLOR_WHITE, COLOR_CYAN); /* Color for status bar */
+    init_pair(1, COLOR_WHITE, use_default_colors()); // Active line number color
+    init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line number color
+    init_pair(3, COLOR_WHITE, COLOR_CYAN); // Color for status bar
+
+    wbkgd(stdscr, COLOR_PAIR(1)); // Set background color
 }
 
 void draw_editor(struct Editor_State* state) {
     erase();
 
-    wbkgd(stdscr, COLOR_PAIR(1));
-
     unsigned int screen_width = getmaxx(stdscr);
     unsigned int screen_height = getmaxy(stdscr);
 
-    unsigned int line_num = 1;
     unsigned int line_num_pos = 0;
+    unsigned int margin = int_len(state->total_lines) + 2;
 
-    for (int index = state->scroll_offset; index < state->scroll_offset + screen_height - 1 && state->lines[index] != NULL; index++) {
+    for (int index = state->scroll_offset; 
+         index < state->scroll_offset + screen_height - 1 && index < state->total_lines; 
+         index++) {
         char* line = state->lines[index];
-        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(line_num + state->scroll_offset));
+        char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(index + 1));
 
-        unsigned int line_len = strlen(line);
-        unsigned int margin = int_len(state->total_lines) + 2;
+        attron(COLOR_PAIR(2));
 
-        unsigned int col = margin;
-        unsigned int row = line_num_pos;
-
-        if (line_num - 1 != state->cursor_y) {
-            attron(COLOR_PAIR(2));
+        // Draw line number
+        if (index == state->cursor_y + state->scroll_offset) {
+            attron(COLOR_PAIR(1)); // Highlight current line
         }
-
-
-        mvprintw(row, 0, "%s%d  ", spaces, line_num + state->scroll_offset);
+        mvprintw(line_num_pos, 0, "%s%d  ", spaces, index + 1);
+        if (index == state->cursor_y + state->scroll_offset) {
+            attroff(COLOR_PAIR(2));
+        }
         attron(COLOR_PAIR(1));
 
+        // Draw line content with wrapping
+        unsigned int col = margin;
+        unsigned int row = line_num_pos;
+        unsigned int line_len = strlen(line);
+
         for (int symb = 0; symb < line_len; symb++) {
-            if (symb % screen_width == 0 && symb != 0) {
+            // Handle wrapping
+            if (col >= screen_width) {
                 col = margin;
                 row++;
+                if (row >= screen_height - 1) {
+                    break; // Don't draw beyond screen bottom
+                }
             }
+            
             mvprintw(row, col, "%c", line[symb]);
             col++;
         }
+        
         line_num_pos = row + 1;
-        line_num++;
+        if (line_num_pos >= screen_height - 1) {
+            break; // Don't draw beyond screen bottom
+        }
     }
 
     attron(COLOR_PAIR(3));
     draw_status_bar(state);
     attroff(COLOR_PAIR(3));
 
-    move(state->cursor_y, state->cursor_x);
+    // Calculate proper cursor position considering line wrapping
+    unsigned int cursor_row = 0;
+    unsigned int cursor_col = margin;
+    for (int i = state->scroll_offset; i < state->cursor_y + state->scroll_offset; i++) {
+        if (i >= state->total_lines) {
+            break;
+        }
+        unsigned int line_len = strlen(state->lines[i]);
+        cursor_row += 1 + (line_len + margin) / screen_width;
+    }
+
+    cursor_col = (state->cursor_x % (screen_width - margin));
+    cursor_row += (state->cursor_x + margin) / screen_width;
+
+    move(cursor_row, cursor_col);
     refresh();
 }
 
 void move_cursor(int key, struct Editor_State* state) {
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
-    int margin = int_len(state->total_lines) + 2; /* Line number length + 2 spaces */
+    int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
         case KEY_UP:
@@ -142,7 +169,7 @@ void move_cursor(int key, struct Editor_State* state) {
     clamp_cursor(state);
 }
 
-void clamp_cursor(struct Editor_State* state) { /* Check if cursor is out of editor window */
+void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
     if (state->cursor_y >= getmaxy(stdscr) - 1) {
         state->cursor_y--;
         state->scroll_offset++;
@@ -256,18 +283,18 @@ void add_tab(struct Editor_State* state) {
 
 void delete_char(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin; /* X axis of the cursor excluding the margin */
+    int pos = state->cursor_x - margin; // X axis of the cursor excluding the margin
     int y_pos = state->scroll_offset + state->cursor_y;
 
-    int len = strlen(state->lines[y_pos]); /* Current line length */
+    int len = strlen(state->lines[y_pos]); // Current line length
 
-    if (pos > 0) {  /* If not at the beggining of the line then delete character from an array of lines */
+    if (pos > 0) {  // If not at the beggining of the line then delete character from an array of lines
         for (int i = pos - 1; i < len; i++) {
             state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
         state->cursor_x--;
-    } else if (y_pos > 0) { /* If cursor is at the beggining of the line then delete current line */
-        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1; /* Size of the previous line + current line + \0 (1) */
+    } else if (y_pos > 0) { // If cursor is at the beggining of the line then delete current line
+        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1; // Size of the previous line + current line + \0 (1)
         char* buf = malloc(size);
         int previous_len = strlen(state->lines[y_pos - 1]) + margin;
 
