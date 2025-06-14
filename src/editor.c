@@ -97,26 +97,39 @@ void draw_editor(struct Editor_State* state) {
     attroff(COLOR_PAIR(3));
 
     // Calculate proper cursor position considering line wrapping
-    unsigned int cursor_row = 0;
-    unsigned int cursor_col = margin;
+    unsigned int cursor_row = state->cursor_y;
+    unsigned int cursor_col = state->cursor_x;
+
+    // Reset to initial position
+    cursor_row = 0;
+    cursor_col = margin;
+
+    // Calculate wrapped lines before current line
     for (int i = state->scroll_offset; i < state->cursor_y + state->scroll_offset; i++) {
         if (i >= state->total_lines) {
             break;
         }
         unsigned int line_len = strlen(state->lines[i]);
-        cursor_row += 1 + (line_len + margin) / screen_width;
+        cursor_row += 1 + (line_len / (screen_width - margin));
     }
 
-    cursor_col = (state->cursor_x % (screen_width - margin));
-    cursor_row += (state->cursor_x + margin) / screen_width;
+    // Calculate position within current line
+    unsigned int current_line_pos = state->cursor_x - margin;
+    unsigned int line_wrap_count = current_line_pos / (screen_width - margin);
+    cursor_row += line_wrap_count;
+    cursor_col = margin + (current_line_pos % (screen_width - margin));
+
+    // Ensure cursor doesn't go into status bar
+    if (cursor_row >= getmaxy(stdscr) - 1) {
+        cursor_row = getmaxy(stdscr) - 2;
+    }
 
     move(cursor_row, cursor_col);
-    refresh();
 }
 
 void move_cursor(int key, struct Editor_State* state) {
-    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
-    int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
+    unsigned int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    unsigned int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
         case KEY_UP:
@@ -134,12 +147,13 @@ void move_cursor(int key, struct Editor_State* state) {
             
         case KEY_DOWN:
             if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
-               state->cursor_y++;
+                state->cursor_y++;
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin + line_len;
             }
             break;
+
         case KEY_LEFT: {
            if (state->cursor_x > margin) {
                 state->cursor_x--;
@@ -154,9 +168,11 @@ void move_cursor(int key, struct Editor_State* state) {
         case KEY_RIGHT:
             if (state->cursor_x < margin + line_len) {
                 state->cursor_x++;
-            } else if (state->cursor_y != state->total_lines - 1 && state->cursor_y + state->scroll_offset + 1 < state->total_lines) {
+            } else if (state->cursor_y + state->scroll_offset < state->total_lines - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;
+            } else {
+                state->cursor_x = margin + line_len;
             }
             state->max_char = state->cursor_x;
             break;
@@ -170,9 +186,31 @@ void move_cursor(int key, struct Editor_State* state) {
 }
 
 void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
-    if (state->cursor_y >= getmaxy(stdscr) - 1) {
-        state->cursor_y--;
-        state->scroll_offset++;
+    unsigned int screen_height = getmaxy(stdscr) - 1;
+    unsigned int screen_width = getmaxx(stdscr);
+    unsigned int margin = int_len(state->total_lines) + 2;
+    unsigned int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+
+    unsigned int wrapped_lines = 1;
+    if (screen_width > margin) {
+        wrapped_lines = 1 + (line_len / (screen_width - margin));
+    }
+
+    if (state->cursor_y > screen_height - wrapped_lines) {
+        state->scroll_offset += (state->cursor_y - (screen_height - wrapped_lines));
+        state->cursor_y = screen_height - wrapped_lines;
+    }
+
+    if (state->scroll_offset > state->total_lines - 1) {
+        state->scroll_offset = state->total_lines - 1;
+    }
+
+    if (state->cursor_x > margin + line_len) {
+        state->cursor_x = margin + line_len;
+    }
+
+    if (state->cursor_y >= screen_height) {
+        state->cursor_y = screen_height - 1;
     }
 }
 
