@@ -32,7 +32,7 @@ void save_file(struct Editor_State *state) {
         if (i != state->total_lines - 1) {
             fprintf(fp, "%s\n", state->lines[i]);
         } else {
-            fprintf(fp, "%s", state->lines[i]);
+            fprintf(fp, "%s\n", state->lines[i]);
         }
     }
     fclose(fp);
