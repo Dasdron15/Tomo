@@ -6,6 +6,11 @@ void load_file(const char* path, struct Editor_State *state) {
     char buffer[1024];
     int i = 0;
 
+    if (fp == NULL) {
+        printf("File not found\n");
+        exit(1);
+    }
+
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         size_t len = strlen(buffer);
         if (len > 0 && buffer[len - 1] == '\n') {
@@ -15,12 +20,6 @@ void load_file(const char* path, struct Editor_State *state) {
         state->lines[i++] = strdup(buffer);
     }
 
-    fseek(fp, -1, SEEK_END);
-    char last;
-    fread(&last, 1, 1, fp);
-    if (last == '\n') {
-        state->lines[i++] = strdup("");
-    }
 
     fclose(fp);
     state->total_lines = i;

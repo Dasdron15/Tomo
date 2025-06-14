@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024
 
