@@ -259,7 +259,10 @@ void handle_key(int key, struct Editor_State* state) {
     if (key == 7) { // CTRL + G (Goto line)
         int target = goto_line(state);
         if (target != -1) {
-            if (target > getmaxy(stdscr) - 2) {
+            if (target < getmaxy(stdscr) - 1) {
+                state->scroll_offset = 0;
+            }
+            else if (target > getmaxy(stdscr) - 2) {
                 state->scroll_offset = target - (getmaxy(stdscr) / 2);
             }
             state->cursor_y = target - state->scroll_offset;
