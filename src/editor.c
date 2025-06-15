@@ -218,7 +218,7 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
-    if (key == 17) {
+    if (key == 17) { // CTRL + Q (Quit the editor)
         endwin();
         exit(0);
         return;
@@ -251,12 +251,12 @@ void handle_key(int key, struct Editor_State* state) {
         return;
     }
 
-    if (key == 19) {
+    if (key == 19) { // CTRL + S (Save file)
         save_file(state);
         return;
     }
 
-    if (key == 7) {
+    if (key == 7) { // CTRL + G (Goto line)
         int target = goto_line(state);
         if (target != -1) {
             if (target > getmaxy(stdscr) - 2) {
@@ -265,6 +265,18 @@ void handle_key(int key, struct Editor_State* state) {
             state->cursor_y = target - state->scroll_offset;
         }
         return;
+    }
+
+    if (key == 534 && state->cursor_y + state->scroll_offset < state->total_lines + 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
+        if (state->total_lines > getmaxy(stdscr) - 1) {
+            state->scroll_offset = state->total_lines - getmaxy(stdscr) + 1;
+        }
+        state->cursor_y = state->total_lines - state->scroll_offset - 1;
+    }
+
+    if (key == 575 && state->cursor_y - state->scroll_offset > 0) { // CTRL + UP_ARROW (Jump to the beggining of the file)
+        state->scroll_offset = 0;
+        state->cursor_y = 0;
     }
 }
 
