@@ -29,12 +29,14 @@ void init_editor(struct Editor_State *state) {
     }
 
     start_color();
+    use_default_colors();
 
-    init_color(COLOR_BLUE, 339, 339, 339);
-    init_color(COLOR_CYAN, 187, 187, 187);
+    if (can_change_color()) {
+        init_color(8, 500, 500, 500);
+    }
 
-    init_pair(1, COLOR_WHITE, use_default_colors()); // Active line number color
-    init_pair(2, COLOR_BLUE, use_default_colors()); // Unactive line number color
+    init_pair(1, COLOR_WHITE, -1); // Active line number color
+    init_pair(2, COLOR_BLUE, -1); // Unactive line number color
     init_pair(3, COLOR_WHITE, COLOR_CYAN); // Color for status bar
 
     wbkgd(stdscr, COLOR_PAIR(1)); // Set background color
@@ -252,6 +254,40 @@ void handle_key(int key, struct Editor_State* state) {
         save_file(state);
         return;
     }
+
+    if (key == 7) {
+        int target = goto_line(state);
+        if (target != -1) {
+            state->cursor_y = target;
+        }
+        return;
+    }
+}
+
+int goto_line(struct Editor_State* state) {
+    const unsigned int height = 3;
+    const unsigned int width = 30;
+
+    WINDOW *box = newwin(height, width, 1, getmaxx(stdscr) - 33);
+
+    box(box, 0, 0);
+    mvwprintw(box, 1, 2, "Go to line: ");
+    wrefresh(box);
+
+    echo();
+    curs_set(1);
+
+    char input[15];
+    wgetnstr(box, input, sizeof(input) - 1);
+
+    noecho();
+    delwin(box);
+
+    int line = atoi(input);
+    if (line < 1 || line > state->total_lines) {
+        return -1;
+    }
+    return line - 1;
 }
 
 void insert_char(char c, struct Editor_State* state) {
