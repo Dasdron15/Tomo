@@ -3,6 +3,7 @@
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
+#include <ctype.h>
 
 void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
@@ -258,7 +259,10 @@ void handle_key(int key, struct Editor_State* state) {
     if (key == 7) {
         int target = goto_line(state);
         if (target != -1) {
-            state->cursor_y = target;
+            if (target > getmaxy(stdscr) - 2) {
+                state->scroll_offset = target - (getmaxy(stdscr) / 2);
+            }
+            state->cursor_y = target - state->scroll_offset;
         }
         return;
     }
@@ -272,13 +276,38 @@ int goto_line(struct Editor_State* state) {
 
     box(box, 0, 0);
     mvwprintw(box, 1, 2, "Go to line: ");
-    wrefresh(box);
 
-    echo();
     curs_set(1);
 
-    char input[15];
-    wgetnstr(box, input, sizeof(input) - 1);
+    char input[15] = {'\0'};
+    int pos = 0;
+
+    int ch;
+    while ((ch = wgetch(box)) != '\n') {
+        if (ch == 17) {
+            endwin();
+            exit(0);
+            return 0;
+        }
+
+        if (ch == 27) {
+            noecho();
+            delwin(box);
+            return -1;
+        }
+        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') && pos > 0) {
+            input[--pos] = '\0';
+            mvwprintw(box, 1, 14 + pos, " ");
+            wmove(box, 1, 14 + pos);
+        }
+        else if (isdigit(ch) && pos < (int) sizeof(input) - 1) {
+            input[pos++] = ch;
+            mvwprintw(box, 1, 13 + pos, "%c", ch);
+            wmove(box, 1, 14 + pos);
+        }
+        wrefresh(box);
+    }
+
 
     noecho();
     delwin(box);
