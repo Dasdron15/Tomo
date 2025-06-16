@@ -32,6 +32,7 @@ void clamp_cursor(struct Editor_State* state); // Check if cursor is out of boun
 
 void handle_key(int key, struct Editor_State* state);
 int goto_line(struct Editor_State* state);
+void ask_for_save(struct Editor_State* state);
 
 void insert_char(char c, struct Editor_State* state);
 void add_tab(struct Editor_State* state);

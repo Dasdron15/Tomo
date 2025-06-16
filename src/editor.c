@@ -224,6 +224,9 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 
 void handle_key(int key, struct Editor_State* state) {
     if (key == 17) { // CTRL + Q (Quit the editor)
+        if (!state->is_saved) {
+            ask_for_save(state);
+        }
         save_pos(state);
         endwin();
         exit(0);
@@ -306,6 +309,9 @@ int goto_line(struct Editor_State* state) {
     int ch;
     while ((ch = wgetch(box)) != '\n') {
         if (ch == 17) {
+            if (!state->is_saved) {
+                ask_for_save(state);
+            }
             save_pos(state);
             endwin();
             exit(0);
@@ -313,7 +319,6 @@ int goto_line(struct Editor_State* state) {
         }
 
         if (ch == 27) {
-            noecho();
             delwin(box);
             return -1;
         }
@@ -339,6 +344,51 @@ int goto_line(struct Editor_State* state) {
         return -1;
     }
     return line - 1;
+}
+
+void ask_for_save(struct Editor_State* state) {
+    const int height = 3;
+    const int width = 30;
+
+    WINDOW *box = newwin(height, width, getmaxy(stdscr) / 2 - 1, getmaxx(stdscr) / 2 - 15);
+
+    box(box, 0, 0);
+    mvwprintw(box, 1, 2, "Save changes? (y/n): ");
+
+    curs_set(1);
+
+    char input[15] = {'\0'};
+    int pos = 0;
+
+    int ch;
+    while ((ch = wgetch(box)) != '\n') {
+        if (ch == 27) {
+            delwin(box);
+            return;
+        }
+        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') && pos > 0) {
+            input[--pos] = '\0';
+            mvwprintw(box, 1, 23 + pos, " ");
+            wmove(box, 1, 23 + pos);
+        }
+        else if (pos < (int) sizeof(input) - 1) {
+            input[pos++] = ch;
+            mvwprintw(box, 1, 22 + pos, "%c", ch);
+            wmove(box, 1, 23 + pos);
+        }
+        wrefresh(box);
+    }
+
+    noecho();
+    delwin(box);
+
+    if (input[0] == 89 || input[0] == 121) { // 'Y' or 'y'
+        save_file(state);
+        save_pos(state);   
+    }
+
+    endwin();
+    exit(0);
 }
 
 void insert_char(char c, struct Editor_State* state) {
