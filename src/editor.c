@@ -5,11 +5,15 @@
 #include "utils/common.h"
 
 void init_editor(struct Editor_State *state) {
-    state->cursor_x = int_len(state->total_lines) + 2;
-    state->max_char = state->cursor_x;
-    state->cursor_y = 0;
-    state->scroll_offset = 0;
     state->is_saved = true;
+
+    if (load_pos(state) == 0) {
+        state->cursor_y = 0;
+        state->scroll_offset = 0;
+        state->cursor_x = int_len(state->total_lines) + 2;
+    }
+
+    state->max_char = state->cursor_x;
 
     if (state->total_lines == 0) {
         state->lines[0] = strdup("");
@@ -21,6 +25,8 @@ void init_editor(struct Editor_State *state) {
     keypad(stdscr, true);
     noecho();
     curs_set(2);
+
+    load_pos(state);
 
     if (has_colors() == FALSE) {
         endwin();
@@ -218,6 +224,7 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 
 void handle_key(int key, struct Editor_State* state) {
     if (key == 17) { // CTRL + Q (Quit the editor)
+        save_pos(state);
         endwin();
         exit(0);
         return;
@@ -299,6 +306,7 @@ int goto_line(struct Editor_State* state) {
     int ch;
     while ((ch = wgetch(box)) != '\n') {
         if (ch == 17) {
+            save_pos(state);
             endwin();
             exit(0);
             return 0;
