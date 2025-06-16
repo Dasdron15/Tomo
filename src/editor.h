@@ -4,6 +4,7 @@
 #include <curses.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <math.h>
 
 #define MAX_LINES 1024

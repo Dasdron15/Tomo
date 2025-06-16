@@ -2,6 +2,8 @@
 #include "utils/fileio.h"
 #include <curses.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <limits.h>
 
 struct Editor_State* state;
 
@@ -12,9 +14,11 @@ int main(int argc, char* argv[]) {
     }
 
     state = malloc(sizeof(struct Editor_State));
-    state->filename = argv[1];
 
-    load_file(argv[1], state);
+    char resolved_path[PATH_MAX];
+    state->filename = realpath(argv[1], resolved_path);
+
+    load_file(state->filename, state);
     init_editor(state);
 
     while (1) {

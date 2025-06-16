@@ -3,7 +3,6 @@
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
-#include <ctype.h>
 
 void init_editor(struct Editor_State *state) {
     state->cursor_x = int_len(state->total_lines) + 2;
