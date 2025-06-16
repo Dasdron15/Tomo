@@ -51,11 +51,11 @@ void init_editor(struct Editor_State *state) {
 void draw_editor(struct Editor_State* state) {
     erase();
 
-    unsigned int screen_width = getmaxx(stdscr);
-    unsigned int screen_height = getmaxy(stdscr);
+    int screen_width = getmaxx(stdscr);
+    int screen_height = getmaxy(stdscr);
 
-    unsigned int line_num_pos = 0;
-    unsigned int margin = int_len(state->total_lines) + 2;
+    int line_num_pos = 0;
+    int margin = int_len(state->total_lines) + 2;
 
     for (int index = state->scroll_offset; 
          index < state->scroll_offset + screen_height - 1 && index < state->total_lines; 
@@ -76,9 +76,9 @@ void draw_editor(struct Editor_State* state) {
         attron(COLOR_PAIR(1));
 
         // Draw line content with wrapping
-        unsigned int col = margin;
-        unsigned int row = line_num_pos;
-        unsigned int line_len = strlen(line);
+        int col = margin;
+        int row = line_num_pos;
+        int line_len = strlen(line);
 
         for (int symb = 0; symb < line_len; symb++) {
             // Handle wrapping
@@ -105,8 +105,8 @@ void draw_editor(struct Editor_State* state) {
     attroff(COLOR_PAIR(3));
 
     // Calculate proper cursor position considering line wrapping
-    unsigned int cursor_row = state->cursor_y;
-    unsigned int cursor_col = state->cursor_x;
+    int cursor_row = state->cursor_y;
+    int cursor_col = state->cursor_x;
 
     // Reset to initial position
     cursor_row = 0;
@@ -117,13 +117,13 @@ void draw_editor(struct Editor_State* state) {
         if (i >= state->total_lines) {
             break;
         }
-        unsigned int line_len = strlen(state->lines[i]);
+        int line_len = strlen(state->lines[i]);
         cursor_row += 1 + (line_len / (screen_width - margin));
     }
 
     // Calculate position within current line
-    unsigned int current_line_pos = state->cursor_x - margin;
-    unsigned int line_wrap_count = current_line_pos / (screen_width - margin);
+    int current_line_pos = state->cursor_x - margin;
+    int line_wrap_count = current_line_pos / (screen_width - margin);
     cursor_row += line_wrap_count;
     cursor_col = margin + (current_line_pos % (screen_width - margin));
 
@@ -136,8 +136,8 @@ void draw_editor(struct Editor_State* state) {
 }
 
 void move_cursor(int key, struct Editor_State* state) {
-    unsigned int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
-    unsigned int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
+    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
         case KEY_UP:
@@ -194,12 +194,12 @@ void move_cursor(int key, struct Editor_State* state) {
 }
 
 void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
-    unsigned int screen_height = getmaxy(stdscr) - 1;
-    unsigned int screen_width = getmaxx(stdscr);
-    unsigned int margin = int_len(state->total_lines) + 2;
-    unsigned int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    int screen_height = getmaxy(stdscr) - 1;
+    int screen_width = getmaxx(stdscr);
+    int margin = int_len(state->total_lines) + 2;
+    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
 
-    unsigned int wrapped_lines = 1;
+    int wrapped_lines = 1;
     if (screen_width > margin) {
         wrapped_lines = 1 + (line_len / (screen_width - margin));
     }
@@ -290,8 +290,8 @@ void handle_key(int key, struct Editor_State* state) {
 }
 
 int goto_line(struct Editor_State* state) {
-    const unsigned int height = 3;
-    const unsigned int width = 30;
+    const int height = 3;
+    const int width = 30;
 
     WINDOW *box = newwin(height, width, 1, getmaxx(stdscr) - 33);
 
