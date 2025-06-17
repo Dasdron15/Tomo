@@ -1,5 +1,4 @@
 #include "editor.h"
-#include "config.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"

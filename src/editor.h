@@ -9,6 +9,7 @@
 
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024
+#define TAB_SIZE 2
 
 struct Editor_State {
     char* lines[MAX_LINES * MAX_LINE_LENGTH]; // Array that stores all the text from a file

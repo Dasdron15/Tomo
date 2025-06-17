@@ -98,7 +98,12 @@ int load_pos(struct Editor_State *state) {
         }
 
         if (count == 4) {
-            state->cursor_y = values[0];
+            if (values[0] + values[2] > state->total_lines - 1) {
+                state->cursor_y = state->total_lines - values[2] - 1;
+            } 
+            else {
+                state->cursor_y = values[0];
+            }
             state->cursor_x = values[1];
             state->scroll_offset = values[2];
             loaded = 1;
