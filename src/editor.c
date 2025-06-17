@@ -21,6 +21,7 @@ void init_editor(struct Editor_State *state) {
 
     initscr();
     raw();
+    set_escdelay(0);
     keypad(stdscr, true);
     noecho();
     curs_set(2);
@@ -220,6 +221,7 @@ void handle_key(int key, struct Editor_State* state) {
     if (key == 17) { // CTRL + Q (Quit the editor)
         if (!state->is_saved) {
             ask_for_save(state);
+            return;
         }
         save_pos(state);
         endwin();
@@ -329,8 +331,6 @@ int goto_line(struct Editor_State* state) {
         wrefresh(box);
     }
 
-
-    noecho();
     delwin(box);
 
     int line = atoi(input);
@@ -341,13 +341,12 @@ int goto_line(struct Editor_State* state) {
 }
 
 void ask_for_save(struct Editor_State* state) {
-    const int height = 3;
-    const int width = 30;
+    move(getmaxy(stdscr) - 1, 0);
+    clrtoeol();
 
-    WINDOW *box = newwin(height, width, getmaxy(stdscr) / 2 - 1, getmaxx(stdscr) / 2 - 15);
-
-    box(box, 0, 0);
-    mvwprintw(box, 1, 2, "Save changes? (y/n): ");
+    attron(A_BOLD);
+    mvwprintw(stdscr, getmaxy(stdscr) - 1, 0, "Save changes? (y/n): ");
+    attroff(A_BOLD);
 
     curs_set(1);
 
@@ -355,34 +354,36 @@ void ask_for_save(struct Editor_State* state) {
     int pos = 0;
 
     int ch;
-    while ((ch = wgetch(box)) != '\n') {
+    while ((ch = wgetch(stdscr)) != '\n') {
         if (ch == 27) {
-            delwin(box);
             return;
         }
-        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') && pos > 0) {
+        else if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0) {
             input[--pos] = '\0';
-            mvwprintw(box, 1, 23 + pos, " ");
-            wmove(box, 1, 23 + pos);
+            mvwprintw(stdscr, getmaxy(stdscr) - 1, 21 + pos, " ");
+            wmove(stdscr, getmaxy(stdscr) - 1, 21 + pos);
         }
-        else if (pos < (int) sizeof(input) - 1) {
+        else if (pos < (int) sizeof(input) - 1 && ch != KEY_BACKSPACE && ch != 127) {
             input[pos++] = ch;
-            mvwprintw(box, 1, 22 + pos, "%c", ch);
-            wmove(box, 1, 23 + pos);
+            mvwprintw(stdscr, getmaxy(stdscr) - 1, 20 + pos, "%c", ch);
+            wmove(stdscr, getmaxy(stdscr) - 1, 21 + pos);
         }
-        wrefresh(box);
+        wrefresh(stdscr);
     }
 
     noecho();
-    delwin(box);
 
-    if (input[0] == 89 || input[0] == 121) { // 'Y' or 'y'
+    if (tolower(input[0]) == 121) { // 'Y' or 'y'
         save_file(state);
         save_pos(state);   
     }
 
-    endwin();
-    exit(0);
+    if (tolower(input[0]) == 121 || tolower(input[0]) == 110) {
+        endwin();
+        exit(0);
+    }
+
+    ask_for_save(state);
 }
 
 void insert_char(char c, struct Editor_State* state) {
