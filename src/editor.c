@@ -69,7 +69,7 @@ void draw_editor(struct Editor_State* state) {
         if (index == state->cursor_y + state->scroll_offset) {
             attron(COLOR_PAIR(1)); // Highlight current line
         }
-        mvprintw(line_num_pos, 0, "%s%d  ", spaces, index + 1);
+        mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
         if (index == state->cursor_y + state->scroll_offset) {
             attroff(COLOR_PAIR(2));
         }
