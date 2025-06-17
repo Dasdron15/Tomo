@@ -1,7 +1,7 @@
-#include "editor.h"
 #include "ui/status_bar.h"
 #include "utils/fileio.h"
 #include "utils/common.h"
+#include "editor.h"
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
