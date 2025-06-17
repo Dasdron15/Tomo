@@ -31,3 +31,7 @@ char* get_filename(char* path) {
     }
     return ptr;
 }
+
+int rgb_to_ncurses(int rgb) {
+    return (rgb * 1000) / 255;
+}

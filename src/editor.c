@@ -37,15 +37,12 @@ void init_editor(struct Editor_State *state) {
     start_color();
     use_default_colors();
 
-    if (can_change_color()) {
-        init_color(8, 500, 500, 500);
-    }
+    init_color(8, rgb_to_ncurses(111), rgb_to_ncurses(118), rgb_to_ncurses(125));
+    init_color(9, rgb_to_ncurses(15), rgb_to_ncurses(17), rgb_to_ncurses(22));
+    init_color(10, rgb_to_ncurses(142), rgb_to_ncurses(145), rgb_to_ncurses(154));
 
-    init_pair(1, COLOR_WHITE, -1); // Active line number color
-    init_pair(2, COLOR_BLUE, -1); // Unactive line number color
-    init_pair(3, COLOR_WHITE, COLOR_CYAN); // Color for status bar
-
-    wbkgd(stdscr, COLOR_PAIR(1)); // Set background color
+    init_pair(1, 8, -1); // Unactive text color
+    init_pair(2, 10, 9); // Status bar color
 }
 
 void draw_editor(struct Editor_State* state) {
@@ -63,17 +60,15 @@ void draw_editor(struct Editor_State* state) {
         char* line = state->lines[index];
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(index + 1));
 
-        attron(COLOR_PAIR(2));
-
         // Draw line number
         if (index == state->cursor_y + state->scroll_offset) {
-            attron(COLOR_PAIR(1)); // Highlight current line
+            attron(COLOR_PAIR(1));
+            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
+            attroff(COLOR_PAIR(1));
+        } 
+        else {
+            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
         }
-        mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
-        if (index == state->cursor_y + state->scroll_offset) {
-            attroff(COLOR_PAIR(2));
-        }
-        attron(COLOR_PAIR(1));
 
         // Draw line content with wrapping
         int col = margin;
@@ -100,9 +95,9 @@ void draw_editor(struct Editor_State* state) {
         }
     }
 
-    attron(COLOR_PAIR(3));
+    attron(COLOR_PAIR(2));
     draw_status_bar(state);
-    attroff(COLOR_PAIR(3));
+    attroff(COLOR_PAIR(2));
 
     // Calculate proper cursor position considering line wrapping
     int cursor_row = state->cursor_y;
