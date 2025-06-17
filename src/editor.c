@@ -281,7 +281,7 @@ void handle_key(int key, struct Editor_State* state) {
         state->cursor_y = state->total_lines - state->scroll_offset - 1;
     }
 
-    if (key == 575 && state->cursor_y - state->scroll_offset > 0) { // CTRL + UP_ARROW (Jump to the beggining of the file)
+    if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
         state->scroll_offset = 0;
         state->cursor_y = 0;
     }
