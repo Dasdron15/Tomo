@@ -2,6 +2,7 @@
 #include "utils/fileio.h"
 #include "utils/common.h"
 #include "editor.h"
+#include "select.h"
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -40,9 +41,11 @@ void init_editor(struct Editor_State *state) {
     init_color(8, rgb_to_ncurses(111), rgb_to_ncurses(118), rgb_to_ncurses(125));
     init_color(9, rgb_to_ncurses(15), rgb_to_ncurses(17), rgb_to_ncurses(22));
     init_color(10, rgb_to_ncurses(142), rgb_to_ncurses(145), rgb_to_ncurses(154));
+    init_color(11, rgb_to_ncurses(31), rgb_to_ncurses(48), rgb_to_ncurses(70));
 
     init_pair(1, 8, -1); // Unactive text color
     init_pair(2, 10, 9); // Status bar color
+    init_pair(3, 255, 11); // Selected text
 }
 
 void draw_editor(struct Editor_State* state) {
@@ -84,11 +87,18 @@ void draw_editor(struct Editor_State* state) {
                     break; // Don't draw beyond screen bottom
                 }
             }
-            
-            mvprintw(row, col, "%c", line[symb]);
+
+            if (is_selected()) {
+                attron(COLOR_PAIR(3));
+                mvprintw(row, col, "%c", line[symb]);
+                attroff(COLOR_PAIR(3));
+            } 
+            else {
+                mvprintw(row, col, "%c", line[symb]);
+            }
             col++;
         }
-        
+
         line_num_pos = row + 1;
         if (line_num_pos >= screen_height - 1) {
             break; // Don't draw beyond screen bottom
@@ -218,6 +228,22 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
+    if (key == 393) {
+        start_selection(state->cursor_y, state->cursor_x);
+        move_cursor(260, state);
+        update_selection(state->cursor_y, state->cursor_x);
+        return;
+    }
+
+    if (key == 402) {
+        start_selection(state->cursor_y, state->cursor_x);
+        move_cursor(261, state);
+        update_selection(state->cursor_y, state->cursor_x);
+        return;
+    }
+
+    cancel_selection();
+
     if (key == 17) { // CTRL + Q (Quit the editor)
         if (!state->is_saved) {
             ask_for_save(state);

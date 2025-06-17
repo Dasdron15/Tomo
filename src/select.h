@@ -10,5 +10,7 @@ typedef struct {
 
 void start_selection(int row, int col);
 void update_selection(int row, int col);
+bool is_selected();
+void cancel_selection();
 
 #endif
