@@ -244,17 +244,36 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 }
 
 void handle_key(int key, struct Editor_State* state) {
-    if (key == 393) {
+    if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(state->cursor_y, state->cursor_x);
         move_cursor(260, state, true);
         update_selection(state->cursor_y, state->cursor_x);
         return;
     }
 
-    if (key == 402) {
+    if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
         start_selection(state->cursor_y, state->cursor_x);
         move_cursor(261, state, true);
         update_selection(state->cursor_y, state->cursor_x);
+        return;
+    }
+
+    if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
+        start_selection(state->cursor_y, state->cursor_x);
+        move_cursor(259, state, true);
+        update_selection(state->cursor_y, state->cursor_x);
+        return;
+    }
+
+    if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
+        start_selection(state->cursor_y, state->cursor_x);
+        move_cursor(258, state, true);
+        update_selection(state->cursor_y, state->cursor_x);
+        return;
+    }
+
+    if (key == 27) { // Esc 
+        cancel_selection();
         return;
     }
 

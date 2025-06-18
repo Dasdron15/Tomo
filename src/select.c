@@ -20,9 +20,18 @@ void update_selection(int row, int col) {
 }
 
 bool is_selected(int char_y, int char_x) {
-    if (selecting && selection_start.row == selection_end.row) {
-        return ((selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x)) && selection_end.row == char_y;
+    if (selecting) {
+        if (selection_start.row == selection_end.row && selection_start.row == char_y) {
+            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
+        }
+        else if (selection_start.row > selection_end.row && selection_start.row >= char_y && selection_end.row <= char_y) {
+            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
+        }
+        else if (selection_start.row < selection_end.row && selection_start.row <= char_y && selection_end.row >= char_y) {
+            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
+        }
     }
+
     return false;
 }
 
