@@ -161,13 +161,13 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             }
             break;
 
-        case KEY_LEFT: {
+        case KEY_LEFT: // Done
             if (state->cursor_x > margin) {
                 state->cursor_x--;
             }
             else if (state->cursor_x <= margin && state->cursor_y + state->y_offset >= 1) {
                 state->cursor_y--;
-                state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->y_offset]);
+                state->cursor_x = margin + line_len + 1;
             }
             state->max_char = state->cursor_x;
 
@@ -175,10 +175,9 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                 cancel_selection();
             }
             break;
-        }
-            
-        case KEY_RIGHT:
-            if (state->cursor_x < margin + line_len) {
+
+        case KEY_RIGHT: // Done
+            if (state->cursor_x < margin + line_len) { 
                 state->cursor_x++;
             }
             else if (state->cursor_x + margin > line_len - 1) {
