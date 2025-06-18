@@ -88,7 +88,7 @@ void draw_editor(struct Editor_State* state) {
                 }
             }
 
-            if (is_selected()) {
+            if (is_selected(row, col)) {
                 attron(COLOR_PAIR(3));
                 mvprintw(row, col, "%c", line[symb]);
                 attroff(COLOR_PAIR(3));

@@ -8,8 +8,8 @@ void start_selection(int row, int col) {
     if (!selecting) {
         selection_start.row = row;
         selection_start.col = col;
+        selecting = true;
     }
-    selecting = true;
 }
 
 void update_selection(int row, int col) {
@@ -19,9 +19,9 @@ void update_selection(int row, int col) {
     }
 }
 
-bool is_selected() {
-    if (selection_start.row == selection_end.row && (selection_start.col > selection_end.col || selection_start.col < selection_end.col) && selecting) {
-        return true;
+bool is_selected(int char_y, int char_x) {
+    if (selecting && selection_start.row == selection_end.row) {
+        return ((selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x)) && selection_end.row == char_y;
     }
     return false;
 }
