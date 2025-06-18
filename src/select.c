@@ -19,16 +19,16 @@ void update_selection(int row, int col) {
     }
 }
 
-bool is_selected(int char_y, int char_x) {
+bool is_selected(int char_y, int char_x, int cursor_y, int cursor_x) {
     if (selecting) {
-        if (selection_start.row == selection_end.row && selection_start.row == char_y) {
+        if (selection_start.row == cursor_y && selection_end.row == char_y) {
             return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
         }
-        else if (selection_start.row > selection_end.row && selection_start.row >= char_y && selection_end.row <= char_y) {
-            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
+        else if (selection_start.row > cursor_y) { // Up arrow
+            return (selection_start.row == char_y && selection_start.col >= char_x) || (selection_start.row > char_y && selection_end.row < char_y) || (selection_end.row == char_y && selection_end.col <= char_x);
         }
-        else if (selection_start.row < selection_end.row && selection_start.row <= char_y && selection_end.row >= char_y) {
-            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
+        else if (selection_start.row < cursor_y) {
+            return (selection_start.row == char_y && selection_start.col <= char_x) || (selection_start.row < char_y && selection_end.row > char_y) || (selection_end.row == char_y && selection_end.col >= char_x);
         }
     }
 
