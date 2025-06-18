@@ -135,7 +135,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
 
     switch (key) {
         case KEY_UP:
-            if (state->cursor_y + state->y_offset > 0) {    
+            if (state->cursor_y + state->y_offset > 0 && !clamp_cursor(state)) {
                 state->cursor_y--;
                 state->cursor_x = state->max_char;
             }
@@ -150,7 +150,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
             
         case KEY_DOWN:
-            if (state->cursor_y < state->total_lines - state->y_offset - 1) {
+            if (state->cursor_y < state->total_lines - state->y_offset - 1 && !clamp_cursor(state)) {
                 state->cursor_y++;
                 state->cursor_x = state->max_char;
             }
@@ -165,10 +165,10 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
 
         case KEY_LEFT: // Done
-            if (state->cursor_x > margin) {
+            if (state->cursor_x > margin && !clamp_cursor(state)) {
                 state->cursor_x--;
             }
-            else if (state->cursor_x <= margin && state->cursor_y + state->y_offset >= 1) {
+            else if (state->cursor_x <= margin && state->cursor_y + state->y_offset >= 1 && !clamp_cursor(state)) {
                 state->cursor_y--;
                 state->cursor_x = margin + line_len + 1;
             }
@@ -180,10 +180,10 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
 
         case KEY_RIGHT: // Done
-            if (state->cursor_x < margin + line_len) { 
+            if (state->cursor_x < margin + line_len && !clamp_cursor(state)) { 
                 state->cursor_x++;
             }
-            else if (state->cursor_x + margin > line_len - 1) {
+            else if (state->cursor_x + margin > line_len - 1 && !clamp_cursor(state)) {
                 state->cursor_y++;
                 state->cursor_x = margin;
             }
@@ -198,7 +198,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
     clamp_cursor(state);
 }
 
-void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
+bool clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
     int line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
@@ -206,21 +206,25 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 
     if (state->cursor_x - margin > line_len) {
         state->cursor_x = margin + line_len;
+        return true;
     }    
     else if (state->cursor_y < 3 && state->y_offset > 0) {
         state->y_offset--;
-        state->cursor_y++;
+        return true;
     }
     else if (state->cursor_y > screen_height - 5 && screen_height + state->y_offset < state->total_lines + 1) {
         state->y_offset++;
-        state->cursor_y--;
+        return true;
     }
     else if (state->cursor_x > screen_width - 4 && screen_width + state->x_offset < line_len - 1) {
         state->x_offset++;
+        return true;
     }
     else if (state->cursor_x < 4 && state->x_offset < 1) {
         state->x_offset--;
+        return true;
     }
+    return false;
 }
 
 void handle_key(int key, struct Editor_State* state) {
