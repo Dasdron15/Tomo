@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <limits.h>
 
 struct Editor_State* state;
@@ -24,7 +25,7 @@ int main(int argc, char* argv[]) {
     while (1) {
         draw_editor(state);
         int key = getch();
-        move_cursor(key, state);
+        move_cursor(key, state, false);
         handle_key(key, state);
     }
 

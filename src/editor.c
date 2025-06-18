@@ -140,7 +140,7 @@ void draw_editor(struct Editor_State* state) {
     move(cursor_row, cursor_col);
 }
 
-void move_cursor(int key, struct Editor_State* state) {
+void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
     int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
     int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
@@ -156,6 +156,10 @@ void move_cursor(int key, struct Editor_State* state) {
             } else {
                 state->cursor_x = margin;
             }
+
+            if (!is_selecting) {
+                cancel_selection();
+            }
             break;
             
         case KEY_DOWN:
@@ -164,6 +168,10 @@ void move_cursor(int key, struct Editor_State* state) {
                 state->cursor_x = state->max_char;
             } else {
                 state->cursor_x = margin + line_len;
+            }
+
+            if (!is_selecting) {
+                cancel_selection();
             }
             break;
 
@@ -175,6 +183,10 @@ void move_cursor(int key, struct Editor_State* state) {
                 state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
             }
             state->max_char = state->cursor_x;
+
+            if (!is_selecting) {
+                cancel_selection();
+            }
             break;
         }
             
@@ -188,6 +200,10 @@ void move_cursor(int key, struct Editor_State* state) {
                 state->cursor_x = margin + line_len;
             }
             state->max_char = state->cursor_x;
+
+            if (!is_selecting) {
+                cancel_selection();
+            }
             break;
     }
 
@@ -230,19 +246,17 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
 void handle_key(int key, struct Editor_State* state) {
     if (key == 393) {
         start_selection(state->cursor_y, state->cursor_x);
-        move_cursor(260, state);
+        move_cursor(260, state, true);
         update_selection(state->cursor_y, state->cursor_x);
         return;
     }
 
     if (key == 402) {
         start_selection(state->cursor_y, state->cursor_x);
-        move_cursor(261, state);
+        move_cursor(261, state, true);
         update_selection(state->cursor_y, state->cursor_x);
         return;
     }
-
-    cancel_selection();
 
     if (key == 17) { // CTRL + Q (Quit the editor)
         if (!state->is_saved) {

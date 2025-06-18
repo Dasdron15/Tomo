@@ -4,6 +4,7 @@
 #include <curses.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <ctype.h>
 #include <math.h>
 
@@ -28,7 +29,7 @@ struct Editor_State {
 void init_editor(struct Editor_State* state);
 void draw_editor(struct Editor_State* state);
 
-void move_cursor(int key, struct Editor_State* state);
+void move_cursor(int key, struct Editor_State* state, bool is_selecting);
 void clamp_cursor(struct Editor_State* state); // Check if cursor is out of bounds
 
 void handle_key(int key, struct Editor_State* state);

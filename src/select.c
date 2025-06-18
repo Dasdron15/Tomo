@@ -20,7 +20,7 @@ void update_selection(int row, int col) {
 }
 
 bool is_selected() {
-    if (selection_start.row == selection_end.row && (selection_start.col > selection_end.col || selection_start.col < selection_end.col)) {
+    if (selection_start.row == selection_end.row && (selection_start.col > selection_end.col || selection_start.col < selection_end.col) && selecting) {
         return true;
     }
     return false;
