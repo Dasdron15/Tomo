@@ -179,8 +179,13 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
         }
             
         case KEY_RIGHT:
-            if (state->cursor_x < margin + line_len) {
-                state->cursor_x++;
+            if (state->cursor_x < margin + line_len + state->cursor_x) {
+                if (state->cursor_x > getmaxx(stdscr) - 3) {
+                    state->x_offset++;
+                }
+                else {
+                    state->cursor_x++;
+                }
             } else if (state->cursor_y + state->y_offset < state->total_lines - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;

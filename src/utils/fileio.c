@@ -43,10 +43,6 @@ void save_pos(struct Editor_State *state) {
     FILE* src = fopen("src/cursor_pos.txt", "r");
     FILE* tmp = fopen("src/cursor_pos_temp.txt", "w");
 
-    if (!src) {
-        timeout(10000);
-    }
-
     char line[1024];
     int found = 0;
     size_t name_len = strlen(state->filename);
@@ -54,7 +50,7 @@ void save_pos(struct Editor_State *state) {
     if (src) {
         while (fgets(line, sizeof(line), src)) {
             if (!found && strstr(line, state->filename) != NULL && line[name_len] == ':') {
-                fprintf(tmp, "%s:%d:%d:%d", state->filename, state->cursor_y, state->cursor_x, state->scroll_offset);
+                fprintf(tmp, "%s:%d:%d:%d:%d", state->filename, state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
                 found = 1;
             }
             else {
@@ -65,7 +61,7 @@ void save_pos(struct Editor_State *state) {
     }
 
     if (!found) {
-        fprintf(tmp, "%s:%d:%d:%d", state->filename, state->cursor_y, state->cursor_x, state->scroll_offset);
+        fprintf(tmp, "%s:%d:%d:%d:%d", state->filename, state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
     }
 
     fclose(tmp);
@@ -90,14 +86,14 @@ int load_pos(struct Editor_State *state) {
         }
 
         int count = 1;
-        int values[3] = {0};
+        int values[4] = {0};
 
         while ((token = strtok(NULL, ":\n")) && count <= 3) {
             values[count-1] = atoi(token);
             count++;
         }
 
-        if (count == 4) {
+        if (count == 5) {
             if (values[0] + values[2] > state->total_lines - 1) {
                 state->cursor_y = state->total_lines - values[2] - 1;
             } 
@@ -105,7 +101,8 @@ int load_pos(struct Editor_State *state) {
                 state->cursor_y = values[0];
             }
             state->cursor_x = values[1];
-            state->scroll_offset = values[2];
+            state->y_offset = values[2];
+            state->x_offset = values[3];
             loaded = 1;
             break;
         }
