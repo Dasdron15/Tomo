@@ -201,14 +201,25 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
 void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
-    
-    if (state->cursor_y < 3 && state->y_offset > 0) {
+    int line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
+    int margin = int_len(state->total_lines) + 2;
+
+    if (state->cursor_x - margin > line_len) {
+        state->cursor_x = margin + line_len;
+    }    
+    else if (state->cursor_y < 3 && state->y_offset > 0) {
         state->y_offset--;
         state->cursor_y++;
     }
     else if (state->cursor_y > screen_height - 5 && screen_height + state->y_offset < state->total_lines + 1) {
         state->y_offset++;
         state->cursor_y--;
+    }
+    else if (state->cursor_x > screen_width - 4 && screen_width + state->x_offset < line_len - 1) {
+        state->x_offset++;
+    }
+    else if (state->cursor_x < 4 && state->x_offset < 1) {
+        state->x_offset--;
     }
 }
 
