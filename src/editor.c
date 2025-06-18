@@ -8,9 +8,10 @@ void init_editor(struct Editor_State *state) {
     state->is_saved = true;
 
     if (load_pos(state) == 0) {
-        state->cursor_y = 0;
-        state->scroll_offset = 0;
         state->cursor_x = int_len(state->total_lines) + 2;
+        state->cursor_y = 0;
+        state->x_offset = 0;
+        state->y_offset = 0;
     }
 
     state->max_char = state->cursor_x;
@@ -57,14 +58,12 @@ void draw_editor(struct Editor_State* state) {
     int line_num_pos = 0;
     int margin = int_len(state->total_lines) + 2;
 
-    for (int index = state->scroll_offset; 
-         index < state->scroll_offset + screen_height - 1 && index < state->total_lines; 
-         index++) {
+    for (int index = state->y_offset; index < state->y_offset + screen_height - 1 && index < state->total_lines; index++) {
         char* line = state->lines[index];
         char* spaces = mult_char(' ', int_len(state->total_lines) - int_len(index + 1));
 
         // Draw line number
-        if (index == state->cursor_y + state->scroll_offset) {
+        if (index == state->cursor_y + state->y_offset) {
             attron(COLOR_PAIR(1));
             mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
             attroff(COLOR_PAIR(1));
@@ -75,31 +74,20 @@ void draw_editor(struct Editor_State* state) {
 
         // Draw line content with wrapping
         int col = margin;
-        int row = line_num_pos;
-        int line_len = strlen(line);
 
-        for (int symb = 0; symb < line_len; symb++) {
-            // Handle wrapping
-            if (col >= screen_width) {
-                col = margin;
-                row++;
-                if (row >= screen_height - 1) {
-                    break; // Don't draw beyond screen bottom
-                }
-            }
-
-            if (is_selected(row, col, state->cursor_y, state->cursor_x)) {
+        for (int symb = state->x_offset; symb < (int) strlen(line) && symb < state->x_offset + screen_width; symb++) {
+            if (is_selected(line_num_pos, col, state->cursor_y)) {
                 attron(COLOR_PAIR(3));
-                mvprintw(row, col, "%c", line[symb]);
+                mvprintw(line_num_pos, col, "%c", line[symb]);
                 attroff(COLOR_PAIR(3));
             } 
             else {
-                mvprintw(row, col, "%c", line[symb]);
+                mvprintw(line_num_pos, col, "%c", line[symb]);
             }
             col++;
         }
 
-        line_num_pos = row + 1;
+        line_num_pos++;
         if (line_num_pos >= screen_height - 1) {
             break; // Don't draw beyond screen bottom
         }
@@ -118,7 +106,7 @@ void draw_editor(struct Editor_State* state) {
     cursor_col = margin;
 
     // Calculate wrapped lines before current line
-    for (int i = state->scroll_offset; i < state->cursor_y + state->scroll_offset; i++) {
+    for (int i = state->y_offset; i < state->cursor_y + state->y_offset; i++) {
         if (i >= state->total_lines) {
             break;
         }
@@ -141,14 +129,14 @@ void draw_editor(struct Editor_State* state) {
 }
 
 void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
-    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    int line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
     int margin = int_len(state->total_lines) + 2; // Line number length + 2 spaces
 
     switch (key) {
         case KEY_UP:
-            if (state->cursor_y + state->scroll_offset > 0) {
-                if (state->cursor_y < 1 && state->scroll_offset > 0) {
-                    state->scroll_offset--;
+            if (state->cursor_y + state->y_offset > 0) {
+                if (state->cursor_y < 1 && state->y_offset > 0) {
+                    state->y_offset--;
                 } else {
                     state->cursor_y--;
                     state->cursor_x = state->max_char;
@@ -163,7 +151,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
             
         case KEY_DOWN:
-            if (state->cursor_y != state->total_lines - 1 - state->scroll_offset) {
+            if (state->cursor_y != state->total_lines - 1 - state->y_offset) {
                 state->cursor_y++;
                 state->cursor_x = state->max_char;
             } else {
@@ -178,9 +166,9 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
         case KEY_LEFT: {
            if (state->cursor_x > margin) {
                 state->cursor_x--;
-            } else if (state->cursor_x <= margin && state->cursor_y + state->scroll_offset >= 1) {
+            } else if (state->cursor_x <= margin && state->cursor_y + state->y_offset >= 1) {
                 state->cursor_y--;
-                state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
+                state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->y_offset]);
             }
             state->max_char = state->cursor_x;
 
@@ -193,7 +181,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
         case KEY_RIGHT:
             if (state->cursor_x < margin + line_len) {
                 state->cursor_x++;
-            } else if (state->cursor_y + state->scroll_offset < state->total_lines - 1) {
+            } else if (state->cursor_y + state->y_offset < state->total_lines - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;
             } else {
@@ -207,8 +195,8 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
     }
 
-    if (state->cursor_x > margin + strlen(state->lines[state->cursor_y + state->scroll_offset])) { /* Check if cursor is out of line */
-        state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    if (state->cursor_x > margin + (int) strlen(state->lines[state->cursor_y + state->y_offset])) { /* Check if cursor is out of line */
+        state->cursor_x = margin + strlen(state->lines[state->cursor_y + state->y_offset]);
     }
 
     clamp_cursor(state);
@@ -218,7 +206,7 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
     int screen_height = getmaxy(stdscr) - 1;
     int screen_width = getmaxx(stdscr);
     int margin = int_len(state->total_lines) + 2;
-    int line_len = strlen(state->lines[state->cursor_y + state->scroll_offset]);
+    int line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
 
     int wrapped_lines = 1;
     if (screen_width > margin) {
@@ -226,12 +214,12 @@ void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of edi
     }
 
     if (state->cursor_y > screen_height - wrapped_lines) {
-        state->scroll_offset += (state->cursor_y - (screen_height - wrapped_lines));
+        state->y_offset += (state->cursor_y - (screen_height - wrapped_lines));
         state->cursor_y = screen_height - wrapped_lines;
     }
 
-    if (state->scroll_offset > state->total_lines - 1) {
-        state->scroll_offset = state->total_lines - 1;
+    if (state->y_offset > state->total_lines - 1) {
+        state->y_offset = state->total_lines - 1;
     }
 
     if (state->cursor_x > margin + line_len) {
@@ -324,25 +312,25 @@ void handle_key(int key, struct Editor_State* state) {
         int target = goto_line(state);
         if (target != -1) {
             if (target < getmaxy(stdscr) - 1) {
-                state->scroll_offset = 0;
+                state->y_offset = 0;
             }
             else if (target > getmaxy(stdscr) - 2) {
-                state->scroll_offset = target - (getmaxy(stdscr) / 2);
+                state->y_offset = target - (getmaxy(stdscr) / 2);
             }
-            state->cursor_y = target - state->scroll_offset;
+            state->cursor_y = target - state->y_offset;
         }
         return;
     }
 
-    if (key == 534 && state->cursor_y + state->scroll_offset < state->total_lines + 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
+    if (key == 534 && state->cursor_y + state->y_offset < state->total_lines + 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
         if (state->total_lines > getmaxy(stdscr) - 1) {
-            state->scroll_offset = state->total_lines - getmaxy(stdscr) + 1;
+            state->y_offset = state->total_lines - getmaxy(stdscr) + 1;
         }
-        state->cursor_y = state->total_lines - state->scroll_offset - 1;
+        state->cursor_y = state->total_lines - state->y_offset - 1;
     }
 
     if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
-        state->scroll_offset = 0;
+        state->y_offset = 0;
         state->cursor_y = 0;
     }
 }
@@ -449,12 +437,12 @@ void insert_char(char c, struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 
-    char* old = state->lines[state->cursor_y + state->scroll_offset];
+    char* old = state->lines[state->cursor_y + state->y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        state->lines[state->cursor_y + state->scroll_offset] = old;
+        state->lines[state->cursor_y + state->y_offset] = old;
     }
 
     char* new = malloc(strlen(old) + 2);
@@ -468,7 +456,7 @@ void insert_char(char c, struct Editor_State* state) {
     new[pos] = c;
     strcpy(new + pos + 1, old + pos);
 
-    state->lines[state->cursor_y + state->scroll_offset] = new;
+    state->lines[state->cursor_y + state->y_offset] = new;
 
     free(old);
     state->cursor_x++;
@@ -478,12 +466,12 @@ void add_tab(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
 
-    char* old = state->lines[state->cursor_y + state->scroll_offset];
+    char* old = state->lines[state->cursor_y + state->y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        state->lines[state->cursor_y + state->scroll_offset] = old;
+        state->lines[state->cursor_y + state->y_offset] = old;
     }
 
     char* tab_str = mult_char(' ', TAB_SIZE);
@@ -503,7 +491,7 @@ void add_tab(struct Editor_State* state) {
     memcpy(new + pos, tab_str, TAB_SIZE);
     strcpy(new + pos + TAB_SIZE, old + pos);
 
-    state->lines[state->cursor_y + state->scroll_offset] = new;
+    state->lines[state->cursor_y + state->y_offset] = new;
     free(old);
     free(tab_str);
 
@@ -513,7 +501,7 @@ void add_tab(struct Editor_State* state) {
 void delete_char(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin; // X axis of the cursor excluding the margin
-    int y_pos = state->scroll_offset + state->cursor_y;
+    int y_pos = state->y_offset + state->cursor_y;
 
     int len = strlen(state->lines[y_pos]); // Current line length
 
@@ -549,7 +537,7 @@ void delete_char(struct Editor_State* state) {
 void new_line(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
     int pos = state->cursor_x - margin;
-    int y_pos = state->cursor_y + state->scroll_offset;
+    int y_pos = state->cursor_y + state->y_offset;
     
     char* current = state->lines[y_pos];
     int current_len = strlen(current);

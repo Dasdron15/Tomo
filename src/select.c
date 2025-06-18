@@ -19,7 +19,7 @@ void update_selection(int row, int col) {
     }
 }
 
-bool is_selected(int char_y, int char_x, int cursor_y, int cursor_x) {
+bool is_selected(int char_y, int char_x, int cursor_y) {
     if (selecting) {
         if (selection_start.row == cursor_y && selection_end.row == char_y) {
             return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);

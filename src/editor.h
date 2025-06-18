@@ -10,13 +10,15 @@
 
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024
-#define TAB_SIZE 2
+#define TAB_SIZE 4
 
 struct Editor_State {
     char* lines[MAX_LINES * MAX_LINE_LENGTH]; // Array that stores all the text from a file
     int total_lines;
 
-    int scroll_offset; // Thing that is needed for proper text scrolling
+    int x_offset; // Thing that is needed for proper text scrolling
+    int y_offset;
+    
     int max_char; // Last symbol X that you were on before pressing up or down arrow
 
     int cursor_x;
