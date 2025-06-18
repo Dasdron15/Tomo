@@ -3,6 +3,7 @@
 #include "utils/common.h"
 #include "editor.h"
 #include "select.h"
+#include <curses.h>
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -194,35 +195,20 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             break;
     }
 
-    // clamp_cursor(state);
+    clamp_cursor(state);
 }
 
 void clamp_cursor(struct Editor_State* state) { // Check if cursor is out of editor window
-    int screen_height = getmaxy(stdscr) - 1;
     int screen_width = getmaxx(stdscr);
-    int margin = int_len(state->total_lines) + 2;
-    int line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
-
-    int wrapped_lines = 1;
-    if (screen_width > margin) {
-        wrapped_lines = 1 + (line_len / (screen_width - margin));
+    int screen_height = getmaxy(stdscr);
+    
+    if (state->cursor_y < 3 && state->y_offset > 0) {
+        state->y_offset--;
+        state->cursor_y++;
     }
-
-    if (state->cursor_y > screen_height - wrapped_lines) {
-        state->y_offset += (state->cursor_y - (screen_height - wrapped_lines));
-        state->cursor_y = screen_height - wrapped_lines;
-    }
-
-    if (state->y_offset > state->total_lines - 1) {
-        state->y_offset = state->total_lines - 1;
-    }
-
-    if (state->cursor_x > margin + line_len) {
-        state->cursor_x = margin + line_len;
-    }
-
-    if (state->cursor_y >= screen_height) {
-        state->cursor_y = screen_height - 1;
+    else if (state->cursor_y > screen_height - 5 && screen_height + state->y_offset < state->total_lines + 1) {
+        state->y_offset++;
+        state->cursor_y--;
     }
 }
 
