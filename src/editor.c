@@ -3,7 +3,6 @@
 #include "utils/common.h"
 #include "editor.h"
 #include "select.h"
-#include <curses.h>
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -164,14 +163,14 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
         }
 
         case KEY_LEFT: {
-            if (state->cursor_x > margin) {
-                if (0) {
+            if (state->cursor_x > margin - state->x_offset) {
+                if (state->cursor_x < 6 && state->x_offset > 0) {
                     state->x_offset--;
                 } else {
                     state->cursor_x--;
                 }
             }
-            else if (state->cursor_x <= margin && state->cursor_y + state->y_offset >= 1) {
+            else if (state->cursor_x <= margin - state->x_offset && state->cursor_y + state->y_offset >= 1) {
                 state->cursor_y--;
                 line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
                 state->cursor_x = margin + line_len;
@@ -195,7 +194,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                     state->cursor_x++;
                 }
             }
-            else if (state->cursor_x + margin > line_len - 1 && state->cursor_y + state->y_offset < state->total_lines - 1) {
+            else if (state->cursor_x + margin - state->x_offset > line_len - 1 && state->cursor_y + state->y_offset < state->total_lines - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;
             }
