@@ -1,2 +1,2 @@
 
-/home/igor/projects/Cobalt/src/editor.c:32:5:512:0
+/home/igor/projects/Cobalt/src/editor.c:22:7:280:10
