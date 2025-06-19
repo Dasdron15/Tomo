@@ -110,7 +110,12 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
     switch (key) {
         case KEY_UP: {
             if (state->cursor_y + state->y_offset > 0) {
-                state->cursor_y--;
+                if (state->cursor_y < 4 && state->y_offset > 0) {
+                    state->y_offset--;
+                }
+                else {
+                    state->cursor_y--;
+                }
                 state->cursor_x = state->max_char;
             }
             else {
@@ -118,7 +123,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                 state->max_char = state->cursor_x;
             }
 
-            // If the cursor is out of line bounds then move cursor to the last line symbol
+            // Cursor clamping
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
             if (state->cursor_x - margin > line_len) {
                 state->cursor_x = margin + line_len;
@@ -132,7 +137,12 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             
         case KEY_DOWN: {
             if (state->cursor_y < state->total_lines - state->y_offset - 1) {
-                state->cursor_y++;
+                if (state->cursor_y > screen_height - 6 && state->y_offset + screen_height < state->total_lines + 1) {
+                    state->y_offset++;
+                }
+                else {
+                    state->cursor_y++;
+                }
                 state->cursor_x = state->max_char;
             }
             else {
@@ -141,6 +151,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                 state->max_char = state->cursor_x;
             }
 
+            // Cursor clamping
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
             if (state->cursor_x - margin > line_len) {
                 state->cursor_x = margin + line_len;
@@ -417,7 +428,7 @@ void insert_char(char c, struct Editor_State* state) {
     state->lines[state->cursor_y + state->y_offset] = new;
 
     free(old);
-    state->cursor_x++;
+    move_cursor(KEY_RIGHT, state, false);
 }
 
 void add_tab(struct Editor_State* state) {
@@ -526,9 +537,7 @@ void new_line(struct Editor_State* state) {
     state->lines[y_pos] = left;
     state->lines[y_pos + 1] = right;
 
-    state->cursor_y++;
-    move_cursor(0, state, false);
-    state->cursor_x = margin;
     state->total_lines++;
+    move_cursor(KEY_DOWN, state, false);
 }
 
