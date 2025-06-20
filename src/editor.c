@@ -14,7 +14,7 @@ void init_editor(struct Editor_State *state) {
         state->y_offset = 0;
     }
 
-    state->max_char = state->cursor_x;
+    state->max_char = state->cursor_x + state->x_offset;
 
     if (state->total_lines == 0) {
         state->lines[0] = strdup("");
@@ -119,13 +119,23 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             }
             else {
                 state->cursor_x = margin;
-                state->max_char = state->cursor_x;
+                state->max_char = state->cursor_x + state->x_offset;
             }
 
-            // Cursor clamping
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
-            if (state->cursor_x - margin > line_len) {
+
+            // Cursor clamping
+            if (state->cursor_x - margin > line_len - state->x_offset) {
                 state->cursor_x = margin + line_len;
+                if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
+                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                }
+                else if ((state->cursor_x - margin) > (screen_width - margin - 5)) { // This is the only statement that doesn't work
+                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                }
+                else {
+                    state->cursor_x = margin + line_len - state->x_offset;                   
+                }
             }
 
             if (!is_selecting) {
@@ -147,13 +157,23 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             else {
                 line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
                 state->cursor_x = margin + line_len;
-                state->max_char = state->cursor_x;
+                state->max_char = state->cursor_x + state->x_offset;
             }
 
-            // Cursor clamping
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
-            if (state->cursor_x - margin > line_len) {
+
+            // Cursor clamping
+            if (state->cursor_x - margin > line_len - state->x_offset) {
                 state->cursor_x = margin + line_len;
+                if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
+                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                }
+                else if ((state->cursor_x - margin) > (screen_width - margin - 5)) { // This is the only statement that doesn't work
+                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                }
+                else {
+                    state->cursor_x = margin + line_len - state->x_offset;                   
+                }
             }
             
             if (!is_selecting) {
@@ -173,9 +193,12 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             else if (state->cursor_x <= margin - state->x_offset && state->cursor_y + state->y_offset >= 1) {
                 state->cursor_y--;
                 line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
-                state->cursor_x = margin + line_len;
+                if (line_len + margin > screen_width - 5) {
+                    state->x_offset = (line_len + margin) - screen_width + 4;
+                }
+                state->cursor_x = margin + line_len - state->x_offset;
             }
-            state->max_char = state->cursor_x;
+            state->max_char = state->cursor_x + state->x_offset;
 
             if (!is_selecting) {
                 cancel_selection();
@@ -194,11 +217,12 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                     state->cursor_x++;
                 }
             }
-            else if (state->cursor_x + margin - state->x_offset > line_len - 1 && state->cursor_y + state->y_offset < state->total_lines - 1) {
+            else if (state->cursor_x + margin + state->x_offset > line_len - 1 && state->cursor_y + state->y_offset < state->total_lines - 1) {
                 state->cursor_y++;
                 state->cursor_x = margin;
+                state->x_offset = 0;
             }
-            state->max_char = state->cursor_x;
+            state->max_char = state->cursor_x + state->x_offset;
 
             if (!is_selecting) {
                 cancel_selection();
@@ -255,7 +279,6 @@ void handle_key(int key, struct Editor_State* state) {
 
     if ((key >= 32 && key <= 126)) {
         insert_char((char)key, state);
-        state->max_char = state->cursor_x;
         state->is_saved = false;
         return;
     }
@@ -269,7 +292,6 @@ void handle_key(int key, struct Editor_State* state) {
 
     if (key == KEY_BACKSPACE || key == 127) {
         delete_char(state);
-        state->max_char = state->cursor_x;
         state->is_saved = false;
         return;
     }

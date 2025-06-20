@@ -7,7 +7,7 @@ void draw_status_bar(struct Editor_State* state) {
     getmaxyx(stdscr, max_y, max_x);
 
     int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+    int pos = state->cursor_x - margin + state->x_offset;
     
     char path[64];
     char cursor_info[64];
