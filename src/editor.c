@@ -77,7 +77,7 @@ void draw_editor(struct Editor_State* state) {
         int col = margin;
 
         for (int symb = state->x_offset; symb < (int) strlen(line) && symb < state->x_offset + screen_width; symb++) {
-            if (is_selected(line_num_pos, col, state->cursor_y + state->y_offset)) {
+            if (is_selected(line_num_pos, col, state->cursor_y)) {
                 attron(COLOR_PAIR(3));
                 mvprintw(line_num_pos, col, "%c", line[symb]);
                 attroff(COLOR_PAIR(3));
@@ -239,30 +239,30 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
 
 void handle_key(int key, struct Editor_State* state) {
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
-        start_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        start_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         move_cursor(260, state, true);
-        update_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        update_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         return;
     }
 
     if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
-        start_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        start_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         move_cursor(261, state, true);
-        update_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        update_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         return;
     }
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
-        start_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        start_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         move_cursor(259, state, true);
-        update_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        update_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         return;
     }
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
-        start_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        start_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         move_cursor(258, state, true);
-        update_selection(state->cursor_y + state->y_offset, state->cursor_x + state->x_offset);
+        update_selection(state->cursor_y, state->cursor_x, state->y_offset, state->x_offset);
         return;
     }
 

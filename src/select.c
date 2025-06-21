@@ -4,18 +4,26 @@ static Position selection_start;
 static Position selection_end;
 static bool selecting = false;
 
-void start_selection(int row, int col) {
+static Position offset_start;
+
+void start_selection(int row, int col, int offset_row, int offset_col) {
     if (!selecting) {
         selection_start.row = row;
         selection_start.col = col;
         selecting = true;
+
+        offset_start.row = offset_row;
+        offset_start.col = offset_col;
     }
 }
 
-void update_selection(int row, int col) {
+void update_selection(int row, int col, int offset_row, int offset_col) {
     if (selecting) {
         selection_end.row = row;
         selection_end.col = col;
+
+        selection_start.row += (offset_start.row - offset_row);
+        selection_start.col += (offset_start.col - offset_col);
     }
 }
 
