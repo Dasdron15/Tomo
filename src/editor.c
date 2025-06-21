@@ -390,9 +390,13 @@ int goto_line(struct Editor_State* state) {
     delwin(box);
 
     int line = atoi(input);
-    if (line < 1 || line > state->total_lines) {
+    if (line < 1) {
         return -1;
     }
+
+    if (line > state->total_lines) {
+        return state->total_lines - 1;
+    }    
     return line - 1;
 }
 
