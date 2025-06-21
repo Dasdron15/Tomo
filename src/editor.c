@@ -125,12 +125,14 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
 
             // Cursor clamping
-            if (state->cursor_x - margin > line_len - state->x_offset) {
+            if (state->cursor_x - margin > line_len - state->x_offset || state->cursor_x + 5 > screen_width) {
                 state->cursor_x = margin + line_len;
-                if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
-                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+
+                if (state->cursor_x + 5 > screen_width) {
+                    state->x_offset = state->cursor_x - screen_width + 5;
+                    state->cursor_x -= state->x_offset;
                 }
-                else if ((state->cursor_x - margin) > (screen_width - margin - 5)) { // This is the only statement that doesn't work
+                else if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
                     state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
                 }
                 else {
@@ -163,12 +165,14 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
             line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
 
             // Cursor clamping
-            if (state->cursor_x - margin > line_len - state->x_offset) {
+            if (state->cursor_x - margin > line_len - state->x_offset || state->cursor_x + 5 > screen_width) {
                 state->cursor_x = margin + line_len;
-                if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
-                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+
+                if (state->cursor_x + 5 > screen_width) {
+                    state->x_offset = state->cursor_x - screen_width + 5;
+                    state->cursor_x -= state->x_offset;
                 }
-                else if ((state->cursor_x - margin) > (screen_width - margin - 5)) { // This is the only statement that doesn't work
+                else if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
                     state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
                 }
                 else {
