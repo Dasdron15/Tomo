@@ -3,6 +3,7 @@
 #include "utils/common.h"
 #include "editor.h"
 #include "select.h"
+#include <curses.h>
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -133,10 +134,10 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                     state->cursor_x -= state->x_offset;
                 }
                 else if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
-                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                    state->x_offset = line_len - (state->cursor_x - margin);
                 }
                 else {
-                    state->cursor_x = margin + line_len - state->x_offset;                   
+                    state->cursor_x = margin + line_len - state->x_offset;                  
                 }
             }
 
@@ -173,7 +174,7 @@ void move_cursor(int key, struct Editor_State* state, bool is_selecting) {
                     state->cursor_x -= state->x_offset;
                 }
                 else if (state->cursor_x - margin < state->x_offset + 5 && state->x_offset > 0) {
-                    state->x_offset = state->cursor_x + state->x_offset - margin - 5 > 0 ? state->cursor_x + state->x_offset - margin - 5 : 0;
+                    state->x_offset = line_len - (state->cursor_x - margin);
                 }
                 else {
                     state->cursor_x = margin + line_len - state->x_offset;                   
@@ -438,7 +439,7 @@ void ask_for_save(struct Editor_State* state) {
 
 void insert_char(char c, struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+    int pos = state->cursor_x + state->x_offset - margin;
 
     char* old = state->lines[state->cursor_y + state->y_offset];
 
@@ -539,7 +540,7 @@ void delete_char(struct Editor_State* state) {
 
 void new_line(struct Editor_State* state) {
     int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+    int pos = state->cursor_x + state->x_offset - margin;
     int y_pos = state->cursor_y + state->y_offset;
     
     char* current = state->lines[y_pos];
@@ -572,6 +573,9 @@ void new_line(struct Editor_State* state) {
     state->lines[y_pos + 1] = right;
 
     state->total_lines++;
-    move_cursor(KEY_DOWN, state, false);
+
+    state->cursor_y++;
+    state->cursor_x = margin;
+    state->x_offset = 0;
 }
 
