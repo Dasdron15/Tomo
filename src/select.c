@@ -4,43 +4,42 @@ static Position selection_start;
 static Position selection_end;
 static bool selecting = false;
 
-static Position offset_start;
-
-void start_selection(int row, int col, int offset_row, int offset_col) {
+void start_selection(int row, int col) {
     if (!selecting) {
         selection_start.row = row;
         selection_start.col = col;
         selecting = true;
-
-        offset_start.row = offset_row;
-        offset_start.col = offset_col;
     }
 }
 
-void update_selection(int row, int col, int offset_row, int offset_col) {
+void update_selection(int row, int col) {
     if (selecting) {
         selection_end.row = row;
         selection_end.col = col;
-
-        selection_start.row += (offset_start.row - offset_row);
-        selection_start.col += (offset_start.col - offset_col);
     }
 }
 
-bool is_selected(int char_y, int char_x, int cursor_y) {
-    if (selecting) {
-        if (selection_start.row == cursor_y && selection_end.row == char_y) {
-            return (selection_start.col >= char_x && selection_end.col <= char_x) || (selection_start.col <= char_x && selection_end.col >= char_x);
-        }
-        else if (selection_start.row > cursor_y) { // Up arrow
-            return (selection_start.row == char_y && selection_start.col >= char_x) || (selection_start.row > char_y && selection_end.row < char_y) || (selection_end.row == char_y && selection_end.col <= char_x);
-        }
-        else if (selection_start.row < cursor_y) {
-            return (selection_start.row == char_y && selection_start.col <= char_x) || (selection_start.row < char_y && selection_end.row > char_y) || (selection_end.row == char_y && selection_end.col >= char_x);
-        }
+bool is_selected(int file_y, int file_x) {
+    if (!selecting) return false;
+
+    Position start = selection_start;
+    Position end = selection_end;
+
+    if (file_y < start.row || file_y > end.row) return false;
+
+    if (start.row == end.row) {
+        return file_x >= start.col && file_x < end.col;
     }
 
-    return false;
+    if (file_y == start.row) {
+        return file_x >= start.col;
+    }
+
+    if (file_y == end.row) {
+        return file_x < end.col;
+    }
+
+    return true;
 }
 
 void cancel_selection() {

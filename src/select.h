@@ -8,9 +8,9 @@ typedef struct {
     int col;
 } Position;
 
-void start_selection(int row, int col, int offset_row, int offset_col);
-void update_selection(int row, int col, int offset_row, int offset_col);
-bool is_selected(int char_y, int char_x, int cursor_y);
+void start_selection(int row, int col);
+void update_selection(int row, int col);
+bool is_selected(int file_y, int file_x);
 void cancel_selection();
 
 #endif
