@@ -3,7 +3,6 @@
 #include "utils/common.h"
 #include "editor.h"
 #include "select.h"
-#include <curses.h>
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
