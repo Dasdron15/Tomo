@@ -28,6 +28,11 @@ struct Editor_State {
     bool is_saved;
 };
 
+typedef struct {
+    int row;
+    int col;
+} Point;
+
 void init_editor(struct Editor_State* state);
 void draw_editor(struct Editor_State* state);
 
@@ -39,7 +44,7 @@ void ask_for_save(struct Editor_State* state);
 
 void insert_char(char c, struct Editor_State* state);
 void add_tab(struct Editor_State* state);
-void delete_char(struct Editor_State* state);
+void deletion(struct Editor_State* state, Point from, Point to);
 void new_line(struct Editor_State* state);
 
 #endif

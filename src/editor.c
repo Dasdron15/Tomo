@@ -510,7 +510,7 @@ void add_tab(struct Editor_State* state) {
     state->cursor_x += TAB_SIZE;
 }
 
-void delete_char(struct Editor_State* state) {
+void deletion(struct Editor_State* state, Point from, Point to) {
     int margin = int_len(state->total_lines) + 2;
     int x_pos = state->cursor_x - margin; // X axis of the cursor excluding the margin
     int y_pos = state->y_offset + state->cursor_y;
