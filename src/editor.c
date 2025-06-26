@@ -300,7 +300,16 @@ void handle_key(int key, struct Editor_State* state) {
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
-        delete_char(state);
+        Point start_select;
+        Point end_select = {state->cursor_x + state->x_offset, state->cursor_y + state->y_offset};
+
+        if (1) {
+            Point start_select = end_select;
+        } else {
+            Point end_select = {}; // Todo: find start cords of selection           
+        }
+        
+        deletion(state, start_select, end_select);
         state->is_saved = false;
         return;
     }
@@ -510,7 +519,7 @@ void add_tab(struct Editor_State* state) {
     state->cursor_x += TAB_SIZE;
 }
 
-void deletion(struct Editor_State* state, Point from, Point to) {
+void deletion(struct Editor_State* state, Point start, Point end) {
     int margin = int_len(state->total_lines) + 2;
     int x_pos = state->cursor_x - margin; // X axis of the cursor excluding the margin
     int y_pos = state->y_offset + state->cursor_y;

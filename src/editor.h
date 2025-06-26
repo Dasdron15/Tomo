@@ -44,7 +44,7 @@ void ask_for_save(struct Editor_State* state);
 
 void insert_char(char c, struct Editor_State* state);
 void add_tab(struct Editor_State* state);
-void deletion(struct Editor_State* state, Point from, Point to);
+void deletion(struct Editor_State* state, Point start, Point end);
 void new_line(struct Editor_State* state);
 
 #endif
