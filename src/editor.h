@@ -29,8 +29,8 @@ struct Editor_State {
 };
 
 typedef struct {
-    int row;
-    int col;
+    int y;
+    int x;
 } Point;
 
 void init_editor(struct Editor_State* state);

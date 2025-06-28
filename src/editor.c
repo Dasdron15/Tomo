@@ -300,13 +300,35 @@ void handle_key(int key, struct Editor_State* state) {
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
+        int x_pos = state->cursor_x + state->x_offset - margin;
+        int y_pos = state->cursor_y + state->y_offset;
+        
         Point start_select;
-        Point end_select = {state->cursor_x + state->x_offset, state->cursor_y + state->y_offset};
+        Point end_select;
 
-        if (1) {
-            Point start_select = end_select;
-        } else {
-            Point end_select = {}; // Todo: find start cords of selection           
+        if (!is_selecting()) {
+            start_select.x = x_pos;
+            start_select.y = y_pos;
+
+            end_select.x = x_pos;
+            end_select.y = y_pos;
+        }
+        else if (is_selecting() && ((get_start().x > x_pos && get_start().y == y_pos) || (get_start().y > y_pos))) {
+            start_select.x = x_pos;
+            start_select.y = y_pos;
+
+            end_select.x = get_start().x;
+            end_select.y = get_start().y;
+        }
+        else if (is_selecting() && ((get_start().x < x_pos && get_start().y == y_pos) || (get_start().y < y_pos))) {
+            start_select.x = get_start().x;
+            start_select.y = get_start().y;
+
+            end_select.x = x_pos;
+            end_select.y = y_pos;
+        }
+        else {
+            return;
         }
         
         deletion(state, start_select, end_select);
@@ -530,14 +552,15 @@ void deletion(struct Editor_State* state, Point start, Point end) {
         for (int i = x_pos - 1; i < len; i++) {
             state->lines[y_pos][i] = state->lines[y_pos][i + 1];
         }
+        state->lines[y_pos][len - 1] = '\0';
+        
         move_cursor(KEY_LEFT, state, false);
-    } else if (y_pos > 0) { // If cursor is at the beggining of the line then delete current line
+    }
+    else if (y_pos > 0) { // If cursor is at the beggining of the line then delete current line
         int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1; // Size of the previous line + current line + \0 (1)
         char* buf = malloc(size);
 
-        if (!buf) {
-            return;
-        }
+        if (!buf) return;
 
         move_cursor(KEY_LEFT, state, false);
         state->cursor_x -= (int_len(state->total_lines) - int_len(state->total_lines - 1));
