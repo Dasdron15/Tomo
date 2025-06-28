@@ -22,19 +22,22 @@ void update_selection(int row, int col) {
 bool is_selected(int file_y, int file_x) {
     Position start;
     Position end;
-    
-    if (!selecting) return false;
 
-    if (selection_start.y > selection_end.y || (selection_start.x > selection_end.x && selection_start.y == selection_end.y)) {
+    if (!selecting)
+        return false;
+
+    if (selection_start.y > selection_end.y ||
+        (selection_start.x > selection_end.x &&
+         selection_start.y == selection_end.y)) {
         start = selection_end;
         end = selection_start;
-    }
-    else {
+    } else {
         start = selection_start;
         end = selection_end;
     }
 
-    if (file_y < start.y || file_y > end.y) return false;
+    if (file_y < start.y || file_y > end.y)
+        return false;
 
     if (start.y == end.y) {
         return file_x >= start.x && file_x < end.x;
@@ -51,14 +54,8 @@ bool is_selected(int file_y, int file_x) {
     return true;
 }
 
-bool is_selecting() {
-    return selecting;
-}
+bool is_selecting() { return selecting; }
 
-void cancel_selection() {
-    selecting = false;
-}
+void cancel_selection() { selecting = false; }
 
-Position get_start() {
-    return selection_start;
-}
+Position get_start() { return selection_start; }

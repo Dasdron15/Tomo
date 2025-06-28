@@ -1,13 +1,13 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
-char* mult_char(char c, int count);
+char *mult_char(char c, int count);
 int int_len(int num);
-char* get_filename(char* path);
+char *get_filename(char *path);
 int rgb_to_ncurses(int rgb);
 
 #endif

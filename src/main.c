@@ -1,14 +1,14 @@
 #include "editor.h"
 #include "utils/fileio.h"
 #include <curses.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include <limits.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-struct Editor_State* state;
+struct Editor_State *state;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("Usage: %s <file>\n", argv[0]);
         return 1;
