@@ -542,40 +542,16 @@ void add_tab(struct Editor_State* state) {
 }
 
 void deletion(struct Editor_State* state, Point start, Point end) {
-    int margin = int_len(state->total_lines) + 2;
-    int x_pos = state->cursor_x - margin; // X axis of the cursor excluding the margin
-    int y_pos = state->y_offset + state->cursor_y;
+    int remove_count = end.y - start.y + 1;
 
-    int len = strlen(state->lines[y_pos]); // Current line length
-
-    if (x_pos > 0) {  // If not at the beggining of the line then delete character from an array of lines
-        for (int i = x_pos - 1; i < len; i++) {
-            state->lines[y_pos][i] = state->lines[y_pos][i + 1];
-        }
-        state->lines[y_pos][len - 1] = '\0';
-        
-        move_cursor(KEY_LEFT, state, false);
+    for (int i = end.y + 1; i < state->total_lines; i++) {
+        state->lines[i - remove_count] = state->lines[i];
     }
-    else if (y_pos > 0) { // If cursor is at the beggining of the line then delete current line
-        int size = strlen(state->lines[y_pos - 1]) + strlen(state->lines[y_pos]) + 1; // Size of the previous line + current line + \0 (1)
-        char* buf = malloc(size);
 
-        if (!buf) return;
-
-        move_cursor(KEY_LEFT, state, false);
-        state->cursor_x -= (int_len(state->total_lines) - int_len(state->total_lines - 1));
-
-        strcpy(buf, state->lines[y_pos - 1]);
-        strcat(buf, state->lines[y_pos]);
-        
-        state->lines[y_pos - 1] = buf;
-
-        for (int i = y_pos; i < state->total_lines; i++) {
-            state->lines[i] = state->lines[i + 1];
-        }
-
-        state->total_lines--;
-    }
+    state->total_lines -= remove_count;
+    state->cursor_y = start.y;
+    
+    cancel_selection(); 
 }
 
 void new_line(struct Editor_State* state) {

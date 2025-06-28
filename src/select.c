@@ -20,10 +20,19 @@ void update_selection(int row, int col) {
 }
 
 bool is_selected(int file_y, int file_x) {
+    Position start;
+    Position end;
+    
     if (!selecting) return false;
 
-    Position start = selection_start;
-    Position end = selection_end;
+    if (selection_start.y > selection_end.y || (selection_start.x > selection_end.x && selection_start.y == selection_end.y)) {
+        start = selection_end;
+        end = selection_start;
+    }
+    else {
+        start = selection_start;
+        end = selection_end;
+    }
 
     if (file_y < start.y || file_y > end.y) return false;
 
