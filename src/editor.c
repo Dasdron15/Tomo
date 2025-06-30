@@ -556,12 +556,11 @@ void add_tab(struct Editor_State *state) {
 void deletion(struct Editor_State *state, Point start, Point end) {
     int margin = int_len(state->total_lines) + 2;
 
-    if (start.y == end.y) {
+    if ((start.y == end.y && is_selecting()) || (!is_selecting() && !(start.x < 0 && start.y == 0))) {
         if (start.x < 0 && start.y > 0) {
             move_cursor(KEY_LEFT, state, false);
 
             char* new_line = realloc(state->lines[start.y - 1], strlen(state->lines[start.y - 1]) + strlen(state->lines[start.y]) + 1);
-
             state->lines[start.y - 1] = new_line;
             
             strcat(state->lines[start.y - 1], state->lines[start.y]);
@@ -569,8 +568,8 @@ void deletion(struct Editor_State *state, Point start, Point end) {
             for (int i = start.y; i < state->total_lines; i++) {
                 state->lines[i] = state->lines[i + 1];
             }
+
             state->total_lines--;
-            
             return;
         }
         
