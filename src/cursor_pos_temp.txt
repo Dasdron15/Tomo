@@ -1,2 +1,2 @@
 
-/home/igor/projects/Cobalt/src/editor.c:3:5:533:0/home/igor/projects/Cobalt/test.c:4:4:0:0/home/igor/projects/Cobalt/test.c:6:4:0:0/home/igor/projects/Cobalt/test.c:0:9:0:0/home/igor/projects/Cobalt/test.c:2:9:0:0/home/igor/projects/Cobalt/test.c:8:7:0:0/home/igor/projects/Cobalt/test.c:5:9:0:0
+/home/igor/projects/Cobalt/src/editor.c:1:6:0:0
