@@ -554,14 +554,16 @@ void add_tab(struct Editor_State *state) {
 }
 
 void deletion(struct Editor_State *state, Point start, Point end) {
-    if (!is_selecting()) {
+    int margin = int_len(state->total_lines) + 2;
+    
+    if (start.y == end.y) {
         int remove_count = end.x - start.x + 1;
         int length = strlen(state->lines[start.y]);
-        
+
         memmove(&state->lines[start.y][start.x], &state->lines[end.y][end.x + 1], length - end.x);
         state->lines[start.y][length - remove_count] = '\0';
 
-        state->cursor_x--;
+        state->cursor_x = start.x + margin;
     }
 
     cancel_selection();
