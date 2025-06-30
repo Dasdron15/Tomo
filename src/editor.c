@@ -318,10 +318,10 @@ void handle_key(int key, struct Editor_State *state) {
         Point end_select;
 
         if (!is_selecting()) {
-            start_select.x = x_pos;
+            start_select.x = x_pos - 1;
             start_select.y = y_pos;
 
-            end_select.x = x_pos;
+            end_select.x = x_pos - 1;
             end_select.y = y_pos;
         } else if (is_selecting() &&
                    ((get_start().x > x_pos && get_start().y == y_pos) ||
@@ -554,14 +554,15 @@ void add_tab(struct Editor_State *state) {
 }
 
 void deletion(struct Editor_State *state, Point start, Point end) {
-    int remove_count = end.y - start.y + 1;
+    if (!is_selecting()) {
+        int remove_count = end.x - start.x + 1;
+        int length = strlen(state->lines[start.y]);
+        
+        memmove(&state->lines[start.y][start.x], &state->lines[end.y][end.x + 1], length - end.x);
+        state->lines[start.y][length - remove_count] = '\0';
 
-    for (int i = end.y + 1; i < state->total_lines; i++) {
-        state->lines[i - remove_count] = state->lines[i];
+        state->cursor_x--;
     }
-
-    state->total_lines -= remove_count;
-    state->cursor_y = start.y;
 
     cancel_selection();
 }
