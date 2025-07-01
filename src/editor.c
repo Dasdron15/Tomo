@@ -580,7 +580,27 @@ void deletion(struct Editor_State *state, Point start, Point end) {
         state->lines[start.y][length - remove_count] = '\0';
 
         state->cursor_x = start.x + margin;
-    } else {
+    } else if (!(start.x < 0 && start.y == 0)) {
+        int deletion_range = end.y - start.y;
+
+        if (start.x > 0) {
+            state->lines[start.y][start.x] = '\0';
+        }
+
+        char* line = state->lines[end.y];
+        memmove(line, line + end.x + 1, strlen(line) - end.x);
+
+        char* new_line = realloc(state->lines[start.y], strlen(state->lines[start.y]) + strlen(line));
+        state->lines[start.y] = new_line;
+        strcat(state->lines[start.y], state->lines[end.y]);
+
+        for (int i = end.y + 1; i < state->total_lines; i++) {
+            state->lines[start.y + 1 + (i - end.y - 1)] = state->lines[i];
+        }
+
+        state->total_lines -= deletion_range;
+        state->cursor_x = start.x + margin;
+        state->cursor_y = start.y;
         
     }
 
