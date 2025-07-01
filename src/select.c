@@ -2,12 +2,15 @@
 
 static Position selection_start;
 static Position selection_end;
+static Position offset_start;
 static bool selecting = false;
 
-void start_selection(int row, int col) {
+void start_selection(int row, int col, int y_offset, int x_offset) {
     if (!selecting) {
         selection_start.y = row;
         selection_start.x = col;
+        offset_start.y = y_offset;
+        offset_start.x = x_offset;
         selecting = true;
     }
 }
@@ -59,3 +62,5 @@ bool is_selecting() { return selecting; }
 void cancel_selection() { selecting = false; }
 
 Position get_start() { return selection_start; }
+
+Position get_offset() { return offset_start; }

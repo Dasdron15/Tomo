@@ -247,7 +247,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
+                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
         move_cursor(260, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -256,7 +256,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
+                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
         move_cursor(261, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -265,7 +265,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
+                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
         move_cursor(259, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -274,7 +274,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
+                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
         move_cursor(258, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -556,15 +556,18 @@ void add_tab(struct Editor_State *state) {
 void deletion(struct Editor_State *state, Point start, Point end) {
     int margin = int_len(state->total_lines) + 2;
 
-    if ((start.y == end.y && is_selecting()) || (!is_selecting() && !(start.x < 0 && start.y == 0))) {
+    if ((start.y == end.y && is_selecting()) ||
+        (!is_selecting() && !(start.x < 0 && start.y == 0))) {
         if (start.x < 0 && start.y > 0) {
             move_cursor(KEY_LEFT, state, false);
 
-            char* new_line = realloc(state->lines[start.y - 1], strlen(state->lines[start.y - 1]) + strlen(state->lines[start.y]) + 1);
+            char *new_line = realloc(state->lines[start.y - 1],
+                                     strlen(state->lines[start.y - 1]) +
+                                         strlen(state->lines[start.y]) + 1);
             state->lines[start.y - 1] = new_line;
-            
+
             strcat(state->lines[start.y - 1], state->lines[start.y]);
-            
+
             for (int i = start.y; i < state->total_lines; i++) {
                 state->lines[i] = state->lines[i + 1];
             }
@@ -572,11 +575,12 @@ void deletion(struct Editor_State *state, Point start, Point end) {
             state->total_lines--;
             return;
         }
-        
+
         int remove_count = end.x - start.x + 1;
         int length = strlen(state->lines[start.y]);
 
-        memmove(&state->lines[start.y][start.x], &state->lines[end.y][end.x + 1], length - end.x);
+        memmove(&state->lines[start.y][start.x],
+                &state->lines[end.y][end.x + 1], length - end.x);
         state->lines[start.y][length - remove_count] = '\0';
 
         state->cursor_x = start.x + margin;
@@ -587,10 +591,11 @@ void deletion(struct Editor_State *state, Point start, Point end) {
             state->lines[start.y][start.x] = '\0';
         }
 
-        char* line = state->lines[end.y];
+        char *line = state->lines[end.y];
         memmove(line, line + end.x + 1, strlen(line) - end.x);
 
-        char* new_line = realloc(state->lines[start.y], strlen(state->lines[start.y]) + strlen(line));
+        char *new_line = realloc(state->lines[start.y],
+                                 strlen(state->lines[start.y]) + strlen(line));
         state->lines[start.y] = new_line;
         strcat(state->lines[start.y], state->lines[end.y]);
 
@@ -599,9 +604,12 @@ void deletion(struct Editor_State *state, Point start, Point end) {
         }
 
         state->total_lines -= deletion_range;
+        
         state->cursor_x = start.x + margin;
         state->cursor_y = start.y;
-        
+
+        state->x_offset = get_offset().x;
+        state->y_offset = get_offset().y;
     }
 
     cancel_selection();
