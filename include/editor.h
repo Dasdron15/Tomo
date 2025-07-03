@@ -1,12 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include <ctype.h>
-#include <curses.h>
-#include <math.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024

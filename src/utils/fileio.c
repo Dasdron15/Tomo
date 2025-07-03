@@ -1,4 +1,10 @@
 #include "fileio.h"
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "editor.h"
 
 void load_file(const char *path, struct Editor_State *state) {

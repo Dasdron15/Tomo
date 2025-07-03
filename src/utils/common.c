@@ -1,5 +1,9 @@
 #include "common.h"
 
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
 char *mult_char(char c, int count) {
     if (count <= 0) {
         char *empty = malloc(1);

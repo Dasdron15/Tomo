@@ -1,10 +1,12 @@
-#include "editor.h"
-#include "fileio.h"
-#include <curses.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <curses.h>
+
+#include "editor.h"
+#include "fileio.h"
 
 struct Editor_State *state;
 

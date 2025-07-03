@@ -1,6 +1,13 @@
 #include "status_bar.h"
-#include "../editor.h"
-#include "../utils/common.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <curses.h>
+
+#include "editor.h"
+#include "common.h"
 
 void draw_status_bar(struct Editor_State *state) {
     int max_x, max_y;

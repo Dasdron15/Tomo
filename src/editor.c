@@ -1,8 +1,15 @@
 #include "editor.h"
-#include "select.h"
-#include "status_bar.h"
+
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <curses.h>
+
 #include "common.h"
 #include "fileio.h"
+#include "select.h"
+#include "status_bar.h"
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -604,7 +611,7 @@ void deletion(struct Editor_State *state, Point start, Point end) {
         }
 
         state->total_lines -= deletion_range;
-        
+
         state->cursor_x = start.x + margin;
         state->cursor_y = start.y;
 
