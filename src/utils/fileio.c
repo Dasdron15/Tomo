@@ -7,7 +7,7 @@
 
 #include "editor.h"
 
-void load_file(const char *path, struct Editor_State *state) {
+void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
     char buffer[1024];
     int i = 0;
@@ -23,98 +23,23 @@ void load_file(const char *path, struct Editor_State *state) {
             buffer[len - 1] = '\0';
         }
 
-        state->lines[i++] = strdup(buffer);
+        editor.lines[i++] = strdup(buffer);
     }
 
     fclose(fp);
-    state->total_lines = i;
+    editor.total_lines = i;
 }
 
-void save_file(struct Editor_State *state) {
-    FILE *fp = fopen(state->filename, "w");
+void save_file() {
+    FILE *fp = fopen(editor.filename, "w");
 
-    for (int i = 0; i < state->total_lines && state->lines[i] != NULL; i++) {
-        if (i != state->total_lines - 1) {
-            fprintf(fp, "%s\n", state->lines[i]);
+    for (int i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {
+        if (i != editor.total_lines - 1) {
+            fprintf(fp, "%s\n", editor.lines[i]);
         } else {
-            fprintf(fp, "%s\n", state->lines[i]);
+            fprintf(fp, "%s\n", editor.lines[i]);
         }
     }
     fclose(fp);
-    state->is_saved = true;
-}
-
-void save_pos(struct Editor_State *state) {
-    FILE *src = fopen("src/cursor_pos.txt", "r");
-    FILE *tmp = fopen("src/cursor_pos_temp.txt", "w");
-
-    char line[1024];
-    int found = 0;
-    size_t name_len = strlen(state->filename);
-
-    if (src) {
-        while (fgets(line, sizeof(line), src)) {
-            if (!found && strstr(line, state->filename) != NULL &&
-                line[name_len] == ':') {
-                fprintf(tmp, "%s:%d:%d:%d:%d", state->filename, state->cursor_y,
-                        state->cursor_x, state->y_offset, state->x_offset);
-                found = 1;
-            } else {
-                fputs(line, tmp);
-            }
-        }
-        fclose(src);
-    }
-
-    if (!found) {
-        fprintf(tmp, "%s:%d:%d:%d:%d", state->filename, state->cursor_y,
-                state->cursor_x, state->y_offset, state->x_offset);
-    }
-
-    fclose(tmp);
-
-    rename("src/cursor_pos.txt", "src/backup.txt");
-    rename("src/cursor_pos_temp.txt", "src/cursor_pos.txt");
-    rename("src/backup.txt", "src/cursor_pos_temp.txt");
-}
-
-int load_pos(struct Editor_State *state) {
-    FILE *src = fopen("src/cursor_pos.txt", "r");
-
-    char line[1024];
-    int loaded = 0;
-
-    while (fgets(line, sizeof(line), src)) {
-        char *token = strtok(line, ":");
-        if (!token)
-            continue;
-
-        if (strcmp(token, state->filename) != 0) {
-            continue;
-        }
-
-        int count = 1;
-        int values[4] = {0};
-
-        while ((token = strtok(NULL, ":\n")) && count <= 3) {
-            values[count - 1] = atoi(token);
-            count++;
-        }
-
-        if (count == 5) {
-            if (values[0] + values[2] > state->total_lines - 1) {
-                state->cursor_y = state->total_lines - values[2] - 1;
-            } else {
-                state->cursor_y = values[0];
-            }
-            state->cursor_x = values[1];
-            state->y_offset = values[2];
-            state->x_offset = values[3];
-            loaded = 1;
-            break;
-        }
-    }
-
-    fclose(src);
-    return loaded;
+    editor.is_saved = true;
 }

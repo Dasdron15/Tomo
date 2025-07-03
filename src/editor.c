@@ -11,21 +11,19 @@
 #include "select.h"
 #include "status_bar.h"
 
-void init_editor(struct Editor_State *state) {
-    state->is_saved = true;
+void init_editor(void) {
+    editor.is_saved = true;
 
-    if (load_pos(state) == 0) {
-        state->cursor_x = int_len(state->total_lines) + 2;
-        state->cursor_y = 0;
-        state->x_offset = 0;
-        state->y_offset = 0;
-    }
+    editor.cursor_x = int_len(editor.total_lines) + 2;
+    editor.cursor_y = 0;
+    editor.x_offset = 0;
+    editor.y_offset = 0;
 
-    state->max_char = state->cursor_x + state->x_offset;
+    editor.max_char = editor.cursor_x + editor.x_offset;
 
-    if (state->total_lines == 0) {
-        state->lines[0] = strdup("");
-        state->total_lines = 1;
+    if (editor.total_lines == 0) {
+        editor.lines[0] = strdup("");
+        editor.total_lines = 1;
     }
 
     initscr();
@@ -34,8 +32,6 @@ void init_editor(struct Editor_State *state) {
     keypad(stdscr, true);
     noecho();
     curs_set(2);
-
-    load_pos(state);
 
     if (has_colors() == FALSE) {
         endwin();
@@ -58,25 +54,25 @@ void init_editor(struct Editor_State *state) {
     init_pair(3, 255, 11); // Selected text
 }
 
-void draw_editor(struct Editor_State *state) {
+void draw_editor() {
     erase();
 
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
 
     int line_num_pos = 0;
-    int margin = int_len(state->total_lines) + 2;
+    int margin = int_len(editor.total_lines) + 2;
 
-    for (int index = state->y_offset;
-         index < state->y_offset + screen_height - 1 &&
-         index < state->total_lines;
+    for (int index = editor.y_offset;
+         index < editor.y_offset + screen_height - 1 &&
+         index < editor.total_lines;
          index++) {
-        char *line = state->lines[index];
+        char *line = editor.lines[index];
         char *spaces =
-            mult_char(' ', int_len(state->total_lines) - int_len(index + 1));
+            mult_char(' ', int_len(editor.total_lines) - int_len(index + 1));
 
         // Draw line number
-        if (index == state->cursor_y + state->y_offset) {
+        if (index == editor.cursor_y + editor.y_offset) {
             attron(COLOR_PAIR(1));
             mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
             attroff(COLOR_PAIR(1));
@@ -87,8 +83,8 @@ void draw_editor(struct Editor_State *state) {
         // Draw line content with wrapping
         int col = margin;
 
-        for (int symb = state->x_offset;
-             symb < (int)strlen(line) && symb < state->x_offset + screen_width;
+        for (int symb = editor.x_offset;
+             symb < (int)strlen(line) && symb < editor.x_offset + screen_width;
              symb++) {
             int file_x = symb;
             int file_y = index;
@@ -110,48 +106,48 @@ void draw_editor(struct Editor_State *state) {
     }
 
     attron(COLOR_PAIR(2));
-    draw_status_bar(state);
+    draw_status_bar();
     attroff(COLOR_PAIR(2));
 
-    move(state->cursor_y, state->cursor_x);
+    move(editor.cursor_y, editor.cursor_x);
 }
 
-void move_cursor(int key, struct Editor_State *state, bool is_selecting) {
+void move_cursor(int key, bool is_selecting) {
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
     int margin =
-        int_len(state->total_lines) + 2; // Line number length + 2 spaces
+        int_len(editor.total_lines) + 2; // Line number length + 2 spaces
     int line_len;
 
     switch (key) {
     case KEY_UP: {
-        if (state->cursor_y + state->y_offset > 0) {
-            if (state->cursor_y < 4 && state->y_offset > 0) {
-                state->y_offset--;
+        if (editor.cursor_y + editor.y_offset > 0) {
+            if (editor.cursor_y < 4 && editor.y_offset > 0) {
+                editor.y_offset--;
             } else {
-                state->cursor_y--;
+                editor.cursor_y--;
             }
-            state->cursor_x = state->max_char;
+            editor.cursor_x = editor.max_char;
         } else {
-            state->cursor_x = margin;
-            state->max_char = state->cursor_x + state->x_offset;
+            editor.cursor_x = margin;
+            editor.max_char = editor.cursor_x + editor.x_offset;
         }
 
-        line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
+        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
 
         // Cursor clamping
-        if (state->cursor_x - margin > line_len - state->x_offset ||
-            state->cursor_x + 5 > screen_width) {
-            state->cursor_x = margin + line_len;
+        if (editor.cursor_x - margin > line_len - editor.x_offset ||
+            editor.cursor_x + 5 > screen_width) {
+            editor.cursor_x = margin + line_len;
 
-            if (state->cursor_x + 5 > screen_width) {
-                state->x_offset = state->cursor_x - screen_width + 5;
-                state->cursor_x -= state->x_offset;
-            } else if (state->cursor_x - margin < state->x_offset + 5 &&
-                       state->x_offset > 0) {
-                state->x_offset = line_len - (state->cursor_x - margin);
+            if (editor.cursor_x + 5 > screen_width) {
+                editor.x_offset = editor.cursor_x - screen_width + 5;
+                editor.cursor_x -= editor.x_offset;
+            } else if (editor.cursor_x - margin < editor.x_offset + 5 &&
+                       editor.x_offset > 0) {
+                editor.x_offset = line_len - (editor.cursor_x - margin);
             } else {
-                state->cursor_x = margin + line_len - state->x_offset;
+                editor.cursor_x = margin + line_len - editor.x_offset;
             }
         }
 
@@ -162,35 +158,35 @@ void move_cursor(int key, struct Editor_State *state, bool is_selecting) {
     }
 
     case KEY_DOWN: {
-        if (state->cursor_y < state->total_lines - state->y_offset - 1) {
-            if (state->cursor_y > screen_height - 6 &&
-                state->y_offset + screen_height < state->total_lines + 1) {
-                state->y_offset++;
+        if (editor.cursor_y < editor.total_lines - editor.y_offset - 1) {
+            if (editor.cursor_y > screen_height - 6 &&
+                editor.y_offset + screen_height < editor.total_lines + 1) {
+                editor.y_offset++;
             } else {
-                state->cursor_y++;
+                editor.cursor_y++;
             }
-            state->cursor_x = state->max_char;
+            editor.cursor_x = editor.max_char;
         } else {
-            line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
-            state->cursor_x = margin + line_len;
-            state->max_char = state->cursor_x + state->x_offset;
+            line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
+            editor.cursor_x = margin + line_len;
+            editor.max_char = editor.cursor_x + editor.x_offset;
         }
 
-        line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
+        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
 
         // Cursor clamping
-        if (state->cursor_x - margin > line_len - state->x_offset ||
-            state->cursor_x + 5 > screen_width) {
-            state->cursor_x = margin + line_len;
+        if (editor.cursor_x - margin > line_len - editor.x_offset ||
+            editor.cursor_x + 5 > screen_width) {
+            editor.cursor_x = margin + line_len;
 
-            if (state->cursor_x + 5 > screen_width) {
-                state->x_offset = state->cursor_x - screen_width + 5;
-                state->cursor_x -= state->x_offset;
-            } else if (state->cursor_x - margin < state->x_offset + 5 &&
-                       state->x_offset > 0) {
-                state->x_offset = line_len - (state->cursor_x - margin);
+            if (editor.cursor_x + 5 > screen_width) {
+                editor.x_offset = editor.cursor_x - screen_width + 5;
+                editor.cursor_x -= editor.x_offset;
+            } else if (editor.cursor_x - margin < editor.x_offset + 5 &&
+                       editor.x_offset > 0) {
+                editor.x_offset = line_len - (editor.cursor_x - margin);
             } else {
-                state->cursor_x = margin + line_len - state->x_offset;
+                editor.cursor_x = margin + line_len - editor.x_offset;
             }
         }
 
@@ -201,22 +197,22 @@ void move_cursor(int key, struct Editor_State *state, bool is_selecting) {
     }
 
     case KEY_LEFT: {
-        if (state->cursor_x > margin - state->x_offset) {
-            if (state->cursor_x < 6 && state->x_offset > 0) {
-                state->x_offset--;
+        if (editor.cursor_x > margin - editor.x_offset) {
+            if (editor.cursor_x < 6 && editor.x_offset > 0) {
+                editor.x_offset--;
             } else {
-                state->cursor_x--;
+                editor.cursor_x--;
             }
-        } else if (state->cursor_x <= margin - state->x_offset &&
-                   state->cursor_y + state->y_offset >= 1) {
-            state->cursor_y--;
-            line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
+        } else if (editor.cursor_x <= margin - editor.x_offset &&
+                   editor.cursor_y + editor.y_offset >= 1) {
+            editor.cursor_y--;
+            line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
             if (line_len + margin > screen_width - 5) {
-                state->x_offset = (line_len + margin) - screen_width + 4;
+                editor.x_offset = (line_len + margin) - screen_width + 4;
             }
-            state->cursor_x = margin + line_len - state->x_offset;
+            editor.cursor_x = margin + line_len - editor.x_offset;
         }
-        state->max_char = state->cursor_x + state->x_offset;
+        editor.max_char = editor.cursor_x + editor.x_offset;
 
         if (!is_selecting) {
             cancel_selection();
@@ -225,21 +221,21 @@ void move_cursor(int key, struct Editor_State *state, bool is_selecting) {
     }
 
     case KEY_RIGHT: {
-        line_len = strlen(state->lines[state->cursor_y + state->y_offset]);
+        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
 
-        if (state->cursor_x + state->x_offset < margin + line_len) {
-            if (state->cursor_x + state->x_offset > screen_width - 5) {
-                state->x_offset++;
+        if (editor.cursor_x + editor.x_offset < margin + line_len) {
+            if (editor.cursor_x + editor.x_offset > screen_width - 5) {
+                editor.x_offset++;
             } else {
-                state->cursor_x++;
+                editor.cursor_x++;
             }
-        } else if (state->cursor_x + margin + state->x_offset > line_len - 1 &&
-                   state->cursor_y + state->y_offset < state->total_lines - 1) {
-            state->cursor_y++;
-            state->cursor_x = margin;
-            state->x_offset = 0;
+        } else if (editor.cursor_x + margin + editor.x_offset > line_len - 1 &&
+                   editor.cursor_y + editor.y_offset < editor.total_lines - 1) {
+            editor.cursor_y++;
+            editor.cursor_x = margin;
+            editor.x_offset = 0;
         }
-        state->max_char = state->cursor_x + state->x_offset;
+        editor.max_char = editor.cursor_x + editor.x_offset;
 
         if (!is_selecting) {
             cancel_selection();
@@ -249,42 +245,42 @@ void move_cursor(int key, struct Editor_State *state, bool is_selecting) {
     }
 }
 
-void handle_key(int key, struct Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
+void handle_key(int key) {
+    int margin = int_len(editor.total_lines) + 2;
 
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
-        start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
-        move_cursor(260, state, true);
-        update_selection(state->cursor_y + state->y_offset,
-                         state->cursor_x - margin + state->x_offset);
+        start_selection(editor.cursor_y + editor.y_offset,
+                        editor.cursor_x - margin + editor.x_offset);
+        move_cursor(260, true);
+        update_selection(editor.cursor_y + editor.y_offset,
+                         editor.cursor_x - margin + editor.x_offset);
         return;
     }
 
     if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
-        start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
-        move_cursor(261, state, true);
-        update_selection(state->cursor_y + state->y_offset,
-                         state->cursor_x - margin + state->x_offset);
+        start_selection(editor.cursor_y + editor.y_offset,
+                        editor.cursor_x - margin + editor.x_offset);
+        move_cursor(261, true);
+        update_selection(editor.cursor_y + editor.y_offset,
+                         editor.cursor_x - margin + editor.x_offset);
         return;
     }
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
-        start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
-        move_cursor(259, state, true);
-        update_selection(state->cursor_y + state->y_offset,
-                         state->cursor_x - margin + state->x_offset);
+        start_selection(editor.cursor_y + editor.y_offset,
+                        editor.cursor_x - margin + editor.x_offset);
+        move_cursor(259, true);
+        update_selection(editor.cursor_y + editor.y_offset,
+                         editor.cursor_x - margin + editor.x_offset);
         return;
     }
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
-        start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset);
-        move_cursor(258, state, true);
-        update_selection(state->cursor_y + state->y_offset,
-                         state->cursor_x - margin + state->x_offset);
+        start_selection(editor.cursor_y + editor.y_offset,
+                        editor.cursor_x - margin + editor.x_offset);
+        move_cursor(258, true);
+        update_selection(editor.cursor_y + editor.y_offset,
+                         editor.cursor_x - margin + editor.x_offset);
         return;
     }
 
@@ -294,32 +290,31 @@ void handle_key(int key, struct Editor_State *state) {
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
-        if (!state->is_saved) {
-            ask_for_save(state);
+        if (!editor.is_saved) {
+            ask_for_save();
             return;
         }
-        save_pos(state);
         endwin();
         exit(0);
         return;
     }
 
     if ((key >= 32 && key <= 126)) {
-        insert_char((char)key, state);
-        state->is_saved = false;
+        insert_char((char)key);
+        editor.is_saved = false;
         return;
     }
 
     if (key == '\t') {
-        add_tab(state);
-        state->max_char = state->cursor_x;
-        state->is_saved = false;
+        add_tab();
+        editor.max_char = editor.cursor_x;
+        editor.is_saved = false;
         return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
-        int x_pos = state->cursor_x + state->x_offset - margin;
-        int y_pos = state->cursor_y + state->y_offset;
+        int x_pos = editor.cursor_x + editor.x_offset - margin;
+        int y_pos = editor.cursor_y + editor.y_offset;
 
         Point start_select;
         Point end_select;
@@ -350,52 +345,52 @@ void handle_key(int key, struct Editor_State *state) {
             return;
         }
 
-        deletion(state, start_select, end_select);
-        state->is_saved = false;
+        deletion(start_select, end_select);
+        editor.is_saved = false;
         return;
     }
 
     if (key == KEY_ENTER || key == 10) {
-        new_line(state);
-        state->is_saved = false;
+        new_line();
+        editor.is_saved = false;
         return;
     }
 
     if (key == 19) { // CTRL + S (Save file)
-        save_file(state);
+        save_file();
         return;
     }
 
     if (key == 7) { // CTRL + G (Goto line)
-        int target = goto_line(state);
+        int target = goto_line();
         if (target != -1) {
             if (target < getmaxy(stdscr) - 1) {
-                state->y_offset = 0;
+                editor.y_offset = 0;
             } else if (target > getmaxy(stdscr) - 2) {
-                state->y_offset = target - (getmaxy(stdscr) / 2);
+                editor.y_offset = target - (getmaxy(stdscr) / 2);
             }
-            state->cursor_y = target - state->y_offset;
+            editor.cursor_y = target - editor.y_offset;
         }
         return;
     }
 
     if (key == 534 &&
-        state->cursor_y + state->y_offset <
-            state->total_lines +
+        editor.cursor_y + editor.y_offset <
+            editor.total_lines +
                 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
-        if (state->total_lines > getmaxy(stdscr) - 1) {
-            state->y_offset = state->total_lines - getmaxy(stdscr) + 1;
+        if (editor.total_lines > getmaxy(stdscr) - 1) {
+            editor.y_offset = editor.total_lines - getmaxy(stdscr) + 1;
         }
-        state->cursor_y = state->total_lines - state->y_offset - 1;
+        editor.cursor_y = editor.total_lines - editor.y_offset - 1;
     }
 
     if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
-        state->y_offset = 0;
-        state->cursor_y = 0;
+        editor.y_offset = 0;
+        editor.cursor_y = 0;
     }
 }
 
-int goto_line(struct Editor_State *state) {
+int goto_line() {
     const int height = 3;
     const int width = 30;
 
@@ -412,10 +407,9 @@ int goto_line(struct Editor_State *state) {
     int ch;
     while ((ch = wgetch(box)) != '\n') {
         if (ch == 17) {
-            if (!state->is_saved) {
-                ask_for_save(state);
+            if (!editor.is_saved) {
+                ask_for_save();
             }
-            save_pos(state);
             endwin();
             exit(0);
             return 0;
@@ -444,13 +438,13 @@ int goto_line(struct Editor_State *state) {
         return -1;
     }
 
-    if (line > state->total_lines) {
-        return state->total_lines - 1;
+    if (line > editor.total_lines) {
+        return editor.total_lines - 1;
     }
     return line - 1;
 }
 
-void ask_for_save(struct Editor_State *state) {
+void ask_for_save() {
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 
@@ -483,8 +477,7 @@ void ask_for_save(struct Editor_State *state) {
     noecho();
 
     if (tolower(input[0]) == 121) { // 'Y' or 'y'
-        save_file(state);
-        save_pos(state);
+        save_file();
     }
 
     if (tolower(input[0]) == 121 || tolower(input[0]) == 110) {
@@ -492,19 +485,19 @@ void ask_for_save(struct Editor_State *state) {
         exit(0);
     }
 
-    ask_for_save(state);
+    ask_for_save();
 }
 
-void insert_char(char c, struct Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x + state->x_offset - margin;
+void insert_char(char c) {
+    int margin = int_len(editor.total_lines) + 2;
+    int pos = editor.cursor_x + editor.x_offset - margin;
 
-    char *old = state->lines[state->cursor_y + state->y_offset];
+    char *old = editor.lines[editor.cursor_y + editor.y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        state->lines[state->cursor_y + state->y_offset] = old;
+        editor.lines[editor.cursor_y + editor.y_offset] = old;
     }
 
     char *new = malloc(strlen(old) + 2);
@@ -518,22 +511,22 @@ void insert_char(char c, struct Editor_State *state) {
     new[pos] = c;
     strcpy(new + pos + 1, old + pos);
 
-    state->lines[state->cursor_y + state->y_offset] = new;
+    editor.lines[editor.cursor_y + editor.y_offset] = new;
 
     free(old);
-    move_cursor(KEY_RIGHT, state, false);
+    move_cursor(KEY_RIGHT, false);
 }
 
-void add_tab(struct Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x - margin;
+void add_tab() {
+    int margin = int_len(editor.total_lines) + 2;
+    int pos = editor.cursor_x - margin;
 
-    char *old = state->lines[state->cursor_y + state->y_offset];
+    char *old = editor.lines[editor.cursor_y + editor.y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        state->lines[state->cursor_y + state->y_offset] = old;
+        editor.lines[editor.cursor_y + editor.y_offset] = old;
     }
 
     char *tab_str = mult_char(' ', TAB_SIZE);
@@ -553,69 +546,69 @@ void add_tab(struct Editor_State *state) {
     memcpy(new + pos, tab_str, TAB_SIZE);
     strcpy(new + pos + TAB_SIZE, old + pos);
 
-    state->lines[state->cursor_y + state->y_offset] = new;
+    editor.lines[editor.cursor_y + editor.y_offset] = new;
     free(old);
     free(tab_str);
 
-    state->cursor_x += TAB_SIZE;
+    editor.cursor_x += TAB_SIZE;
 }
 
-void deletion(struct Editor_State *state, Point start, Point end) {
-    int margin = int_len(state->total_lines) + 2;
+void deletion(Point start, Point end) {
+    int margin = int_len(editor.total_lines) + 2;
 
     if ((start.y == end.y && is_selecting()) ||
         (!is_selecting() && !(start.x < 0 && start.y == 0))) {
         if (start.x < 0 && start.y > 0) {
-            move_cursor(KEY_LEFT, state, false);
+            move_cursor(KEY_LEFT, false);
 
-            char *new_line = realloc(state->lines[start.y - 1],
-                                     strlen(state->lines[start.y - 1]) +
-                                         strlen(state->lines[start.y]) + 1);
-            state->lines[start.y - 1] = new_line;
+            char *new_line = realloc(editor.lines[start.y - 1],
+                                     strlen(editor.lines[start.y - 1]) +
+                                         strlen(editor.lines[start.y]) + 1);
+            editor.lines[start.y - 1] = new_line;
 
-            strcat(state->lines[start.y - 1], state->lines[start.y]);
+            strcat(editor.lines[start.y - 1], editor.lines[start.y]);
 
-            for (int i = start.y; i < state->total_lines; i++) {
-                state->lines[i] = state->lines[i + 1];
+            for (int i = start.y; i < editor.total_lines; i++) {
+                editor.lines[i] = editor.lines[i + 1];
             }
 
-            state->total_lines--;
+            editor.total_lines--;
             return;
         }
 
         int remove_count = end.x - start.x + 1;
-        int length = strlen(state->lines[start.y]);
+        int length = strlen(editor.lines[start.y]);
 
-        memmove(&state->lines[start.y][start.x],
-                &state->lines[end.y][end.x + 1], length - end.x);
-        state->lines[start.y][length - remove_count] = '\0';
+        memmove(&editor.lines[start.y][start.x],
+                &editor.lines[end.y][end.x + 1], length - end.x);
+        editor.lines[start.y][length - remove_count] = '\0';
 
-        state->cursor_x = start.x + margin;
+        editor.cursor_x = start.x + margin;
     } else if (!(start.x < 0 && start.y == 0)) {
         int deletion_range = end.y - start.y;
 
         if (start.x > 0) {
-            state->lines[start.y][start.x] = '\0';
+            editor.lines[start.y][start.x] = '\0';
         }
 
-        char *line = state->lines[end.y];
+        char *line = editor.lines[end.y];
         memmove(line, line + end.x + 1, strlen(line) - end.x);
 
-        char *new_line = realloc(state->lines[start.y],
-                                 strlen(state->lines[start.y]) + strlen(line));
-        state->lines[start.y] = new_line;
-        strcat(state->lines[start.y], state->lines[end.y]);
+        char *new_line = realloc(editor.lines[start.y],
+                                 strlen(editor.lines[start.y]) + strlen(line));
+        editor.lines[start.y] = new_line;
+        strcat(editor.lines[start.y], editor.lines[end.y]);
 
-        for (int i = end.y + 1; i < state->total_lines; i++) {
-            state->lines[start.y + 1 + (i - end.y - 1)] = state->lines[i];
+        for (int i = end.y + 1; i < editor.total_lines; i++) {
+            editor.lines[start.y + 1 + (i - end.y - 1)] = editor.lines[i];
         }
 
-        state->total_lines -= deletion_range;
+        editor.total_lines -= deletion_range;
 
-        state->cursor_x = start.x + margin;
-        state->cursor_y = start.y;
+        editor.cursor_x = start.x + margin;
+        editor.cursor_y = start.y;
 
-        if (state->cursor_y + state->y_offset > start.y + 5) {
+        if (editor.cursor_y + editor.y_offset > start.y + 5) {
             endwin();
         }
     }
@@ -623,12 +616,12 @@ void deletion(struct Editor_State *state, Point start, Point end) {
     cancel_selection();
 }
 
-void new_line(struct Editor_State *state) {
-    int margin = int_len(state->total_lines) + 2;
-    int pos = state->cursor_x + state->x_offset - margin;
-    int y_pos = state->cursor_y + state->y_offset;
+void new_line() {
+    int margin = int_len(editor.total_lines) + 2;
+    int pos = editor.cursor_x + editor.x_offset - margin;
+    int y_pos = editor.cursor_y + editor.y_offset;
 
-    char *current = state->lines[y_pos];
+    char *current = editor.lines[y_pos];
     int current_len = strlen(current);
 
     char *left = malloc(pos + 1);
@@ -647,20 +640,20 @@ void new_line(struct Editor_State *state) {
 
     strcpy(right, current + pos);
 
-    free(state->lines[y_pos]);
-    state->lines[y_pos] = NULL;
+    free(editor.lines[y_pos]);
+    editor.lines[y_pos] = NULL;
 
-    for (int i = state->total_lines; i > y_pos; i--) {
-        state->lines[i] = state->lines[i - 1];
+    for (int i = editor.total_lines; i > y_pos; i--) {
+        editor.lines[i] = editor.lines[i - 1];
     }
 
-    state->lines[y_pos] = left;
-    state->lines[y_pos + 1] = right;
+    editor.lines[y_pos] = left;
+    editor.lines[y_pos + 1] = right;
 
-    state->total_lines++;
+    editor.total_lines++;
 
-    state->cursor_y++;
-    margin = int_len(state->total_lines) + 2;
-    state->cursor_x = margin;
-    state->x_offset = 0;
+    editor.cursor_y++;
+    margin = int_len(editor.total_lines) + 2;
+    editor.cursor_x = margin;
+    editor.x_offset = 0;
 }

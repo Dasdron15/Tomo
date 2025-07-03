@@ -1,2 +1,0 @@
-
-/home/igor/projects/Cobalt/src/editor.c:14:10:0:0

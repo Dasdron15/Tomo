@@ -3,6 +3,6 @@
 
 struct Editor_State;
 
-void draw_status_bar(struct Editor_State *state);
+void draw_status_bar();
 
 #endif

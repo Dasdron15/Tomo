@@ -8,27 +8,23 @@
 #include "editor.h"
 #include "fileio.h"
 
-struct Editor_State *state;
-
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("Usage: %s <file>\n", argv[0]);
         return 1;
     }
 
-    state = malloc(sizeof(struct Editor_State));
-
     char resolved_path[PATH_MAX];
-    state->filename = realpath(argv[1], resolved_path);
+    editor.filename = realpath(argv[1], resolved_path);
 
-    load_file(state->filename, state);
-    init_editor(state);
+    load_file(editor.filename);
+    init_editor();
 
     while (1) {
-        draw_editor(state);
+        draw_editor();
         int key = getch();
-        move_cursor(key, state, false);
-        handle_key(key, state);
+        move_cursor(key, false);
+        handle_key(key);
     }
 
     endwin();
