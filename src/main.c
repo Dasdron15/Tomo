@@ -1,5 +1,5 @@
 #include "editor.h"
-#include "utils/fileio.h"
+#include "fileio.h"
 #include <curses.h>
 #include <limits.h>
 #include <stdbool.h>

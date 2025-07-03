@@ -1,2 +1,2 @@
 
-/home/igor/projects/Cobalt/src/editor.c:2:12:0:0
+/home/igor/projects/Cobalt/src/editor.c:2:12:0:0/home/igor/projects/Cobalt/Makefile:3:4:0:0

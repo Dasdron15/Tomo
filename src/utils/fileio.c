@@ -1,5 +1,5 @@
 #include "fileio.h"
-#include "../editor.h"
+#include "editor.h"
 
 void load_file(const char *path, struct Editor_State *state) {
     FILE *fp = fopen(path, "r");

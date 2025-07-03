@@ -1,8 +1,8 @@
 #include "editor.h"
 #include "select.h"
-#include "ui/status_bar.h"
-#include "utils/common.h"
-#include "utils/fileio.h"
+#include "status_bar.h"
+#include "common.h"
+#include "fileio.h"
 
 void init_editor(struct Editor_State *state) {
     state->is_saved = true;
@@ -247,7 +247,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
+                        state->cursor_x - margin + state->x_offset);
         move_cursor(260, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -256,7 +256,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
+                        state->cursor_x - margin + state->x_offset);
         move_cursor(261, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -265,7 +265,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
+                        state->cursor_x - margin + state->x_offset);
         move_cursor(259, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -274,7 +274,7 @@ void handle_key(int key, struct Editor_State *state) {
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
         start_selection(state->cursor_y + state->y_offset,
-                        state->cursor_x - margin + state->x_offset, state->y_offset, state->x_offset);
+                        state->cursor_x - margin + state->x_offset);
         move_cursor(258, state, true);
         update_selection(state->cursor_y + state->y_offset,
                          state->cursor_x - margin + state->x_offset);
@@ -608,8 +608,9 @@ void deletion(struct Editor_State *state, Point start, Point end) {
         state->cursor_x = start.x + margin;
         state->cursor_y = start.y;
 
-        state->x_offset = get_offset().x;
-        state->y_offset = get_offset().y;
+        if (state->cursor_y + state->y_offset > start.y + 5) {
+            endwin();
+        }
     }
 
     cancel_selection();
