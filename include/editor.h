@@ -12,16 +12,8 @@ typedef struct {
     char *lines[MAX_LINES *
                 MAX_LINE_LENGTH]; // Array that stores all the text from a file
     size_t total_lines;
-
-    int x_offset; // Thing that is needed for proper text scrolling
-    int y_offset;
-
-    int max_char; // Last symbol X that you were on before pressing up or down
-                  // arrow
-
-    int cursor_x;
-    int cursor_y;
-
+    size_t margin;
+    
     char *filename;
     bool is_saved;
 } EditorState;
@@ -35,8 +27,6 @@ typedef struct {
 
 void init_editor(void);
 void draw_editor(void);
-
-void move_cursor(int key, bool is_selecting);
 
 void handle_key(int key);
 int goto_line(void);

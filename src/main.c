@@ -23,7 +23,6 @@ int main(int argc, char *argv[]) {
     while (1) {
         draw_editor();
         int key = getch();
-        move_cursor(key, false);
         handle_key(key);
     }
 

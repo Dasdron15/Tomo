@@ -7,19 +7,22 @@
 #include <curses.h>
 
 #include "common.h"
+#include "cursor.h"
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
 
+EditorState editor;
+
 void init_editor(void) {
     editor.is_saved = true;
 
-    editor.cursor_x = int_len(editor.total_lines) + 2;
-    editor.cursor_y = 0;
-    editor.x_offset = 0;
-    editor.y_offset = 0;
+    editor.margin = int_len(editor.total_lines) + 2;
 
-    editor.max_char = editor.cursor_x + editor.x_offset;
+    cursor.x = editor.margin;
+    cursor.y = 0;
+    cursor.x_offset = 0;
+    cursor.y_offset = 0;
 
     if (editor.total_lines == 0) {
         editor.lines[0] = strdup("");
@@ -63,8 +66,8 @@ void draw_editor() {
     int line_num_pos = 0;
     int margin = int_len(editor.total_lines) + 2;
 
-    for (int index = editor.y_offset;
-         index < editor.y_offset + screen_height - 1 &&
+    for (int index = cursor.y_offset;
+         index < cursor.y_offset + screen_height - 1 &&
          index < editor.total_lines;
          index++) {
         char *line = editor.lines[index];
@@ -72,7 +75,7 @@ void draw_editor() {
             mult_char(' ', int_len(editor.total_lines) - int_len(index + 1));
 
         // Draw line number
-        if (index == editor.cursor_y + editor.y_offset) {
+        if (index == cursor.y + cursor.y_offset) {
             attron(COLOR_PAIR(1));
             mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
             attroff(COLOR_PAIR(1));
@@ -83,8 +86,8 @@ void draw_editor() {
         // Draw line content with wrapping
         int col = margin;
 
-        for (int symb = editor.x_offset;
-             symb < (int)strlen(line) && symb < editor.x_offset + screen_width;
+        for (int symb = cursor.x_offset;
+             symb < (int)strlen(line) && symb < cursor.x_offset + screen_width;
              symb++) {
             int file_x = symb;
             int file_y = index;
@@ -109,178 +112,43 @@ void draw_editor() {
     draw_status_bar();
     attroff(COLOR_PAIR(2));
 
-    move(editor.cursor_y, editor.cursor_x);
-}
-
-void move_cursor(int key, bool is_selecting) {
-    int screen_width = getmaxx(stdscr);
-    int screen_height = getmaxy(stdscr);
-    int margin =
-        int_len(editor.total_lines) + 2; // Line number length + 2 spaces
-    int line_len;
-
-    switch (key) {
-    case KEY_UP: {
-        if (editor.cursor_y + editor.y_offset > 0) {
-            if (editor.cursor_y < 4 && editor.y_offset > 0) {
-                editor.y_offset--;
-            } else {
-                editor.cursor_y--;
-            }
-            editor.cursor_x = editor.max_char;
-        } else {
-            editor.cursor_x = margin;
-            editor.max_char = editor.cursor_x + editor.x_offset;
-        }
-
-        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
-
-        // Cursor clamping
-        if (editor.cursor_x - margin > line_len - editor.x_offset ||
-            editor.cursor_x + 5 > screen_width) {
-            editor.cursor_x = margin + line_len;
-
-            if (editor.cursor_x + 5 > screen_width) {
-                editor.x_offset = editor.cursor_x - screen_width + 5;
-                editor.cursor_x -= editor.x_offset;
-            } else if (editor.cursor_x - margin < editor.x_offset + 5 &&
-                       editor.x_offset > 0) {
-                editor.x_offset = line_len - (editor.cursor_x - margin);
-            } else {
-                editor.cursor_x = margin + line_len - editor.x_offset;
-            }
-        }
-
-        if (!is_selecting) {
-            cancel_selection();
-        }
-        break;
-    }
-
-    case KEY_DOWN: {
-        if (editor.cursor_y < editor.total_lines - editor.y_offset - 1) {
-            if (editor.cursor_y > screen_height - 6 &&
-                editor.y_offset + screen_height < editor.total_lines + 1) {
-                editor.y_offset++;
-            } else {
-                editor.cursor_y++;
-            }
-            editor.cursor_x = editor.max_char;
-        } else {
-            line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
-            editor.cursor_x = margin + line_len;
-            editor.max_char = editor.cursor_x + editor.x_offset;
-        }
-
-        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
-
-        // Cursor clamping
-        if (editor.cursor_x - margin > line_len - editor.x_offset ||
-            editor.cursor_x + 5 > screen_width) {
-            editor.cursor_x = margin + line_len;
-
-            if (editor.cursor_x + 5 > screen_width) {
-                editor.x_offset = editor.cursor_x - screen_width + 5;
-                editor.cursor_x -= editor.x_offset;
-            } else if (editor.cursor_x - margin < editor.x_offset + 5 &&
-                       editor.x_offset > 0) {
-                editor.x_offset = line_len - (editor.cursor_x - margin);
-            } else {
-                editor.cursor_x = margin + line_len - editor.x_offset;
-            }
-        }
-
-        if (!is_selecting) {
-            cancel_selection();
-        }
-        break;
-    }
-
-    case KEY_LEFT: {
-        if (editor.cursor_x > margin - editor.x_offset) {
-            if (editor.cursor_x < 6 && editor.x_offset > 0) {
-                editor.x_offset--;
-            } else {
-                editor.cursor_x--;
-            }
-        } else if (editor.cursor_x <= margin - editor.x_offset &&
-                   editor.cursor_y + editor.y_offset >= 1) {
-            editor.cursor_y--;
-            line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
-            if (line_len + margin > screen_width - 5) {
-                editor.x_offset = (line_len + margin) - screen_width + 4;
-            }
-            editor.cursor_x = margin + line_len - editor.x_offset;
-        }
-        editor.max_char = editor.cursor_x + editor.x_offset;
-
-        if (!is_selecting) {
-            cancel_selection();
-        }
-        break;
-    }
-
-    case KEY_RIGHT: {
-        line_len = strlen(editor.lines[editor.cursor_y + editor.y_offset]);
-
-        if (editor.cursor_x + editor.x_offset < margin + line_len) {
-            if (editor.cursor_x + editor.x_offset > screen_width - 5) {
-                editor.x_offset++;
-            } else {
-                editor.cursor_x++;
-            }
-        } else if (editor.cursor_x + margin + editor.x_offset > line_len - 1 &&
-                   editor.cursor_y + editor.y_offset < editor.total_lines - 1) {
-            editor.cursor_y++;
-            editor.cursor_x = margin;
-            editor.x_offset = 0;
-        }
-        editor.max_char = editor.cursor_x + editor.x_offset;
-
-        if (!is_selecting) {
-            cancel_selection();
-        }
-        break;
-    }
-    }
+    move(cursor.y, cursor.x);
 }
 
 void handle_key(int key) {
-    int margin = int_len(editor.total_lines) + 2;
-
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
-        start_selection(editor.cursor_y + editor.y_offset,
-                        editor.cursor_x - margin + editor.x_offset);
-        move_cursor(260, true);
-        update_selection(editor.cursor_y + editor.y_offset,
-                         editor.cursor_x - margin + editor.x_offset);
+        start_selection(cursor.y + cursor.y_offset,
+                        cursor.x - editor.margin + cursor.x_offset);
+        move_right(true);
+        update_selection(cursor.y + cursor.y_offset,
+                         cursor.x - editor.margin + cursor.x_offset);
         return;
     }
 
     if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
-        start_selection(editor.cursor_y + editor.y_offset,
-                        editor.cursor_x - margin + editor.x_offset);
-        move_cursor(261, true);
-        update_selection(editor.cursor_y + editor.y_offset,
-                         editor.cursor_x - margin + editor.x_offset);
+        start_selection(cursor.y + cursor.y_offset,
+                        cursor.x - editor.margin + cursor.x_offset);
+        move_left(true);
+        update_selection(cursor.y + cursor.y_offset,
+                         cursor.x - editor.margin + cursor.x_offset);
         return;
     }
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
-        start_selection(editor.cursor_y + editor.y_offset,
-                        editor.cursor_x - margin + editor.x_offset);
-        move_cursor(259, true);
-        update_selection(editor.cursor_y + editor.y_offset,
-                         editor.cursor_x - margin + editor.x_offset);
+        start_selection(cursor.y + cursor.y_offset,
+                        cursor.x - editor.margin + cursor.x_offset);
+        move_up(true);
+        update_selection(cursor.y + cursor.y_offset,
+                         cursor.x - editor.margin + cursor.x_offset);
         return;
     }
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
-        start_selection(editor.cursor_y + editor.y_offset,
-                        editor.cursor_x - margin + editor.x_offset);
-        move_cursor(258, true);
-        update_selection(editor.cursor_y + editor.y_offset,
-                         editor.cursor_x - margin + editor.x_offset);
+        start_selection(cursor.y + cursor.y_offset,
+                        cursor.x - editor.margin + cursor.x_offset);
+        move_down(true);
+        update_selection(cursor.y + cursor.y_offset,
+                         cursor.x - editor.margin + cursor.x_offset);
         return;
     }
 
@@ -307,14 +175,14 @@ void handle_key(int key) {
 
     if (key == '\t') {
         add_tab();
-        editor.max_char = editor.cursor_x;
+        cursor.max_x = cursor.x;
         editor.is_saved = false;
         return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
-        int x_pos = editor.cursor_x + editor.x_offset - margin;
-        int y_pos = editor.cursor_y + editor.y_offset;
+        int x_pos = cursor.x + cursor.x_offset - editor.margin;
+        int y_pos = cursor.y + cursor.y_offset;
 
         Point start_select;
         Point end_select;
@@ -365,28 +233,28 @@ void handle_key(int key) {
         int target = goto_line();
         if (target != -1) {
             if (target < getmaxy(stdscr) - 1) {
-                editor.y_offset = 0;
+                cursor.y_offset = 0;
             } else if (target > getmaxy(stdscr) - 2) {
-                editor.y_offset = target - (getmaxy(stdscr) / 2);
+                cursor.y_offset = target - (getmaxy(stdscr) / 2);
             }
-            editor.cursor_y = target - editor.y_offset;
+            cursor.y = target - cursor.y_offset;
         }
         return;
     }
 
     if (key == 534 &&
-        editor.cursor_y + editor.y_offset <
+        cursor.y + cursor.y_offset <
             editor.total_lines +
                 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
         if (editor.total_lines > getmaxy(stdscr) - 1) {
-            editor.y_offset = editor.total_lines - getmaxy(stdscr) + 1;
+            cursor.y_offset = editor.total_lines - getmaxy(stdscr) + 1;
         }
-        editor.cursor_y = editor.total_lines - editor.y_offset - 1;
+        cursor.y = editor.total_lines - cursor.y_offset - 1;
     }
 
     if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
-        editor.y_offset = 0;
-        editor.cursor_y = 0;
+        cursor.y_offset = 0;
+        cursor.y = 0;
     }
 }
 
@@ -489,15 +357,14 @@ void ask_for_save() {
 }
 
 void insert_char(char c) {
-    int margin = int_len(editor.total_lines) + 2;
-    int pos = editor.cursor_x + editor.x_offset - margin;
+    int pos = cursor.x + cursor.x_offset - editor.margin;
 
-    char *old = editor.lines[editor.cursor_y + editor.y_offset];
+    char *old = editor.lines[cursor.y + cursor.y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        editor.lines[editor.cursor_y + editor.y_offset] = old;
+        editor.lines[cursor.y + cursor.y_offset] = old;
     }
 
     char *new = malloc(strlen(old) + 2);
@@ -511,22 +378,21 @@ void insert_char(char c) {
     new[pos] = c;
     strcpy(new + pos + 1, old + pos);
 
-    editor.lines[editor.cursor_y + editor.y_offset] = new;
+    editor.lines[cursor.y + cursor.y_offset] = new;
 
     free(old);
-    move_cursor(KEY_RIGHT, false);
+    move_right(false);
 }
 
-void add_tab() {
-    int margin = int_len(editor.total_lines) + 2;
-    int pos = editor.cursor_x - margin;
+void add_tab(void) {
+    int pos = cursor.x - editor.margin;
 
-    char *old = editor.lines[editor.cursor_y + editor.y_offset];
+    char *old = editor.lines[cursor.y + cursor.y_offset];
 
     if (old == NULL) {
         old = malloc(1);
         old[0] = '\0';
-        editor.lines[editor.cursor_y + editor.y_offset] = old;
+        editor.lines[cursor.y + cursor.y_offset] = old;
     }
 
     char *tab_str = mult_char(' ', TAB_SIZE);
@@ -546,11 +412,11 @@ void add_tab() {
     memcpy(new + pos, tab_str, TAB_SIZE);
     strcpy(new + pos + TAB_SIZE, old + pos);
 
-    editor.lines[editor.cursor_y + editor.y_offset] = new;
+    editor.lines[cursor.y + cursor.y_offset] = new;
     free(old);
     free(tab_str);
 
-    editor.cursor_x += TAB_SIZE;
+    cursor.x += TAB_SIZE;
 }
 
 void deletion(Point start, Point end) {
@@ -559,7 +425,7 @@ void deletion(Point start, Point end) {
     if ((start.y == end.y && is_selecting()) ||
         (!is_selecting() && !(start.x < 0 && start.y == 0))) {
         if (start.x < 0 && start.y > 0) {
-            move_cursor(KEY_LEFT, false);
+            move_left(false);
 
             char *new_line = realloc(editor.lines[start.y - 1],
                                      strlen(editor.lines[start.y - 1]) +
@@ -583,7 +449,7 @@ void deletion(Point start, Point end) {
                 &editor.lines[end.y][end.x + 1], length - end.x);
         editor.lines[start.y][length - remove_count] = '\0';
 
-        editor.cursor_x = start.x + margin;
+        cursor.x = start.x + margin;
     } else if (!(start.x < 0 && start.y == 0)) {
         int deletion_range = end.y - start.y;
 
@@ -605,21 +471,17 @@ void deletion(Point start, Point end) {
 
         editor.total_lines -= deletion_range;
 
-        editor.cursor_x = start.x + margin;
-        editor.cursor_y = start.y;
-
-        if (editor.cursor_y + editor.y_offset > start.y + 5) {
-            endwin();
-        }
+        cursor.x = start.x + margin;
+        cursor.y = start.y;
     }
 
     cancel_selection();
 }
 
-void new_line() {
+void new_line(void) {
     int margin = int_len(editor.total_lines) + 2;
-    int pos = editor.cursor_x + editor.x_offset - margin;
-    int y_pos = editor.cursor_y + editor.y_offset;
+    int pos = cursor.x + cursor.x_offset - margin;
+    int y_pos = cursor.y + cursor.y_offset;
 
     char *current = editor.lines[y_pos];
     int current_len = strlen(current);
@@ -652,8 +514,8 @@ void new_line() {
 
     editor.total_lines++;
 
-    editor.cursor_y++;
+    cursor.y++;
     margin = int_len(editor.total_lines) + 2;
-    editor.cursor_x = margin;
-    editor.x_offset = 0;
+    cursor.x = margin;
+    cursor.x_offset = 0;
 }

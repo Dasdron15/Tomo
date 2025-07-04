@@ -1,20 +1,28 @@
 #include "cursor.h"
 
-void move_up(void) {
+#include "editor.h"
+
+CursorState cursor;
+
+void move_up(bool is_selecting) {
     if (cursor.y + cursor.y_offset > 0) {
-        cursor.x--;
+        cursor.y--;
     }
 }
 
-void move_down(size_t total_lines) {
-        
+void move_down(bool is_selecting) {
+    if (cursor.y + cursor.y_offset < editor.total_lines) {
+        cursor.y++;
+    } else if (cursor.y + cursor.y_offset == editor.total_lines) {
+        cursor.x = 
+    }
 }
 
-void move_right(void) {
-
+void move_right(bool is_selecting) {
+    if ()
 }
 
-void move_left(void) {
+void move_left(bool is_selecting) {
 
 }
 
