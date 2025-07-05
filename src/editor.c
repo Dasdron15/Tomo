@@ -20,6 +20,7 @@ void init_editor(void) {
     editor.margin = int_len(editor.total_lines) + 2;
 
     cursor.x = editor.margin;
+    cursor.max_x = editor.margin;
     cursor.y = 0;
     cursor.x_offset = 0;
     cursor.y_offset = 0;

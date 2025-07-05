@@ -9,8 +9,14 @@
 CursorState cursor;
 
 void move_up(bool is_selecting) {
-    cursor.y--;
-
+    if (cursor.y + cursor.y_offset > 0) {    
+        cursor.y--;
+        cursor.x = cursor.max_x;
+    } else {
+        cursor.x = editor.margin;
+        cursor.max_x = cursor.x;
+    }
+    
     if (!is_selecting) {
         cancel_selection();
     }
@@ -19,7 +25,14 @@ void move_up(bool is_selecting) {
 }
 
 void move_down(bool is_selecting) {
-    cursor.y++;
+    if (cursor.y + cursor.y_offset < editor.total_lines) {
+        cursor.y++;
+        cursor.x = cursor.max_x;
+    } else {
+        size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
+        cursor.x = line_len;
+        cursor.max_x = cursor.x;
+    }
 
     if (!is_selecting) {
         cancel_selection();
@@ -39,7 +52,7 @@ void move_right(bool is_selecting) {
         cursor.x++;
     }
 
-    cursor.max_x = editor.margin + cursor.x;
+    cursor.max_x = cursor.x;
 
     if (!is_selecting) {
         cancel_selection();
@@ -58,7 +71,7 @@ void move_left(bool is_selecting) {
         cursor.x--;
     }
 
-    cursor.max_x = editor.margin + cursor.x;
+    cursor.max_x = cursor.x;
 
     if (!is_selecting) {
         cancel_selection();
@@ -68,7 +81,9 @@ void move_left(bool is_selecting) {
 }
 
 void clamp_cursor(void) {
-    if (true) {
-        
+    size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
+    
+    if (cursor.x + cursor.x_offset > line_len) {
+        cursor.x = line_len + editor.margin;
     }
 }
