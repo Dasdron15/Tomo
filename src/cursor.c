@@ -2,6 +2,8 @@
 
 #include <curses.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 #include "editor.h"
 #include "select.h"
@@ -99,3 +101,58 @@ void clamp_cursor(void) {
         cursor.y = screen_height - 5;
     }
 }
+
+int goto_line() {
+    const size_t height = 3;
+    const size_t width = 30;
+
+    WINDOW *box = newwin(height, width, 1, getmaxx(stdscr) - 33);
+
+    box(box, 0, 0);
+    mvwprintw(box, 1, 2, "Go to line: ");
+
+    curs_set(1);
+
+    char input[15] = {'\0'};
+    int pos = 0;
+
+    int ch;
+    while ((ch = wgetch(box)) != '\n') {
+        if (ch == 17) {
+            if (!editor.is_saved) {
+                ask_for_save();
+            }
+            endwin();
+            exit(0);
+            return 0;
+        }
+
+        if (ch == 27) {
+            delwin(box);
+            return -1;
+        } else if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') &&
+                   pos > 0) {
+            input[--pos] = '\0';
+            mvwprintw(box, 1, 14 + pos, " ");
+            wmove(box, 1, 14 + pos);
+        } else if (isdigit(ch) && pos < (int)sizeof(input) - 1) {
+            input[pos++] = ch;
+            mvwprintw(box, 1, 13 + pos, "%c", ch);
+            wmove(box, 1, 14 + pos);
+        }
+        wrefresh(box);
+    }
+
+    delwin(box);
+
+    size_t line = atoi(input);
+    if (line < 1) {
+        return -1;
+    }
+
+    if (line > editor.total_lines) {
+        return editor.total_lines - 1;
+    }
+    return line - 1;
+}
+

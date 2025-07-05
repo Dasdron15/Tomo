@@ -22,4 +22,6 @@ void move_left(bool is_selecting);
 
 void clamp_cursor(void);
 
+int goto_line();
+
 #endif

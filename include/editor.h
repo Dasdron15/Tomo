@@ -29,7 +29,6 @@ void init_editor(void);
 void draw_editor(void);
 
 void handle_key(int key);
-int goto_line(void);
 void ask_for_save(void);
 
 void insert_char(char c);
