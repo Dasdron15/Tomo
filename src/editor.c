@@ -262,12 +262,8 @@ void handle_key(int key) {
     if (key == 7) { // CTRL + G (Goto line)
         int target = goto_line();
         if (target != -1) {
-            if (target < getmaxy(stdscr) - 1) {
-                cursor.y_offset = 0;
-            } else if (target > getmaxy(stdscr) - 2) {
-                cursor.y_offset = target - (getmaxy(stdscr) / 2);
-            }
             cursor.y = target - cursor.y_offset;
+            clamp_cursor();
         }
         return;
     }
@@ -289,8 +285,8 @@ void handle_key(int key) {
 }
 
 int goto_line() {
-    const int height = 3;
-    const int width = 30;
+    const size_t height = 3;
+    const size_t width = 30;
 
     WINDOW *box = newwin(height, width, 1, getmaxx(stdscr) - 33);
 
@@ -331,7 +327,7 @@ int goto_line() {
 
     delwin(box);
 
-    int line = atoi(input);
+    size_t line = atoi(input);
     if (line < 1) {
         return -1;
     }
@@ -502,8 +498,7 @@ void deletion(Point start, Point end) {
         editor.total_lines -= deletion_range;
 
         cursor.x = start.x + margin;
-        cursor.y_offset = 0;
-        cursor.y = start.y;
+        cursor.y = start.y - cursor.y_offset;
     }
 
     cancel_selection();
