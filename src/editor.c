@@ -11,6 +11,7 @@
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
+#include "clip.h"
 
 EditorState editor;
 
