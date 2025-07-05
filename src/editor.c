@@ -56,6 +56,11 @@ void init_editor(void) {
     init_pair(1, 8, -1);   // Unactive text color
     init_pair(2, 10, 9);   // Status bar color
     init_pair(3, 255, 11); // Selected text
+
+    // Disable default terminal text selection
+    printf("\033[?1006h");
+    mousemask(ALL_MOUSE_EVENTS, NULL);
+    mouseinterval(0);
 }
 
 void draw_editor() {
@@ -185,6 +190,8 @@ void handle_key(int key) {
             ask_for_save();
             return;
         }
+        printf("\033[?1006l");
+        
         endwin();
         exit(0);
         return;
@@ -495,10 +502,12 @@ void deletion(Point start, Point end) {
         editor.total_lines -= deletion_range;
 
         cursor.x = start.x + margin;
+        cursor.y_offset = 0;
         cursor.y = start.y;
     }
 
     cancel_selection();
+    clamp_cursor();
 }
 
 void new_line(void) {

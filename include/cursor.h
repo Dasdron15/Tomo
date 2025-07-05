@@ -5,9 +5,9 @@
 #include <stdbool.h>
 
 typedef struct {
-    size_t x;
-    size_t y;
-    size_t max_x;
+    int x;
+    int y;
+    int max_x;
 
     size_t x_offset;
     size_t y_offset;

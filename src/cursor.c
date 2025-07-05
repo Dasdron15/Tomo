@@ -62,12 +62,12 @@ void move_right(bool is_selecting) {
 }
 
 void move_left(bool is_selecting) {
-    if (cursor.x <= editor.margin && cursor.y > 0) {
+    if (cursor.x <= (int) editor.margin && cursor.y > 0) {
         cursor.y--;
         size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
 
         cursor.x = line_len + editor.margin;
-    } else if (!(cursor.x <= editor.margin && cursor.y + cursor.y_offset < 1)) {
+    } else if (!(cursor.x <= (int) editor.margin && cursor.y + cursor.y_offset < 1)) {
         cursor.x--;
     }
 
@@ -82,8 +82,8 @@ void move_left(bool is_selecting) {
 
 void clamp_cursor(void) {
     size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
-    size_t screen_width = getmaxx(stdscr);
-    size_t screen_height = getmaxy(stdscr);
+    int screen_width = getmaxx(stdscr);
+    int screen_height = getmaxy(stdscr);
 
     if (cursor.x + cursor.x_offset > line_len + editor.margin) {
         cursor.x = line_len + editor.margin;
