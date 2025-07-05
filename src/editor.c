@@ -116,6 +116,26 @@ void draw_editor() {
 }
 
 void handle_key(int key) {
+    if (key == KEY_UP) {
+        move_up(false);
+        return;
+    }
+
+    if (key == KEY_DOWN) {
+        move_down(false);
+        return;
+    }
+
+    if (key == KEY_RIGHT) {
+        move_right(false);
+        return;
+    }
+
+    if (key == KEY_LEFT) {
+        move_left(false);
+        return;
+    }
+    
     if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
