@@ -86,18 +86,20 @@ void draw_editor() {
         // Draw line content with wrapping
         int col = margin;
 
-        for (int symb = cursor.x_offset;
-             symb < (int)strlen(line) && symb < cursor.x_offset + screen_width;
+        for (size_t symb = cursor.x_offset;
+             symb <= strlen(line) && symb < cursor.x_offset + screen_width;
              symb++) {
             int file_x = symb;
             int file_y = index;
 
+            char ch = (symb < strlen(line)) ? line[symb] : ' ';
+
             if (is_selected(file_y, file_x)) {
                 attron(COLOR_PAIR(3));
-                mvprintw(line_num_pos, col, "%c", line[symb]);
+                mvprintw(line_num_pos, col, "%c", ch);
                 attroff(COLOR_PAIR(3));
             } else {
-                mvprintw(line_num_pos, col, "%c", line[symb]);
+                mvprintw(line_num_pos, col, "%c", ch);
             }
             col++;
         }
@@ -136,7 +138,7 @@ void handle_key(int key) {
         return;
     }
     
-    if (key == 393) { // Shift + RIGHT_ARROW (Right arrow selection)
+    if (key == 402) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
         move_right(true);
@@ -145,7 +147,7 @@ void handle_key(int key) {
         return;
     }
 
-    if (key == 402) { // Shift + LEFT_ARROW (Left arrow selection)
+    if (key == 393) { // Shift + LEFT_ARROW (Left arrow selection)
         start_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
         move_left(true);
