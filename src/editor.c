@@ -19,6 +19,11 @@ EditorState editor;
 void init_editor(void) {
     editor.is_saved = true;
 
+    if (editor.total_lines == 0) {
+        editor.lines[0] = strdup("");
+        editor.total_lines = 1;
+    }
+
     editor.margin = int_len(editor.total_lines) + 2;
 
     cursor.x = editor.margin;
@@ -26,11 +31,6 @@ void init_editor(void) {
     cursor.y = 0;
     cursor.x_offset = 0;
     cursor.y_offset = 0;
-
-    if (editor.total_lines == 0) {
-        editor.lines[0] = strdup("");
-        editor.total_lines = 1;
-    }
 
     initscr();
     raw();

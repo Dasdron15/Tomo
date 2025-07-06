@@ -1,6 +1,7 @@
 #ifndef CLIP_H
 #define CLIP_H
 
-int set_clipboard(const char* text);
+void set_clipboard(const char* text);
+char* get_clipboard();
 
 #endif

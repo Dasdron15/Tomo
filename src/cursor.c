@@ -63,12 +63,12 @@ void move_right(bool is_selecting) {
 }
 
 void move_left(bool is_selecting) {
-    if (cursor.x <= (int) editor.margin && cursor.y > 0) {
+    if (cursor.x <= editor.margin && cursor.y > 0) {
         cursor.y--;
         size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
 
         cursor.x = line_len + editor.margin;
-    } else if (!(cursor.x <= (int) editor.margin && cursor.y + cursor.y_offset < 1)) {
+    } else if (!(cursor.x <= editor.margin && cursor.y + cursor.y_offset < 1)) {
         cursor.x--;
     }
 

@@ -128,6 +128,8 @@ void deletion(Point start, Point end) {
         cursor.y = start.y - cursor.y_offset;
     }
 
+    editor.margin = int_len(editor.total_lines) + 2;
+
     cancel_selection();
     clamp_cursor();
 }
