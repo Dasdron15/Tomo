@@ -21,7 +21,7 @@ void draw_status_bar() {
 
     sprintf(path, " %s%s", get_filename(editor.filename),
             editor.is_saved ? "" : " [+]");
-    sprintf(cursor_info, "Ln %zu, Col %d", cursor.y + cursor.y_offset + 1,
+    sprintf(cursor_info, "Ln %d, Col %d", cursor.y + cursor.y_offset + 1,
             pos + 1);
 
     int space_length = max_x - strlen(path) - strlen(cursor_info);

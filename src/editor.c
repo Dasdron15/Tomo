@@ -6,13 +6,13 @@
 
 #include <curses.h>
 
+#include "clip.h"
 #include "common.h"
 #include "cursor.h"
+#include "edit.h"
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
-#include "edit.h"
-#include "clip.h"
 
 EditorState editor;
 
@@ -145,7 +145,7 @@ void handle_key(int key) {
         move_left(false);
         return;
     }
-    
+
     if (key == 402) { // Shift + RIGHT_ARROW (Right arrow selection)
         start_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
@@ -193,7 +193,7 @@ void handle_key(int key) {
             return;
         }
         printf("\033[?1006l");
-        
+
         endwin();
         exit(0);
         return;
@@ -288,9 +288,7 @@ void handle_key(int key) {
     }
 }
 
-void copy_text(const char* text) {
-        
-}
+void copy_text(const char *text) {}
 
 void ask_for_save() {
     move(getmaxy(stdscr) - 1, 0);

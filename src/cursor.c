@@ -92,7 +92,7 @@ void clamp_cursor(void) {
     }
 
     if (cursor.y < 3 && cursor.y_offset > 0) {
-        cursor.y_offset -= 3 - cursor.y;
+        cursor.y_offset = (cursor.y_offset - (3 - cursor.y)) < 0 ? 0 : cursor.y_offset - (3 - cursor.y);
         cursor.y = 3;
     }
 
@@ -102,7 +102,7 @@ void clamp_cursor(void) {
     }
 }
 
-int goto_line() {
+size_t goto_line() {
     const size_t height = 3;
     const size_t width = 30;
 

@@ -9,8 +9,8 @@ typedef struct {
     int y;
     int max_x;
 
-    size_t x_offset;
-    size_t y_offset;
+    int x_offset;
+    int y_offset;
 } CursorState;
 
 extern CursorState cursor;
@@ -22,6 +22,6 @@ void move_left(bool is_selecting);
 
 void clamp_cursor(void);
 
-int goto_line();
+size_t goto_line();
 
 #endif
