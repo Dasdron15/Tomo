@@ -73,8 +73,6 @@ void insert_char(char c) {
 }
 
 void deletion(Point start, Point end) {
-    int margin = int_len(editor.total_lines) + 2;
-
     if ((start.y == end.y && is_selecting()) ||
         (!is_selecting() && !(start.x < 0 && start.y == 0))) {
         if (start.x < 0 && start.y > 0) {
@@ -102,7 +100,7 @@ void deletion(Point start, Point end) {
                 &editor.lines[end.y][end.x + 1], length - end.x);
         editor.lines[start.y][length - remove_count] = '\0';
 
-        cursor.x = start.x + margin;
+        cursor.x = start.x + editor.margin;
     } else if (!(start.x < 0 && start.y == 0)) {
         int deletion_range = end.y - start.y;
 
@@ -124,11 +122,19 @@ void deletion(Point start, Point end) {
 
         editor.total_lines -= deletion_range;
 
-        cursor.x = start.x + margin;
+        cursor.x = start.x + editor.margin;
         cursor.y = start.y - cursor.y_offset;
     }
 
     editor.margin = int_len(editor.total_lines) + 2;
+
+    if (cursor.x < editor.margin) {
+        cursor.x = editor.margin;
+    }
+
+    if (cursor.y < 0) {
+        cursor.y = 0;
+    }
 
     cancel_selection();
     clamp_cursor();
