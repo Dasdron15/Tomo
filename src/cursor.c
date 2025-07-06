@@ -91,8 +91,13 @@ void clamp_cursor(void) {
     }
 
     if (cursor.y < 3 && cursor.y_offset > 0) {
-        cursor.y_offset = (cursor.y_offset - (3 - cursor.y)) < 0 ? 0 : cursor.y_offset - (3 - cursor.y);
-        cursor.y = 3;
+        if (cursor.y_offset - (3 - cursor.y) < 0) {
+            cursor.y_offset = 0;
+            cursor.y = 0;
+        } else {
+            cursor.y_offset -= 3 - cursor.y;
+            cursor.y = 3;
+        }
     }
 
     if (cursor.y > screen_height - 5 && editor.total_lines > screen_height + cursor.y_offset - 1) {
