@@ -171,4 +171,6 @@ void new_line(void) {
     editor.margin = int_len(editor.total_lines) + 2;
     cursor.x = editor.margin;
     cursor.x_offset = 0;
+
+    clamp_cursor();
 }

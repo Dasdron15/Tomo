@@ -46,8 +46,7 @@ void move_down(bool is_selecting) {
 void move_right(bool is_selecting) {
     size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
 
-    if (line_len <= cursor.x - editor.margin &&
-        cursor.y + cursor.y_offset < editor.total_lines) {
+    if (line_len <= cursor.x - editor.margin && cursor.y + cursor.y_offset < editor.total_lines - 1) {
         cursor.x = editor.margin;
         cursor.y++;
     } else {
