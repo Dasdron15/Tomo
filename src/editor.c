@@ -314,6 +314,37 @@ void handle_key(int key) {
 
         copy_text(start_select, end_select);
     }
+
+    if (key == 24 && is_selecting()) { // CTRL + X (Cut)
+        int x_pos = cursor.x + cursor.x_offset - editor.margin;
+        int y_pos = cursor.y + cursor.y_offset;
+
+        Point start_select;
+        Point end_select;
+        
+        if (is_selecting() &&
+                   ((get_start().x > x_pos && get_start().y == y_pos) ||
+                    (get_start().y > y_pos))) {
+            start_select.x = x_pos;
+            start_select.y = y_pos;
+
+            end_select.x = get_start().x;
+            end_select.y = get_start().y;
+        } else if (is_selecting() &&
+                   ((get_start().x < x_pos && get_start().y == y_pos) ||
+                    (get_start().y < y_pos))) {
+            start_select.x = get_start().x;
+            start_select.y = get_start().y;
+
+            end_select.x = x_pos;
+            end_select.y = y_pos;
+        }
+
+        copy_text(start_select, end_select);
+        deletion(start_select, end_select);
+
+        editor.is_saved = false;
+    }
 }
 
 void copy_text(Point start, Point end) {
