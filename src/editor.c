@@ -286,9 +286,61 @@ void handle_key(int key) {
         cursor.y = 0;
         clamp_cursor();
     }
+
+    if (key == 3 && is_selecting()) { // CTRL + C (Copy)
+        int x_pos = cursor.x + cursor.x_offset - editor.margin;
+        int y_pos = cursor.y + cursor.y_offset;
+
+        Point start_select;
+        Point end_select;
+        
+        if (is_selecting() &&
+                   ((get_start().x > x_pos && get_start().y == y_pos) ||
+                    (get_start().y > y_pos))) {
+            start_select.x = x_pos;
+            start_select.y = y_pos;
+
+            end_select.x = get_start().x;
+            end_select.y = get_start().y;
+        } else if (is_selecting() &&
+                   ((get_start().x < x_pos && get_start().y == y_pos) ||
+                    (get_start().y < y_pos))) {
+            start_select.x = get_start().x;
+            start_select.y = get_start().y;
+
+            end_select.x = x_pos;
+            end_select.y = y_pos;
+        }
+
+        copy_text(start_select, end_select);
+    }
 }
 
-void copy_text(const char *text) {}
+void copy_text(Point start, Point end) {
+    char* clipboard = malloc(1);
+    clipboard[0] = '\0';
+    size_t clip_len = 0;
+
+    for (int y = start.y; y <= end.y; y++) {
+        int from = (y == start.y) ? start.x : 0;
+        int to = (y == end.y) ? end.y : strlen(editor.lines[y]) - 1;
+        
+        for (int x = from; x <= to; x++) {
+            char ch = editor.lines[y][x];
+            clipboard = realloc(clipboard, clip_len + 2);
+            clipboard[clip_len++] = ch;
+            clipboard[clip_len] = '\0';
+        }
+
+        if (y < end.y) {
+            clipboard = realloc(clipboard, clip_len + 2);
+            clipboard[clip_len++] = '\n';
+            clipboard[clip_len] = '\0';
+        }
+    }
+
+    set_clipboard(clipboard);
+}
 
 void ask_for_save() {
     move(getmaxy(stdscr) - 1, 0);

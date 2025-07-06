@@ -9,8 +9,7 @@
 #define TAB_SIZE 4
 
 typedef struct {
-    char *lines[MAX_LINES *
-                MAX_LINE_LENGTH]; // Array that stores all the text from a file
+    char *lines[MAX_LINES * MAX_LINE_LENGTH]; // MAX_LINES * MAX_LINE_LENGTH
     size_t total_lines;
     size_t margin;
     
@@ -28,6 +27,7 @@ typedef struct {
 void init_editor(void);
 void draw_editor(void);
 
+void copy_text(Point start, Point end);
 void handle_key(int key);
 void ask_for_save(void);
 
