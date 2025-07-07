@@ -7,11 +7,12 @@
 
 #include "editor.h"
 #include "select.h"
+#include "common.h"
 
 CursorState cursor;
 
 void move_up(bool is_selecting) {
-    if (cursor.y + cursor.y_offset > 0) {    
+    if (cursor.y + cursor.y_offset > 0) { 
         cursor.y--;
         cursor.x = cursor.max_x;
     } else {
@@ -63,13 +64,13 @@ void move_right(bool is_selecting) {
 }
 
 void move_left(bool is_selecting) {
-    if (cursor.x <= editor.margin && cursor.y > 0) {
+    if (cursor.x > editor.margin) {
+        cursor.x--;
+    } else if (cursor.y > 0) {
         cursor.y--;
         size_t line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
-
+        editor.margin = int_len(editor.total_lines) + 2;
         cursor.x = line_len + editor.margin;
-    } else if (!(cursor.x <= editor.margin && cursor.y + cursor.y_offset < 1)) {
-        cursor.x--;
     }
 
     cursor.max_x = cursor.x;
@@ -86,10 +87,12 @@ void clamp_cursor(void) {
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
 
-    if (cursor.x + cursor.x_offset > line_len + editor.margin) {
+    if (cursor.x < editor.margin) {
+        cursor.x = editor.margin;
+    } else if (cursor.x + cursor.x_offset > line_len + editor.margin) {
         cursor.x = line_len + editor.margin;
     }
-
+    
     if (cursor.y < 3 && cursor.y_offset > 0) {
         if (cursor.y_offset - (3 - cursor.y) < 0) {
             cursor.y_offset = 0;

@@ -41,6 +41,8 @@ void add_tab(void) {
     free(tab_str);
 
     cursor.x += TAB_SIZE;
+
+    cursor.max_x = cursor.x;
 }
 
 
@@ -70,12 +72,15 @@ void insert_char(char c) {
 
     free(old);
     move_right(false);
+
+    cursor.max_x = cursor.x;
 }
 
 void deletion(Point start, Point end) {
     if ((start.y == end.y && is_selecting()) ||
-        (!is_selecting() && !(start.x < 0 && start.y == 0))) {
+        (!is_selecting())) {
         if (start.x < 0 && start.y > 0) {
+            editor.total_lines--;            
             move_left(false);
 
             char *new_line = realloc(editor.lines[start.y - 1],
@@ -89,7 +94,6 @@ void deletion(Point start, Point end) {
                 editor.lines[i] = editor.lines[i + 1];
             }
 
-            editor.total_lines--;
             return;
         }
 
@@ -138,6 +142,8 @@ void deletion(Point start, Point end) {
 
     cancel_selection();
     clamp_cursor();
+
+    cursor.max_x = cursor.x;
 }
 
 void new_line(void) {
@@ -179,6 +185,7 @@ void new_line(void) {
     editor.margin = int_len(editor.total_lines) + 2;
     cursor.x = editor.margin;
     cursor.x_offset = 0;
+    cursor.max_x = cursor.x;
 
     clamp_cursor();
 }
