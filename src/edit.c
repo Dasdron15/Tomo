@@ -7,6 +7,7 @@
 #include "cursor.h"
 #include "editor.h"
 #include "select.h"
+#include "clip.h"
 
 void add_tab(void) {
     int pos = cursor.x - editor.margin;
@@ -191,3 +192,30 @@ void new_line(void) {
 
     clamp_cursor();
 }
+
+void copy_text(Point start, Point end) {
+    char* clipboard = malloc(1);
+    clipboard[0] = '\0';
+    size_t clip_len = 0;
+
+    for (int y = start.y; y <= end.y; y++) {
+        int from = (y == start.y) ? start.x : 0;
+        int to = (y == end.y) ? end.y : strlen(editor.lines[y]) - 1;
+        
+        for (int x = from; x <= to; x++) {
+            char ch = editor.lines[y][x];
+            clipboard = realloc(clipboard, clip_len + 2);
+            clipboard[clip_len++] = ch;
+            clipboard[clip_len] = '\0';
+        }
+
+        if (y < end.y) {
+            clipboard = realloc(clipboard, clip_len + 2);
+            clipboard[clip_len++] = '\n';
+            clipboard[clip_len] = '\0';
+        }
+    }
+
+    set_clipboard(clipboard);
+}
+

@@ -27,7 +27,6 @@ typedef struct {
 void init_editor(void);
 void draw_editor(void);
 
-void copy_text(Point start, Point end);
 void handle_key(int key);
 void ask_for_save(void);
 
