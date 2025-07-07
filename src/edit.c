@@ -43,6 +43,8 @@ void add_tab(void) {
     cursor.x += TAB_SIZE;
 
     cursor.max_x = cursor.x;
+
+    clamp_cursor();
 }
 
 
