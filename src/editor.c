@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include <curses.h>
+#include <strings.h>
 
 #include "clip.h"
 #include "common.h"
@@ -383,7 +384,7 @@ void ask_for_save() {
 
     curs_set(1);
 
-    char input[15] = {'\0'};
+    char input[16] = {0};
     int pos = 0;
 
     int ch;
@@ -403,13 +404,11 @@ void ask_for_save() {
         wrefresh(stdscr);
     }
 
-    noecho();
-
-    if (tolower(input[0]) == 121) { // 'Y' or 'y'
+    if (strcasecmp(input, "y") == 0 || strcasecmp(input, "yes") == 0) {
         save_file();
     }
 
-    if (tolower(input[0]) == 121 || tolower(input[0]) == 110) {
+    if (strcasecmp(input, "n") == 0 || strcasecmp(input, "no")) {
         endwin();
         exit(0);
     }
