@@ -1,5 +1,6 @@
 #include "edit.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -91,7 +92,7 @@ void deletion(Point start, Point end) {
         end = tmp;
     }
 
-    // 1. one line deletion
+    // 1. One line deletion
     if (start.y == end.y) {
         char* line = editor.lines[start.y];
         int len = strlen(line);
@@ -103,9 +104,44 @@ void deletion(Point start, Point end) {
 
         cursor.x = start.x + editor.margin;
     }
+    // 2. Multiple line deletion
+    else {
+        char* first = editor.lines[start.y];
+        char* last = editor.lines[end.y];
 
+        first[start.x] = '\0';
+        char* rest = &last[end.x + 1];
+
+        size_t new_len = strlen(first) + strlen(rest) + 1;
+        char* merged = malloc(new_len);
+        snprintf(merged, new_len, "%s%s", first, rest);
+
+        free(editor.lines[start.y]);
+        editor.lines[start.y] = merged;
+
+        for (int i = start.y + 1; i <= end.y; i++) {
+            free(editor.lines[i]);
+        }
+
+        for (int i = end.y + 1; i < editor.total_lines; i++) {
+            editor.lines[start.y + 1 + (i - end.y - 1)] = editor.lines[i];
+        }
+
+        editor.total_lines -= (end.y - start.y);
+
+        cursor.x = start.x + editor.margin;
+        cursor.y = start.y - cursor.y_offset;
+    }
+    
     cancel_selection();
     clamp_cursor();
+
+    editor.margin = int_len(editor.total_lines) + 2;
+
+    if (cursor.x < editor.margin) cursor.x = editor.margin;
+    if (cursor.y < 0) cursor.y = 0;
+
+    cursor.max_x = cursor.x;
 }
 
 void new_line(void) {
