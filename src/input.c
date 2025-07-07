@@ -174,7 +174,7 @@ void handle_key(int key) {
     }
 
     if (key == 22) {
-        
+        paste_text();                
     }
 }
 

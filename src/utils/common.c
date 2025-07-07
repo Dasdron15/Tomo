@@ -35,3 +35,14 @@ char *get_filename(char *path) {
 }
 
 int rgb_to_ncurses(int rgb) { return (rgb * 1000) / 255; }
+
+int count_element(const char* string, char ch) {
+    int count = 0;
+
+    for (int i = 0; i < strlen(string); i++) {
+        if (string[i] == ch) {
+            count++;
+        }
+    }
+    return count;
+}

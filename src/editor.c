@@ -8,6 +8,7 @@
 
 #include "common.h"
 #include "cursor.h"
+#include "edit.h"
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
@@ -61,6 +62,8 @@ void init_editor(void) {
     printf("\033[?1006h");
     mousemask(ALL_MOUSE_EVENTS, NULL);
     mouseinterval(0);
+
+    paste_text();
 }
 
 void draw_editor() {

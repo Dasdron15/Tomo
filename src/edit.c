@@ -227,3 +227,47 @@ void copy_text(Point start, Point end) {
 
     set_clipboard(clipboard);
 }
+
+void paste_text() {
+    char* clipboard = strdup(get_clipboard());
+    if (!clipboard) return;
+
+    int lines_num = count_element(clipboard, '\n') + 1;
+    char** new_lines = malloc(lines_num * sizeof(char*));
+    if (!new_lines) {
+        free(clipboard);
+        return;
+    }
+
+    char* token = strtok(clipboard, "\n");
+    for (int i = 0; i < lines_num && token; i++) {
+        new_lines[i] = strdup(token);
+        token = strtok(NULL, "\n");
+    }
+
+    int insert_pos = cursor.y + cursor.y_offset;
+
+    for (int i = editor.total_lines - 1; i >= insert_pos + lines_num && i >= 0; i--) {
+        if (i - lines_num >= 0) {
+            editor.lines[i] = editor.lines[i - lines_num];
+        }
+    }
+
+    for (int i = 0; i < lines_num && insert_pos + i < editor.total_lines; i++) {
+        if (editor.lines[insert_pos + i]) {
+            free(editor.lines[insert_pos + i]);
+        }
+        editor.lines[insert_pos + i] = strdup(new_lines[i]);
+    }
+
+    for (int i = 0; i < lines_num; i++) {
+        free(new_lines[i]);
+    }
+
+    free(new_lines);
+    free(clipboard);
+
+    if (insert_pos + lines_num > editor.total_lines) {
+        editor.total_lines = insert_pos + lines_num;
+    }
+}
