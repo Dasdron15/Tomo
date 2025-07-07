@@ -88,7 +88,6 @@ void deletion(Point start, Point end) {
     if (end.x < 0)
         end.x = 0;
 
-    // Start less than or equal to end
     if (start.y > end.y || (start.y == end.y && start.x > end.x)) {
         Point tmp = start;
         start = end;
@@ -112,16 +111,7 @@ void deletion(Point start, Point end) {
 
         cursor.y--;
         cursor.x = prev_len + editor.margin;
-
-        cancel_selection();
-        clamp_cursor();
-
-        editor.margin = int_len(editor.total_lines) + 2;
-        return;
-    }
-
-    // 2. One line deletion
-    else if (start.y == end.y) {
+    } else if (start.y == end.y) {
         char *line = editor.lines[start.y];
         int len = strlen(line);
 
@@ -132,9 +122,7 @@ void deletion(Point start, Point end) {
         line[len - (end.x - start.x + 1)] = '\0';
 
         cursor.x = start.x + editor.margin;
-    }
-    // 3. Multiple line deletion
-    else {
+    } else {
         char *first = editor.lines[start.y];
         char *last = editor.lines[end.y];
 
@@ -162,15 +150,10 @@ void deletion(Point start, Point end) {
         cursor.y = start.y - cursor.y_offset;
     }
 
-    cancel_selection();
     clamp_cursor();
+    cancel_selection();
 
     editor.margin = int_len(editor.total_lines) + 2;
-
-    if (cursor.x < editor.margin)
-        cursor.x = editor.margin;
-    if (cursor.y < 0)
-        cursor.y = 0;
 
     cursor.max_x = cursor.x;
 }
