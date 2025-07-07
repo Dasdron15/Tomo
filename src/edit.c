@@ -80,73 +80,32 @@ void insert_char(char c) {
 }
 
 void deletion(Point start, Point end) {
-    if ((start.y == end.y && is_selecting()) ||
-        (!is_selecting())) {
-        if (start.x < 0 && start.y > 0) {
-            editor.total_lines--;            
-            move_left(false);
+    if (start.y >= editor.total_lines || end.y >= editor.total_lines) return;
+    if (start.x < 0) start.x = 0;
+    if (end.x < 0) end.x = 0;
 
-            char *new_line = realloc(editor.lines[start.y - 1],
-                                     strlen(editor.lines[start.y - 1]) +
-                                         strlen(editor.lines[start.y]) + 1);
-            editor.lines[start.y - 1] = new_line;
-
-            strcat(editor.lines[start.y - 1], editor.lines[start.y]);
-
-            for (int i = start.y; i < editor.total_lines; i++) {
-                editor.lines[i] = editor.lines[i + 1];
-            }
-
-            return;
-        }
-
-        int remove_count = end.x - start.x + 1;
-        int length = strlen(editor.lines[start.y]);
-
-        memmove(&editor.lines[start.y][start.x],
-                &editor.lines[end.y][end.x + 1], length - end.x);
-        editor.lines[start.y][length - remove_count] = '\0';
-
-        cursor.x = start.x + editor.margin;
-    } else if (!(start.x < 0 && start.y == 0)) {
-        int deletion_range = end.y - start.y;
-
-        if (start.x > 0) {
-            editor.lines[start.y][start.x] = '\0';
-        }
-
-        char *line = editor.lines[end.y];
-        memmove(line, line + end.x + 1, strlen(line) - end.x);
-
-        char *new_line = realloc(editor.lines[start.y],
-                                 strlen(editor.lines[start.y]) + strlen(line));
-        editor.lines[start.y] = new_line;
-        strcat(editor.lines[start.y], editor.lines[end.y]);
-
-        for (int i = end.y + 1; i < editor.total_lines; i++) {
-            editor.lines[start.y + 1 + (i - end.y - 1)] = editor.lines[i];
-        }
-
-        editor.total_lines -= deletion_range;
-
-        cursor.x = start.x + editor.margin;
-        cursor.y = start.y - cursor.y_offset;
+    // Start less than or equal to end
+    if (start.y > end.y || (start.y == end.y && start.x > end.x)) {
+        Point tmp = start;
+        start = end;
+        end = tmp;
     }
 
-    editor.margin = int_len(editor.total_lines) + 2;
+    // 1. one line deletion
+    if (start.y == end.y) {
+        char* line = editor.lines[start.y];
+        int len = strlen(line);
 
-    if (cursor.x < editor.margin) {
-        cursor.x = editor.margin;
-    }
+        if (start.x >= len) return;
 
-    if (cursor.y < 0) {
-        cursor.y = 0;
+        memmove(&line[start.x], &line[end.x + 1], len - end.x);
+        line[len - (end.x - start.x + 1)] = '\0';
+
+        cursor.x = start.x + editor.margin;
     }
 
     cancel_selection();
     clamp_cursor();
-
-    cursor.max_x = cursor.x;
 }
 
 void new_line(void) {
