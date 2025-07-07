@@ -1,14 +1,14 @@
 #include "edit.h"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "clip.h"
 #include "common.h"
 #include "cursor.h"
 #include "editor.h"
 #include "select.h"
-#include "clip.h"
 
 void add_tab(void) {
     int pos = cursor.x - editor.margin;
@@ -49,7 +49,6 @@ void add_tab(void) {
     clamp_cursor();
 }
 
-
 void insert_char(char c) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
 
@@ -81,9 +80,13 @@ void insert_char(char c) {
 }
 
 void deletion(Point start, Point end) {
-    if (start.y >= editor.total_lines || end.y >= editor.total_lines) return;
-    if (start.x < 0) start.x = 0;
-    if (end.x < 0) end.x = 0;
+    if (start.y >= editor.total_lines || end.y >= editor.total_lines ||
+        (!is_selecting() && start.y <= 0 && start.x < 0))
+        return;
+    if (start.x < 0)
+        start.x = 0;
+    if (end.x < 0)
+        end.x = 0;
 
     // Start less than or equal to end
     if (start.y > end.y || (start.y == end.y && start.x > end.x)) {
@@ -92,28 +95,54 @@ void deletion(Point start, Point end) {
         end = tmp;
     }
 
-    // 1. One line deletion
-    if (start.y == end.y) {
-        char* line = editor.lines[start.y];
+    if (!is_selecting() && start.x == 0 && start.y > 0) {
+        int prev_len = strlen(editor.lines[start.y - 1]);
+        int curr_len = strlen(editor.lines[start.y]);
+
+        editor.lines[start.y - 1] =
+            realloc(editor.lines[start.y - 1], prev_len + curr_len + 1);
+        strcat(editor.lines[start.y - 1], editor.lines[start.y]);
+        free(editor.lines[start.y]);
+
+        for (int i = start.y; i < editor.total_lines - 1; i++) {
+            editor.lines[i] = editor.lines[i + 1];
+        }
+
+        editor.total_lines--;
+
+        cursor.y--;
+        cursor.x = prev_len + editor.margin;
+
+        cancel_selection();
+        clamp_cursor();
+
+        editor.margin = int_len(editor.total_lines) + 2;
+        return;
+    }
+
+    // 2. One line deletion
+    else if (start.y == end.y) {
+        char *line = editor.lines[start.y];
         int len = strlen(line);
 
-        if (start.x >= len) return;
+        if (start.x >= len)
+            return;
 
         memmove(&line[start.x], &line[end.x + 1], len - end.x);
         line[len - (end.x - start.x + 1)] = '\0';
 
         cursor.x = start.x + editor.margin;
     }
-    // 2. Multiple line deletion
+    // 3. Multiple line deletion
     else {
-        char* first = editor.lines[start.y];
-        char* last = editor.lines[end.y];
+        char *first = editor.lines[start.y];
+        char *last = editor.lines[end.y];
 
         first[start.x] = '\0';
-        char* rest = &last[end.x + 1];
+        char *rest = &last[end.x + 1];
 
         size_t new_len = strlen(first) + strlen(rest) + 1;
-        char* merged = malloc(new_len);
+        char *merged = malloc(new_len);
         snprintf(merged, new_len, "%s%s", first, rest);
 
         free(editor.lines[start.y]);
@@ -132,14 +161,16 @@ void deletion(Point start, Point end) {
         cursor.x = start.x + editor.margin;
         cursor.y = start.y - cursor.y_offset;
     }
-    
+
     cancel_selection();
     clamp_cursor();
 
     editor.margin = int_len(editor.total_lines) + 2;
 
-    if (cursor.x < editor.margin) cursor.x = editor.margin;
-    if (cursor.y < 0) cursor.y = 0;
+    if (cursor.x < editor.margin)
+        cursor.x = editor.margin;
+    if (cursor.y < 0)
+        cursor.y = 0;
 
     cursor.max_x = cursor.x;
 }
@@ -189,14 +220,14 @@ void new_line(void) {
 }
 
 void copy_text(Point start, Point end) {
-    char* clipboard = malloc(1);
+    char *clipboard = malloc(1);
     clipboard[0] = '\0';
     size_t clip_len = 0;
 
     for (int y = start.y; y <= end.y; y++) {
         int from = (y == start.y) ? start.x : 0;
         int to = (y == end.y) ? end.y : strlen(editor.lines[y]) - 1;
-        
+
         for (int x = from; x <= to; x++) {
             char ch = editor.lines[y][x];
             clipboard = realloc(clipboard, clip_len + 2);
@@ -213,4 +244,3 @@ void copy_text(Point start, Point end) {
 
     set_clipboard(clipboard);
 }
-
