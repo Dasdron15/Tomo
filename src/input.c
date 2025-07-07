@@ -84,7 +84,16 @@ void handle_key(int key) {
     }
 
     if ((key >= 32 && key <= 126)) {
-        insert_char((char)key);
+        Point start_select;
+        Point end_select;
+        
+        if (is_selecting()) {
+            get_selection_bounds(&start_select, &end_select);
+            deletion(start_select, end_select);
+            cancel_selection();
+        }
+        
+        insert_char((char) key);
         editor.is_saved = false;
         return;
     }
@@ -162,6 +171,10 @@ void handle_key(int key) {
         deletion(start_select, end_select);
 
         editor.is_saved = false;
+    }
+
+    if (key == 22) {
+        
     }
 }
 
