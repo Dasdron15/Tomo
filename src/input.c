@@ -97,38 +97,11 @@ void handle_key(int key) {
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
-        int x_pos = cursor.x + cursor.x_offset - editor.margin;
-        int y_pos = cursor.y + cursor.y_offset;
-
         Point start_select;
         Point end_select;
 
-        if (!is_selecting()) {
-            start_select.x = x_pos - 1;
-            start_select.y = y_pos;
-
-            end_select.x = x_pos - 1;
-            end_select.y = y_pos;
-        } else if (is_selecting() &&
-                   ((get_start().x > x_pos && get_start().y == y_pos) ||
-                    (get_start().y > y_pos))) {
-            start_select.x = x_pos;
-            start_select.y = y_pos;
-
-            end_select.x = get_start().x;
-            end_select.y = get_start().y;
-        } else if (is_selecting() &&
-                   ((get_start().x < x_pos && get_start().y == y_pos) ||
-                    (get_start().y < y_pos))) {
-            start_select.x = get_start().x;
-            start_select.y = get_start().y;
-
-            end_select.x = x_pos;
-            end_select.y = y_pos;
-        } else {
-            return;
-        }
-
+        get_selection_bounds(&start_select, &end_select);
+        
         deletion(start_select, end_select);
         editor.is_saved = false;
         return;
@@ -172,58 +145,19 @@ void handle_key(int key) {
     }
 
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
-        int x_pos = cursor.x + cursor.x_offset - editor.margin;
-        int y_pos = cursor.y + cursor.y_offset;
-
         Point start_select;
         Point end_select;
         
-        if (is_selecting() &&
-                   ((get_start().x > x_pos && get_start().y == y_pos) ||
-                    (get_start().y > y_pos))) {
-            start_select.x = x_pos;
-            start_select.y = y_pos;
-
-            end_select.x = get_start().x;
-            end_select.y = get_start().y;
-        } else if (is_selecting() &&
-                   ((get_start().x < x_pos && get_start().y == y_pos) ||
-                    (get_start().y < y_pos))) {
-            start_select.x = get_start().x;
-            start_select.y = get_start().y;
-
-            end_select.x = x_pos;
-            end_select.y = y_pos;
-        }
-
+        get_selection_bounds(&start_select, &end_select);
         copy_text(start_select, end_select);
     }
 
     if (key == 24 && is_selecting()) { // CTRL + X (Cut)
-        int x_pos = cursor.x + cursor.x_offset - editor.margin;
-        int y_pos = cursor.y + cursor.y_offset;
-
         Point start_select;
         Point end_select;
         
-        if (is_selecting() &&
-                   ((get_start().x > x_pos && get_start().y == y_pos) ||
-                    (get_start().y > y_pos))) {
-            start_select.x = x_pos;
-            start_select.y = y_pos;
-
-            end_select.x = get_start().x;
-            end_select.y = get_start().y;
-        } else if (is_selecting() &&
-                   ((get_start().x < x_pos && get_start().y == y_pos) ||
-                    (get_start().y < y_pos))) {
-            start_select.x = get_start().x;
-            start_select.y = get_start().y;
-
-            end_select.x = x_pos;
-            end_select.y = y_pos;
-        }
-
+        get_selection_bounds(&start_select, &end_select);        
+        
         copy_text(start_select, end_select);
         deletion(start_select, end_select);
 

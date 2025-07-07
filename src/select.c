@@ -1,7 +1,10 @@
 #include "select.h"
 
-static Position selection_start;
-static Position selection_end;
+#include "cursor.h"
+#include "editor.h"
+
+static Point selection_start;
+static Point selection_end;
 static bool selecting = false;
 
 void start_selection(int row, int col) {
@@ -19,9 +22,30 @@ void update_selection(int row, int col) {
     }
 }
 
+void get_selection_bounds(Point* start, Point* end) {
+    int x_pos = cursor.x + cursor.x_offset - editor.margin;
+    int y_pos = cursor.y + cursor.y_offset;
+
+    if (!is_selecting()) {
+        start->x = x_pos - 1;
+        start->y = y_pos;
+
+        end->x = x_pos - 1;
+        end->y = y_pos;
+    } else if ((selection_start.x > x_pos && selection_start.y == y_pos) || (selection_start.y > y_pos)) {
+        start->x = x_pos;
+        start->y = y_pos;
+        *end = selection_start;
+    } else {
+        *start = selection_start;
+        end->x = x_pos;
+        end->y = y_pos;
+    }
+}
+
 bool is_selected(int file_y, int file_x) {
-    Position start;
-    Position end;
+    Point start;
+    Point end;
 
     if (!selecting)
         return false;
@@ -58,4 +82,4 @@ bool is_selecting() { return selecting; }
 
 void cancel_selection() { selecting = false; }
 
-Position get_start() { return selection_start; }
+Point get_start() { return selection_start; }
