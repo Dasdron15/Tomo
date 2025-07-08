@@ -94,7 +94,7 @@ void deletion(Point start, Point end) {
         end = tmp;
     }
 
-    if (!is_selecting() && start.x == 0 && start.y > 0) {
+    if (!is_selecting() && cursor.x - editor.margin - 1 < 0 && cursor.y > 0) {
         int prev_len = strlen(editor.lines[start.y - 1]);
         int curr_len = strlen(editor.lines[start.y]);
 
@@ -111,6 +111,7 @@ void deletion(Point start, Point end) {
 
         cursor.y--;
         cursor.x = prev_len + editor.margin;
+
     } else if (start.y == end.y) {
         char *line = editor.lines[start.y];
         int len = strlen(line);
@@ -209,7 +210,7 @@ void copy_text(Point start, Point end) {
 
     for (int y = start.y; y <= end.y; y++) {
         int from = (y == start.y) ? start.x : 0;
-        int to = (y == end.y) ? end.y : (int) strlen(editor.lines[y]) - 1;
+        int to = (y == end.y) ? end.y : (int)strlen(editor.lines[y]) - 1;
 
         for (int x = from; x <= to; x++) {
             char ch = editor.lines[y][x];
@@ -229,8 +230,9 @@ void copy_text(Point start, Point end) {
 }
 
 void paste_text() {
-    char* clipboard = strdup(get_clipboard());
-    if (!clipboard) return;
+    char *clipboard = get_clipboard();
+    if (!clipboard)
+        return;
 
     int insert_index = cursor.y + cursor.y_offset;
     int clipboard_len = count_char(clipboard, '\n');
@@ -240,7 +242,7 @@ void paste_text() {
         editor.lines[i] = editor.lines[i - clipboard_len];
     }
 
-    char* token = strtok(clipboard, "\n");
+    char *token = strtok(clipboard, "\n");
     for (int i = 0; i < clipboard_len; i++) {
         if (insert_index + 1 < new_file_size) {
             editor.lines[insert_index + i] = token;
@@ -249,6 +251,5 @@ void paste_text() {
     }
 
     free(clipboard);
-
     editor.total_lines += clipboard_len;
 }
