@@ -10,8 +10,8 @@
 
 typedef struct {
     char *lines[MAX_LINES * MAX_LINE_LENGTH]; // MAX_LINES * MAX_LINE_LENGTH
-    size_t total_lines;
-    size_t margin;
+    int total_lines;
+    int margin;
     
     char *filename;
     bool is_saved;

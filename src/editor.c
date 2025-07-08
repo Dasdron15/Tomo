@@ -95,13 +95,13 @@ void draw_editor() {
         // Draw line content with wrapping
         int col = margin;
 
-        for (size_t symb = cursor.x_offset;
-             symb <= strlen(line) && symb < cursor.x_offset + screen_width;
+        for (int symb = cursor.x_offset;
+             symb <= (int) strlen(line) && symb < cursor.x_offset + screen_width;
              symb++) {
             int file_x = symb;
             int file_y = index;
 
-            char ch = (symb < strlen(line)) ? line[symb] : ' ';
+            char ch = (symb < (int) strlen(line)) ? line[symb] : ' ';
 
             if (is_selected(file_y, file_x)) {
                 attron(COLOR_PAIR(3));

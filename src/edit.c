@@ -209,7 +209,7 @@ void copy_text(Point start, Point end) {
 
     for (int y = start.y; y <= end.y; y++) {
         int from = (y == start.y) ? start.x : 0;
-        int to = (y == end.y) ? end.y : strlen(editor.lines[y]) - 1;
+        int to = (y == end.y) ? end.y : (int) strlen(editor.lines[y]) - 1;
 
         for (int x = from; x <= to; x++) {
             char ch = editor.lines[y][x];
@@ -232,42 +232,23 @@ void paste_text() {
     char* clipboard = strdup(get_clipboard());
     if (!clipboard) return;
 
-    int lines_num = count_element(clipboard, '\n') + 1;
-    char** new_lines = malloc(lines_num * sizeof(char*));
-    if (!new_lines) {
-        free(clipboard);
-        return;
+    int insert_index = cursor.y + cursor.y_offset;
+    int clipboard_len = count_char(clipboard, '\n');
+    int new_file_size = editor.total_lines + clipboard_len;
+
+    for (int i = new_file_size - 1; i >= insert_index + clipboard_len; i--) {
+        editor.lines[i] = editor.lines[i - clipboard_len];
     }
 
     char* token = strtok(clipboard, "\n");
-    for (int i = 0; i < lines_num && token; i++) {
-        new_lines[i] = strdup(token);
-        token = strtok(NULL, "\n");
-    }
-
-    int insert_pos = cursor.y + cursor.y_offset;
-
-    for (int i = editor.total_lines - 1; i >= insert_pos + lines_num && i >= 0; i--) {
-        if (i - lines_num >= 0) {
-            editor.lines[i] = editor.lines[i - lines_num];
+    for (int i = 0; i < clipboard_len; i++) {
+        if (insert_index + 1 < new_file_size) {
+            editor.lines[insert_index + i] = token;
+            token = strtok(NULL, "\n");
         }
     }
 
-    for (int i = 0; i < lines_num && insert_pos + i < editor.total_lines; i++) {
-        if (editor.lines[insert_pos + i]) {
-            free(editor.lines[insert_pos + i]);
-        }
-        editor.lines[insert_pos + i] = strdup(new_lines[i]);
-    }
-
-    for (int i = 0; i < lines_num; i++) {
-        free(new_lines[i]);
-    }
-
-    free(new_lines);
     free(clipboard);
 
-    if (insert_pos + lines_num > editor.total_lines) {
-        editor.total_lines = insert_pos + lines_num;
-    }
+    editor.total_lines += clipboard_len;
 }

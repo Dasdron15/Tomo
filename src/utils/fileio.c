@@ -33,7 +33,7 @@ void load_file(const char *path) {
 void save_file() {
     FILE *fp = fopen(editor.filename, "w");
 
-    for (size_t i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {
+    for (int i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {
         if (i != editor.total_lines - 1) {
             fprintf(fp, "%s\n", editor.lines[i]);
         } else {
