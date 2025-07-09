@@ -210,7 +210,7 @@ void copy_text(Point start, Point end) {
     if (!clipboard) {
         return;
     }
-    
+
     clipboard[0] = '\0';
     size_t clip_len = 0;
 
@@ -238,18 +238,28 @@ void copy_text(Point start, Point end) {
 
 void paste_text() {
     char *clipboard = strdup(get_clipboard());
-    if (!clipboard) return;
-    
+    if (!clipboard)
+        return;
+
     int lines_count = count_char(clipboard, '\n') + 1;
-    char* insert_lines[lines_count];
+    char *insert_lines[lines_count];
     int insert_index = cursor.y + cursor.y_offset;
-    
+
     char *token = strtok(clipboard, "\n");
-    int i = 0;
-    while (token && i < lines_count) {
+
+    for (int i = 0; i < lines_count; i++) {
         insert_lines[i] = strdup(token);
         token = strtok(NULL, "\n");
     }
 
+    memmove(editor.lines + insert_index + lines_count,
+            editor.lines + insert_index,
+            (editor.total_lines - insert_index) * sizeof(char *));
+
+    memcpy(editor.lines + insert_index, insert_lines, lines_count * sizeof(char*));
+    editor.total_lines += lines_count;
+
     free(clipboard);
+
+    clamp_cursor();
 }
