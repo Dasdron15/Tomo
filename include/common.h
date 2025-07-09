@@ -5,6 +5,6 @@ char *mult_char(char c, int count);
 int int_len(int num);
 char *get_filename(char *path);
 int rgb_to_ncurses(int rgb);
-int count_char(const char* string, char ch);
+int count_char(char* string, char ch);
 
 #endif

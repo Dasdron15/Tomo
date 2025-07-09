@@ -36,7 +36,7 @@ char *get_filename(char *path) {
 
 int rgb_to_ncurses(int rgb) { return (rgb * 1000) / 255; }
 
-int count_char(const char* string, char ch) {
+int count_char(char* string, char ch) {
     int count = 0;
 
     for (int i = 0; i < (int) strlen(string); i++) {
