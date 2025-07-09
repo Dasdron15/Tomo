@@ -174,8 +174,6 @@ void ask_for_save() {
         exit(0);
         return;
     }
-
-    ask_for_save();
 }
 
 void reset() {
