@@ -217,7 +217,7 @@ void copy_text(Point start, Point end) {
         int from = (y == start.y) ? start.x : 0;
         int to = (y == end.y) ? end.x : (int)strlen(editor.lines[y]) - 1;
 
-        for (int x = from; x <= to; x++) {
+        for (int x = from; x < to; x++) {
             char ch = editor.lines[y][x];
             clipboard = realloc(clipboard, clip_len + 2);
             clipboard[clip_len++] = ch;
