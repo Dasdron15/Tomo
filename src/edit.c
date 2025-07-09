@@ -241,25 +241,15 @@ void paste_text() {
     if (!clipboard)
         return;
 
-    int lines_count = count_char(clipboard, '\n') + 1;
-    char *insert_lines[lines_count];
-    int insert_index = cursor.y + cursor.y_offset;
+    int y_pos = cursor.y + cursor.y_offset;
+    int x_pos = cursor.x + cursor.x_offset - editor.margin;
+    char* current_line = editor.lines[y_pos];
 
-    char *token = strtok(clipboard, "\n");
+    char* right = strdup(current_line + x_pos);
+    current_line[x_pos] = '\0';
 
-    for (int i = 0; i < lines_count; i++) {
-        insert_lines[i] = strdup(token);
-        token = strtok(NULL, "\n");
-    }
-
-    memmove(editor.lines + insert_index + lines_count,
-            editor.lines + insert_index,
-            (editor.total_lines - insert_index) * sizeof(char *));
-
-    memcpy(editor.lines + insert_index, insert_lines, lines_count * sizeof(char*));
-    editor.total_lines += lines_count;
+    
 
     free(clipboard);
-
     clamp_cursor();
 }
