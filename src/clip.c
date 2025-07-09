@@ -13,6 +13,7 @@ void set_clipboard(const char* text) {
     FILE* pipe = popen("pbcopy", "w");
     if (!pipe) return;
     fwrite(text, sizeof(char), strlen(text), pipe);
+    pclose(pipe);
 
 #elif defined (__linux__)
     const char* display = getenv("WAYLAND_DISPLAY");

@@ -156,28 +156,22 @@ void ask_for_save() {
     }
 
     if (strcasecmp(input, "y") == 0 || strcasecmp(input, "yes") == 0) {
+        reset();
         save_file();
+        return;
     }
 
     if (strcasecmp(input, "n") == 0 || strcasecmp(input, "no")) {
-        endwin();
-        exit(0);
+        reset();
+        return;
     }
 
     ask_for_save();
 }
 
-void quit() {
-    if (!editor.is_saved) {
-        ask_for_save();
-        return;
-    }
+void reset() {
     printf("\033[?1006l"); // Reset mouse selection
 
     printf("\033[2 q");
     fflush(stdout);
-
-    endwin();
-    exit(0);
-    
 }

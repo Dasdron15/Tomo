@@ -72,7 +72,15 @@ void handle_key(int key) {
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
-        quit();
+        if (!editor.is_saved) {
+            ask_for_save();
+        }
+        
+        reset();
+
+        endwin();
+        exit(0);
+        
         return;
     }
 
