@@ -113,6 +113,7 @@ void handle_key(int key) {
         
         deletion(start_select, end_select);
         editor.is_saved = false;
+        
         return;
     }
 

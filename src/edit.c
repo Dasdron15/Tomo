@@ -120,10 +120,14 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
-        memmove(&line[start.x], &line[end.x + 1], len - end.x);
-        line[len - (end.x - start.x + 1)] = '\0';
+        if (end.x - start.x == len) {
+            editor.lines[start.y][start.x] = '\0';
+        } else {
+            memmove(&line[start.x], &line[end.x + 1], len - end.x);
+            line[len - (end.x - start.x + 1)] = '\0';
 
         cursor.x = start.x + editor.margin;
+        }
     } else {
         char *first = editor.lines[start.y];
         char *last = editor.lines[end.y];
@@ -241,6 +245,8 @@ void paste_text() {
     if (!clipboard)
         return;
 
+    start_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
+
     int y_pos = cursor.y + cursor.y_offset;
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     char* current_line = editor.lines[y_pos];
@@ -254,6 +260,10 @@ void paste_text() {
     strcat(current_line, right);
 
     editor.lines[y_pos] = current_line;
+
+    cursor.x += strlen(clipboard);
+
+    update_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
 
     free(right);
     free(clipboard);
