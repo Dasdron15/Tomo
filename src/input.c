@@ -145,12 +145,14 @@ void handle_key(int key) {
         }
         cursor.y = editor.total_lines - cursor.y_offset - 1;
         clamp_cursor();
+        return;
     }
 
     if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
         cursor.y_offset = 0;
         cursor.y = 0;
         clamp_cursor();
+        return;
     }
 
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
@@ -159,6 +161,7 @@ void handle_key(int key) {
         
         get_selection_bounds(&start_select, &end_select);
         copy_text(start_select, end_select);
+        return;
     }
 
     if (key == 24 && is_selecting()) { // CTRL + X (Cut)
@@ -171,10 +174,12 @@ void handle_key(int key) {
         deletion(start_select, end_select);
 
         editor.is_saved = false;
+        return;
     }
 
     if (key == 22) {
-        paste_text();                
+        paste_text();
+        return;                
     }
 }
 

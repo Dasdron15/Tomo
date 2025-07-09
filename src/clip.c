@@ -15,9 +15,18 @@ void set_clipboard(const char* text) {
     fwrite(text, sizeof(char), strlen(text), pipe);
 
 #elif defined (__linux__)
-    FILE* pipe = popen("xclip -selection clipboard", "w");
+    const char* display = getenv("WAYLAND_DISPLAY");
+    FILE* pipe = NULL;
+
+    if (display) {
+        pipe = popen("wl-copy", "w");
+    } else {
+        pipe = popen("xclip -selection clipboard", "w");
+    }
+
     if (!pipe) return;
     fwrite(text, sizeof(char), strlen(text), pipe);
+    pclose(pipe);
 
 #elif defined (_WIN32)
     if (!OpenClipboard(NULL)) return 0;

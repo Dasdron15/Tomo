@@ -205,12 +205,17 @@ void new_line(void) {
 
 void copy_text(Point start, Point end) {
     char *clipboard = malloc(1);
+
+    if (!clipboard) {
+        return;
+    }
+    
     clipboard[0] = '\0';
     size_t clip_len = 0;
 
     for (int y = start.y; y <= end.y; y++) {
         int from = (y == start.y) ? start.x : 0;
-        int to = (y == end.y) ? end.y : (int)strlen(editor.lines[y]) - 1;
+        int to = (y == end.y) ? end.x : (int)strlen(editor.lines[y]) - 1;
 
         for (int x = from; x <= to; x++) {
             char ch = editor.lines[y][x];
