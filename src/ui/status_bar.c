@@ -31,6 +31,6 @@ void draw_status_bar() {
     }
 
     char *padding = mult_char(' ', space_length);
-    mvprintw(max_y - 1, 0, "%s%s%s", path, padding, cursor_info);
+    mvprintw(max_y - 2, 0, "%s%s%s", path, padding, cursor_info);
     free(padding);
 }

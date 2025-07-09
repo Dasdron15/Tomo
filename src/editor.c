@@ -73,7 +73,7 @@ void draw_editor() {
     int margin = int_len(editor.total_lines) + 2;
 
     for (int index = cursor.y_offset;
-         index < cursor.y_offset + screen_height - 1 &&
+         index < cursor.y_offset + screen_height - 2 &&
          index < editor.total_lines;
          index++) {
         char *line = editor.lines[index];

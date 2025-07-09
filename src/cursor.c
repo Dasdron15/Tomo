@@ -104,9 +104,9 @@ void clamp_cursor(void) {
         }
     }
 
-    if (cursor.y > screen_height - 5) {
-        cursor.y_offset += cursor.y - (screen_height - 5);
-        cursor.y = screen_height - 5;
+    if (cursor.y > screen_height - 6) {
+        cursor.y_offset += cursor.y - (screen_height - 6);
+        cursor.y = screen_height - 6;
     }
 }
 
