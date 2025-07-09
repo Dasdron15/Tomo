@@ -86,6 +86,7 @@ void clamp_cursor(void) {
     int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
+    editor.margin = int_len(editor.total_lines) + 2;
 
     if (cursor.x < editor.margin) {
         cursor.x = editor.margin;
@@ -106,6 +107,10 @@ void clamp_cursor(void) {
     if (cursor.y > screen_height - 5) {
         cursor.y_offset += cursor.y - (screen_height - 5);
         cursor.y = screen_height - 5;
+    }
+
+    if (cursor.x - editor.margin > line_len) {
+        cursor.x = editor.margin + line_len;
     }
 }
 
