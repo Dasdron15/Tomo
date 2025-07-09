@@ -248,8 +248,14 @@ void paste_text() {
     char* right = strdup(current_line + x_pos);
     current_line[x_pos] = '\0';
 
-    
+    size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
+    current_line = realloc(current_line, new_len);
+    strcat(current_line, clipboard);
+    strcat(current_line, right);
 
+    editor.lines[y_pos] = current_line;
+
+    free(right);
     free(clipboard);
     clamp_cursor();
 }

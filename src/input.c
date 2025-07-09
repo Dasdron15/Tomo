@@ -2,6 +2,7 @@
 
 #include <curses.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cursor.h"
 #include "select.h"
@@ -139,8 +140,8 @@ void handle_key(int key) {
         cursor.y + cursor.y_offset <
             editor.total_lines +
                 1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
-        if (editor.total_lines > getmaxy(stdscr) - 1) {
-            cursor.y_offset = editor.total_lines - getmaxy(stdscr) + 1;
+        if (editor.total_lines > getmaxy(stdscr) - 2) {
+            cursor.y_offset = editor.total_lines - getmaxy(stdscr) + 2;
         }
         cursor.y = editor.total_lines - cursor.y_offset - 1;
         clamp_cursor();
@@ -152,6 +153,18 @@ void handle_key(int key) {
         cursor.y = 0;
         clamp_cursor();
         return;
+    }
+
+    if (key == 554) { // CTRL + RIGHT_ARROW (Jump to the beggining of the line)
+        cursor.x = editor.margin;
+        cursor.x_offset = 0;
+        return;
+    }
+
+    if (key == 569) { // CTRL + LEFT_ARROW (Jump to the end of the line)
+        int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
+        cursor.x = editor.margin + line_len - cursor.x_offset;
+        clamp_cursor();
     }
 
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
@@ -178,7 +191,7 @@ void handle_key(int key) {
 
     if (key == 22) {
         paste_text();
-        return;                
+        return;
     }
 }
 
