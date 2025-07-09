@@ -29,5 +29,6 @@ void draw_editor(void);
 
 void handle_key(int key);
 void ask_for_save(void);
+void quit();
 
 #endif

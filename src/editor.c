@@ -8,7 +8,6 @@
 
 #include "common.h"
 #include "cursor.h"
-#include "edit.h"
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
@@ -31,12 +30,12 @@ void init_editor(void) {
     cursor.x_offset = 0;
     cursor.y_offset = 0;
 
+    printf("\033[5 q"); // Set cursor to line
     initscr();
     raw();
     set_escdelay(0);
     keypad(stdscr, true);
     noecho();
-    curs_set(2);
 
     if (has_colors() == FALSE) {
         endwin();
@@ -166,4 +165,19 @@ void ask_for_save() {
     }
 
     ask_for_save();
+}
+
+void quit() {
+    if (!editor.is_saved) {
+        ask_for_save();
+        return;
+    }
+    printf("\033[?1006l"); // Reset mouse selection
+
+    printf("\033[2 q");
+    fflush(stdout);
+
+    endwin();
+    exit(0);
+    
 }

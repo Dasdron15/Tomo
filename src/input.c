@@ -72,14 +72,7 @@ void handle_key(int key) {
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
-        if (!editor.is_saved) {
-            ask_for_save();
-            return;
-        }
-        printf("\033[?1006l");
-
-        endwin();
-        exit(0);
+        quit();
         return;
     }
 
