@@ -7,18 +7,18 @@ static Point selection_start;
 static Point selection_end;
 static bool selecting = false;
 
-void start_selection(int row, int col) {
+void start_selection(int y, int x) {
     if (!selecting) {
-        selection_start.y = row;
-        selection_start.x = col;
+        selection_start.y = y;
+        selection_start.x = x;
         selecting = true;
     }
 }
 
-void update_selection(int row, int col) {
+void update_selection(int y, int x) {
     if (selecting) {
-        selection_end.y = row;
-        selection_end.x = col;
+        selection_end.y = y;
+        selection_end.x = x;
     }
 }
 

@@ -244,6 +244,7 @@ void paste_text() {
     char *clipboard = strdup(get_clipboard());
     if (!clipboard)
         return;
+    int clipboard_lines = count_char(clipboard, '\n');
 
     start_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
 
@@ -254,14 +255,44 @@ void paste_text() {
     char* right = strdup(current_line + x_pos);
     current_line[x_pos] = '\0';
 
-    size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
-    current_line = realloc(current_line, new_len);
-    strcat(current_line, clipboard);
-    strcat(current_line, right);
+    if (clipboard_lines > 0) {
+        int index = cursor.y + cursor.y_offset;
+        char* token = strtok(clipboard, "\n");
+        size_t new_len = strlen(current_line) + strlen(token) + 1;
+        current_line = realloc(current_line, new_len);
 
-    editor.lines[y_pos] = current_line;
+        strcat(current_line, token);
 
-    cursor.x += strlen(clipboard);
+        int i;
+        for (i = 0; i < clipboard_lines && token; i++) {
+            token = strtok(NULL, "\n");
+            
+            memmove(editor.lines + index + i + 1, editor.lines + index + i, (editor.total_lines - index + i) * sizeof(char*));
+            editor.lines[index + i] = token;
+        }
+
+        new_len = strlen(token) + strlen(right) + 1;
+        current_line = editor.lines[y_pos + i];
+        current_line = realloc(current_line, new_len);
+        
+        strcat(current_line, right);
+        editor.lines[y_pos + i] = current_line;
+        
+        editor.total_lines += clipboard_lines;
+
+        cursor.y += i;
+        cursor.x = strlen(editor.lines[y_pos + i]) + editor.margin;
+        
+    } else {
+        size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
+        current_line = realloc(current_line, new_len);
+    
+        strcat(current_line, clipboard);
+        strcat(current_line, right);
+        
+        editor.lines[y_pos] = current_line;
+        cursor.x += strlen(clipboard);
+    }
 
     update_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
 
