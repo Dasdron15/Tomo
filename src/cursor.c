@@ -108,10 +108,6 @@ void clamp_cursor(void) {
         cursor.y_offset += cursor.y - (screen_height - 5);
         cursor.y = screen_height - 5;
     }
-
-    if (cursor.x - editor.margin > line_len) {
-        cursor.x = editor.margin + line_len;
-    }
 }
 
 size_t goto_line() {
