@@ -120,7 +120,7 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
-        if (end.x - start.x == len) {
+        if (end.x - start.x == len) { // If the whole line is selected
             editor.lines[start.y][start.x] = '\0';
         } else {
             memmove(&line[start.x], &line[end.x + 1], len - end.x);
