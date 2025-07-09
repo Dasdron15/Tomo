@@ -1,5 +1,6 @@
 #include "edit.h"
 
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -230,6 +231,7 @@ void copy_text(Point start, Point end) {
             clipboard[clip_len] = '\0';
         }
     }
+    editor.is_copied = true;
 
     set_clipboard(clipboard);
 }

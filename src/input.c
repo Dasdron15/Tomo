@@ -75,12 +75,6 @@ void handle_key(int key) {
         if (!editor.is_saved) {
             ask_for_save();
         }
-        
-        reset();
-
-        endwin();
-        exit(0);
-        
         return;
     }
 
