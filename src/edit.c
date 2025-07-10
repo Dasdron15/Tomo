@@ -245,6 +245,7 @@ void paste_text() {
     if (!clipboard)
         return;
     int clipboard_lines = count_char(clipboard, '\n');
+    editor.total_lines += clipboard_lines;
 
     int y_pos = cursor.y + cursor.y_offset;
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
@@ -275,9 +276,10 @@ void paste_text() {
         editor.lines[index] = current_line;
 
         // Shift lines in the main lines array
-        memmove(editor.lines + index + clipboard_lines, editor.lines + index, (editor.total_lines - index) * sizeof(char*));
-        memcpy(editor.lines + index, lines + 1, (clipboard_lines - 1) * sizeof(char*));
-
+        for (int i = editor.total_lines - 1; i >= index; i--) {
+            editor.lines[i + clipboard_lines] = editor.lines[i];
+        }
+        
         cursor.y += clipboard_lines;
         cursor.x = strlen(editor.lines[y_pos + clipboard_lines]) + editor.margin;
     } else {
@@ -291,7 +293,6 @@ void paste_text() {
         cursor.x += strlen(clipboard);
     }
 
-    editor.total_lines += clipboard_lines;
     cursor.max_x = cursor.x + cursor.x_offset;
 
     free(right);
