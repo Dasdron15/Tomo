@@ -255,31 +255,31 @@ void paste_text() {
 
     if (clipboard_lines > 0) {
         int index = cursor.y + cursor.y_offset;
+
+        // Tokenise clipboard to an array
+        char* lines[clipboard_lines];
         char* token = strtok(clipboard, "\n");
-        size_t new_len = strlen(current_line) + strlen(token) + 1;
-        current_line = realloc(current_line, new_len);
-
-        strcat(current_line, token);
-
-        int i;
-        for (i = 0; i < clipboard_lines && token; i++) {
-            token = strtok(NULL, "\n");
-            
-            memmove(editor.lines + index + i + 1, editor.lines + index + i, (editor.total_lines - index + i) * sizeof(char*));
-            editor.lines[index + i] = token;
+        for (int i = 0; i < clipboard_lines; i++) {
+            if (token) {
+                lines[i] = strdup(token);
+                token = strtok(NULL, "\n");
+            } else {
+                lines[i] = strdup("");
+            }
         }
 
-        new_len = strlen(token) + strlen(right) + 1;
-        current_line = editor.lines[y_pos + i];
+        // Merge the current line and first clipboard line
+        size_t new_len = strlen(current_line) + strlen(lines[0]) + 1;
         current_line = realloc(current_line, new_len);
-        
-        strcat(current_line, right);
-        editor.lines[y_pos + i] = current_line;
-        
-        editor.total_lines += clipboard_lines;
+        strcat(current_line, lines[0]);
+        editor.lines[index] = current_line;
 
-        cursor.y += i;
-        cursor.x = strlen(editor.lines[y_pos + i]) + editor.margin;
+        // Shift lines in the main lines array
+        memmove(editor.lines + index + clipboard_lines, editor.lines + index, (editor.total_lines - index) * sizeof(char*));
+        memcpy(editor.lines + index, lines + 1, (clipboard_lines - 1) * sizeof(char*));
+
+        cursor.y += clipboard_lines;
+        cursor.x = strlen(editor.lines[y_pos + clipboard_lines]) + editor.margin;
     } else {
         size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
         current_line = realloc(current_line, new_len);
@@ -290,6 +290,9 @@ void paste_text() {
         editor.lines[y_pos] = current_line;
         cursor.x += strlen(clipboard);
     }
+
+    editor.total_lines += clipboard_lines;
+    cursor.max_x = cursor.x + cursor.x_offset;
 
     free(right);
     free(clipboard);
