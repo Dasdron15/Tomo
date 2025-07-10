@@ -246,8 +246,6 @@ void paste_text() {
         return;
     int clipboard_lines = count_char(clipboard, '\n');
 
-    start_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
-
     int y_pos = cursor.y + cursor.y_offset;
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     char* current_line = editor.lines[y_pos];
@@ -282,7 +280,6 @@ void paste_text() {
 
         cursor.y += i;
         cursor.x = strlen(editor.lines[y_pos + i]) + editor.margin;
-        
     } else {
         size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
         current_line = realloc(current_line, new_len);
@@ -293,8 +290,6 @@ void paste_text() {
         editor.lines[y_pos] = current_line;
         cursor.x += strlen(clipboard);
     }
-
-    update_selection(cursor.y + cursor.y_offset, cursor.x + cursor.x_offset - editor.margin);
 
     free(right);
     free(clipboard);
