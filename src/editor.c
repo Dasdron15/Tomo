@@ -15,7 +15,7 @@ EditorState editor;
 
 void init_editor(void) {
     editor.is_saved = true;
-    editor.is_copied = false;
+    editor.bottom_text = "";
 
     if (editor.total_lines == 0) {
         editor.lines[0] = strdup("");
@@ -122,9 +122,7 @@ void draw_editor() {
     draw_status_bar();
     attroff(COLOR_PAIR(2));
 
-    if (editor.is_copied) {
-        mvprintw(getmaxy(stdscr) - 1, 0, "Copied selection");       
-    }
+    mvprintw(getmaxy(stdscr) - 1, 0, "%s", editor.bottom_text);
 
     move(cursor.y, cursor.x);
 }
@@ -145,7 +143,7 @@ void ask_for_save() {
     int ch;
     while ((ch = wgetch(stdscr)) != '\n') {
         if (ch == 27) {
-            editor.is_copied = false;
+            editor.bottom_text = "";
             return;
         } else if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0) {
             input[--pos] = '\0';

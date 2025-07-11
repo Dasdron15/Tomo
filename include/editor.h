@@ -16,7 +16,7 @@ typedef struct {
     char *filename;
     bool is_saved;
 
-    bool is_copied;
+    char *bottom_text;
 } EditorState;
 
 extern EditorState editor;

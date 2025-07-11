@@ -235,8 +235,6 @@ void copy_text(Point start, Point end) {
             clipboard[clip_len] = '\0';
         }
     }
-    editor.is_copied = true;
-
     set_clipboard(clipboard);
 }
 
@@ -252,7 +250,7 @@ void paste_text() {
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     char *current_line = editor.lines[y_pos];
 
-    char *right = strdup(current_line + x_pos);
+    char *line_remainder = strdup(current_line + x_pos);
     current_line[x_pos] = '\0';
 
     if (clipboard_lines > 0) {
@@ -281,10 +279,10 @@ void paste_text() {
         i--;
         size_t old_last_len = strlen(lines[i]);
         
-        size_t new_last_len = strlen(lines[i]) + strlen(right) + 1;
+        size_t new_last_len = strlen(lines[i]) + strlen(line_remainder) + 1;
         char* last_line = lines[i];
         last_line = realloc(last_line, new_last_len);
-        strcat(last_line, right);
+        strcat(last_line, line_remainder);
         editor.lines[i + index] = last_line;
 
         cursor.y += clipboard_lines;
@@ -293,11 +291,11 @@ void paste_text() {
         free(lines);
     } else {
         size_t new_len =
-            strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
+            strlen(current_line) + strlen(line_remainder) + strlen(clipboard) + 1;
         current_line = realloc(current_line, new_len);
 
         strcat(current_line, clipboard);
-        strcat(current_line, right);
+        strcat(current_line, line_remainder);
 
         editor.lines[y_pos] = current_line;
         cursor.x += strlen(clipboard);
@@ -305,7 +303,7 @@ void paste_text() {
 
     cursor.max_x = cursor.x + cursor.x_offset;
 
-    free(right);
+    free(line_remainder);
     free(clipboard);
     clamp_cursor();
 }

@@ -174,6 +174,8 @@ void handle_key(int key) {
         
         get_selection_bounds(&start_select, &end_select);
         copy_text(start_select, end_select);
+
+        editor.bottom_text = "Selection copied";
         return;
     }
 
@@ -187,10 +189,11 @@ void handle_key(int key) {
         deletion(start_select, end_select);
 
         editor.is_saved = false;
+        editor.bottom_text = "Cut selection";
         return;
     }
 
-    if (key == 22) {
+    if (key == 22) { // CTRL + V (Paste)
         Point start_select;
         Point end_select;
         
@@ -201,6 +204,9 @@ void handle_key(int key) {
         }
         
         paste_text();
+
+        editor.is_saved = false;
+        editor.bottom_text = "Clipboard pasted";
         return;
     }
 }
