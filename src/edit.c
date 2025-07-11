@@ -260,14 +260,6 @@ void paste_text() {
 
         // Tokenise clipboard to an array
         char **lines = split(clipboard, '\n');
-        
-
-        endwin();
-        reset();
-        for (int i = 0; i < clipboard_lines; i++) {
-            printf("%s\n", lines[i]);
-        }
-        exit(0);
 
         // Merge the current line and first clipboard line
         size_t new_len = strlen(current_line) + strlen(lines[0]) + 1;
@@ -280,9 +272,25 @@ void paste_text() {
             editor.lines[i + clipboard_lines] = editor.lines[i];
         }
 
+        // Add the rest of the lines
+        int i;
+        for (i = 1; i < clipboard_lines + 1; i++) {
+            editor.lines[i + index] = lines[i];
+        }
+
+        i--;
+        size_t old_last_len = strlen(lines[i]);
+        
+        size_t new_last_len = strlen(lines[i]) + strlen(right) + 1;
+        char* last_line = lines[i];
+        last_line = realloc(last_line, new_last_len);
+        strcat(last_line, right);
+        editor.lines[i + index] = last_line;
+
         cursor.y += clipboard_lines;
-        cursor.x =
-            strlen(editor.lines[y_pos + clipboard_lines]) + editor.margin;
+        cursor.x = old_last_len + editor.margin;
+
+        free(lines);
     } else {
         size_t new_len =
             strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
