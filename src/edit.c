@@ -126,7 +126,7 @@ void deletion(Point start, Point end) {
             memmove(&line[start.x], &line[end.x + 1], len - end.x);
             line[len - (end.x - start.x + 1)] = '\0';
 
-        cursor.x = start.x + editor.margin;
+            cursor.x = start.x + editor.margin;
         }
     } else {
         char *first = editor.lines[start.y];
@@ -244,28 +244,24 @@ void paste_text() {
     char *clipboard = strdup(get_clipboard());
     if (!clipboard)
         return;
-    
+
     int clipboard_lines = count_char(clipboard, '\n');
     editor.total_lines += clipboard_lines;
 
     int y_pos = cursor.y + cursor.y_offset;
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
-    char* current_line = editor.lines[y_pos];
+    char *current_line = editor.lines[y_pos];
 
-    char* right = strdup(current_line + x_pos);
+    char *right = strdup(current_line + x_pos);
     current_line[x_pos] = '\0';
 
     if (clipboard_lines > 0) {
         int index = cursor.y + cursor.y_offset;
 
         // Tokenise clipboard to an array
-        char* lines[clipboard_lines];
-        char* token = strsep(&clipboard, "\n");
-        for (int i = 0; i < clipboard_lines; i++) {
-            lines[i] = strdup(token);
-            token = strsep(&clipboard, "\n");
-        }        
+        char **lines = split(clipboard, '\n');
         
+
         endwin();
         reset();
         for (int i = 0; i < clipboard_lines; i++) {
@@ -283,16 +279,18 @@ void paste_text() {
         for (int i = editor.total_lines - 1; i >= index; i--) {
             editor.lines[i + clipboard_lines] = editor.lines[i];
         }
-        
+
         cursor.y += clipboard_lines;
-        cursor.x = strlen(editor.lines[y_pos + clipboard_lines]) + editor.margin;
+        cursor.x =
+            strlen(editor.lines[y_pos + clipboard_lines]) + editor.margin;
     } else {
-        size_t new_len = strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
+        size_t new_len =
+            strlen(current_line) + strlen(right) + strlen(clipboard) + 1;
         current_line = realloc(current_line, new_len);
-    
+
         strcat(current_line, clipboard);
         strcat(current_line, right);
-        
+
         editor.lines[y_pos] = current_line;
         cursor.x += strlen(clipboard);
     }

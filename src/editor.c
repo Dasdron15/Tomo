@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <curses.h>
-#include <strings.h>
 
 #include "common.h"
 #include "cursor.h"
