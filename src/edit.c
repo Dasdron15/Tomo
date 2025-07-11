@@ -220,7 +220,7 @@ void copy_text(Point start, Point end) {
 
     for (int y = start.y; y <= end.y; y++) {
         int from = (y == start.y) ? start.x : 0;
-        int to = (y == end.y) ? end.x : (int)strlen(editor.lines[y]) - 1;
+        int to = (y == end.y) ? end.x : (int)strlen(editor.lines[y]);
 
         for (int x = from; x < to; x++) {
             char ch = editor.lines[y][x];
@@ -244,6 +244,11 @@ void paste_text() {
     char *clipboard = strdup(get_clipboard());
     if (!clipboard)
         return;
+
+    endwin();
+    printf("%s\n", clipboard);
+    exit(0);
+    
     int clipboard_lines = count_char(clipboard, '\n');
     editor.total_lines += clipboard_lines;
 
