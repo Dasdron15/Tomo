@@ -46,3 +46,21 @@ int count_char(char* string, char ch) {
     }
     return count;
 }
+
+char* split(char** string, const char* delim) {
+    if (*string == NULL) {
+        return NULL;
+    }
+
+    char* start = *string;
+    char* end = start + strcspn(start, delim);
+
+    if (*end != '\0') {
+        *end = '\0';
+        *string = end + 1;
+    } else {
+        *string = NULL;
+    }
+
+    return start;
+}

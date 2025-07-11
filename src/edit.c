@@ -244,10 +244,6 @@ void paste_text() {
     char *clipboard = strdup(get_clipboard());
     if (!clipboard)
         return;
-
-    endwin();
-    printf("%s\n", clipboard);
-    exit(0);
     
     int clipboard_lines = count_char(clipboard, '\n');
     editor.total_lines += clipboard_lines;
@@ -264,15 +260,18 @@ void paste_text() {
 
         // Tokenise clipboard to an array
         char* lines[clipboard_lines];
-        char* token = strtok(clipboard, "\n");
+        char* token = strsep(&clipboard, "\n");
         for (int i = 0; i < clipboard_lines; i++) {
-            if (token) {
-                lines[i] = strdup(token);
-                token = strtok(NULL, "\n");
-            } else {
-                lines[i] = strdup("");
-            }
+            lines[i] = strdup(token);
+            token = strsep(&clipboard, "\n");
+        }        
+        
+        endwin();
+        reset();
+        for (int i = 0; i < clipboard_lines; i++) {
+            printf("%s\n", lines[i]);
         }
+        exit(0);
 
         // Merge the current line and first clipboard line
         size_t new_len = strlen(current_line) + strlen(lines[0]) + 1;
