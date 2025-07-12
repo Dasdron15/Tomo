@@ -45,7 +45,7 @@ void add_tab(void) {
 
     cursor.x += TAB_SIZE;
 
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 
     clamp_cursor();
 }
@@ -77,7 +77,7 @@ void insert_char(char c) {
     free(old);
     move_right(false);
 
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 }
 
 void deletion(Point start, Point end) {
@@ -161,7 +161,7 @@ void deletion(Point start, Point end) {
 
     editor.margin = int_len(editor.total_lines) + 2;
 
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 }
 
 void new_line(void) {
@@ -203,7 +203,7 @@ void new_line(void) {
     editor.margin = int_len(editor.total_lines) + 2;
     cursor.x = editor.margin;
     cursor.x_offset = 0;
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 
     clamp_cursor();
 }
@@ -278,9 +278,9 @@ void paste_text() {
 
         i--;
         size_t old_last_len = strlen(lines[i]);
-        
+
         size_t new_last_len = strlen(lines[i]) + strlen(line_remainder) + 1;
-        char* last_line = lines[i];
+        char *last_line = lines[i];
         last_line = realloc(last_line, new_last_len);
         strcat(last_line, line_remainder);
         editor.lines[i + index] = last_line;
@@ -290,8 +290,8 @@ void paste_text() {
 
         free(lines);
     } else {
-        size_t new_len =
-            strlen(current_line) + strlen(line_remainder) + strlen(clipboard) + 1;
+        size_t new_len = strlen(current_line) + strlen(line_remainder) +
+                         strlen(clipboard) + 1;
         current_line = realloc(current_line, new_len);
 
         strcat(current_line, clipboard);

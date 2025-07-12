@@ -100,7 +100,7 @@ void handle_key(int key) {
 
     if (key == '\t') {
         add_tab();
-        cursor.max_x = cursor.x;
+        cursor.max_x = cursor.x + cursor.x_offset;
         editor.is_saved = false;
         return;
     }

@@ -49,13 +49,14 @@ void move_right(bool is_selecting) {
 
     if (line_len <= cursor.x + cursor.x_offset - editor.margin &&
         cursor.y + cursor.y_offset < editor.total_lines - 1) {
+        cursor.x_offset = 0;
         cursor.x = editor.margin;
         cursor.y++;
     } else {
         cursor.x++;
     }
 
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 
     if (!is_selecting) {
         cancel_selection();
@@ -74,7 +75,7 @@ void move_left(bool is_selecting) {
         cursor.x = line_len + editor.margin;
     }
 
-    cursor.max_x = cursor.x;
+    cursor.max_x = cursor.x + cursor.x_offset;
 
     if (!is_selecting) {
         cancel_selection();
@@ -103,20 +104,18 @@ void clamp_cursor(void) {
     int line_len = strlen(editor.lines[line_index]);
 
     // Clamp X axis to line length
-    int max_x = line_len + editor.margin - cursor.x_offset;
-    if (cursor.x + cursor.x_offset < editor.margin) {
-        cursor.x = editor.margin;
-    } else if (cursor.x > max_x) {
-        cursor.x = max_x < editor.margin ? editor.margin : max_x;
+    if (cursor.x + cursor.x_offset - editor.margin > line_len) {
+        cursor.x = line_len + editor.margin - cursor.x_offset;
     }
 
     // Y axis limit (scroll up)
     if (cursor.y < y_limit && cursor.y_offset > y_limit) {
-        if (cursor.y_offset - (y_limit - cursor.y) < 0) {
+        int y_diff = y_limit - cursor.y;
+        if (cursor.y_offset - y_diff < 0) {
             cursor.y_offset = 0;
             cursor.y = is_selecting() ? get_start().y : 0;
         } else {
-            cursor.y_offset -= y_limit - cursor.y;
+            cursor.y_offset -= y_diff;
             cursor.y = y_limit;
         }
     }
@@ -130,14 +129,13 @@ void clamp_cursor(void) {
     // X axis limit (scroll left)
     int left_threshold = x_limit + editor.margin;
     if (cursor.x < left_threshold && cursor.x_offset > 0) {
-        int diff = left_threshold - cursor.x;
-        if (cursor.x_offset < diff) {
+        int x_diff = left_threshold - cursor.x;
+        if (cursor.x_offset < x_diff) {
             cursor.x_offset = 0;
             cursor.x = is_selecting() ? get_start().x : editor.margin;
         } else {
-            cursor.x_offset -= diff;
-            cursor.x = x_limit;
-        }
+            cursor.x_offset -= x_diff;
+            cursor.x = left_threshold;        }
     }
 
     // X axis limit (scroll right)
