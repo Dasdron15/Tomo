@@ -109,7 +109,7 @@ void clamp_cursor(void) {
     }
 
     // Y axis limit (scroll up)
-    if (cursor.y < y_limit && cursor.y_offset > y_limit) {
+    if (cursor.y < y_limit && cursor.y_offset > 0) {
         int y_diff = y_limit - cursor.y;
         if (cursor.y_offset - y_diff < 0) {
             cursor.y_offset = 0;

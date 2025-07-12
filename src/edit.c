@@ -154,8 +154,37 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
+        bool double_del = false;
+
+        // Check if the cursor is in quotes or braces
+        if (!is_selecting()) {
+            char open_ch = editor.lines[start.y][start.x];
+            char close_ch = editor.lines[start.y][start.x + 1];
+
+            if (open_ch == '\'' && close_ch == '\'') {
+                double_del = true;
+            }
+            if (open_ch == '"' && close_ch == '"') {
+                double_del = true;
+            }
+            if (open_ch == '{' && close_ch == '}') {
+                double_del = true;
+            }
+            if (open_ch == '[' && close_ch == ']') {
+                double_del = true;
+            }
+            if (open_ch == '(' && close_ch == ')') {
+                double_del = true;
+            }
+        }
+
         if (end.x - start.x == len) { // If the whole line is selected
             editor.lines[start.y][start.x] = '\0';
+        } else if (double_del) {
+            memmove(&line[start.x], &line[end.x + 2], len - end.x);
+            line[len - (end.x - start.x + 2)] = '\0';
+
+            cursor.x = start.x + editor.margin;
         } else {
             memmove(&line[start.x], &line[end.x + 1], len - end.x);
             line[len - (end.x - start.x + 1)] = '\0';
