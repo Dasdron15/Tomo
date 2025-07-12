@@ -52,6 +52,7 @@ void add_tab(void) {
 
 void insert_char(char c) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
+    char *new;
 
     char *old = editor.lines[cursor.y + cursor.y_offset];
 
@@ -61,16 +62,49 @@ void insert_char(char c) {
         editor.lines[cursor.y + cursor.y_offset] = old;
     }
 
-    char *new = malloc(strlen(old) + 2);
-    memset(new, 0, strlen(old) + 2);
+    if (c == '\'' || c == '"' || c == '{' || c == '[' || c == '(') {
+        char close_ch;
+        switch(c) {
+            case '\'':
+                close_ch = '\'';
+                break;
+            case '"':
+                close_ch = '"';
+                break;
+            case '{':
+                close_ch = '}';
+                break;
+            case '[':
+                close_ch = ']';
+                break;
+            case '(':
+                close_ch = ')';
+                break;
+        }
+        
+        new = malloc(strlen(old) + 3);
+        memset(new, 0, strlen(old) + 3);
 
-    if (new == NULL) {
-        return;
+        if (new == NULL) {
+            return;
+        }
+
+        strncpy(new, old, pos);
+        new[pos] = c;
+        new[pos + 1] = close_ch;
+        strcpy(new + pos + 2, old + pos);
+    } else {
+        new = malloc(strlen(old) + 2);
+        memset(new, 0, strlen(old) + 2);
+
+        if (new == NULL) {
+            return;
+        }
+
+        strncpy(new, old, pos);
+        new[pos] = c;
+        strcpy(new + pos + 1, old + pos);
     }
-
-    strncpy(new, old, pos);
-    new[pos] = c;
-    strcpy(new + pos + 1, old + pos);
 
     editor.lines[cursor.y + cursor.y_offset] = new;
 
