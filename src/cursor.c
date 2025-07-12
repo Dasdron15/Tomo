@@ -1,25 +1,25 @@
 #include "cursor.h"
 
-#include <curses.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
+#include <curses.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "common.h"
 #include "editor.h"
 #include "select.h"
-#include "common.h"
 
 CursorState cursor;
 
 void move_up(bool is_selecting) {
-    if (cursor.y + cursor.y_offset > 0) { 
+    if (cursor.y + cursor.y_offset > 0) {
         cursor.y--;
         cursor.x = cursor.max_x;
     } else {
         cursor.x = editor.margin - cursor.x_offset;
         cursor.max_x = cursor.x;
     }
-    
+
     if (!is_selecting) {
         cancel_selection();
     }
@@ -47,7 +47,8 @@ void move_down(bool is_selecting) {
 void move_right(bool is_selecting) {
     int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
 
-    if (line_len <= cursor.x + cursor.x_offset - editor.margin && cursor.y + cursor.y_offset < editor.total_lines - 1) {
+    if (line_len <= cursor.x + cursor.x_offset - editor.margin &&
+        cursor.y + cursor.y_offset < editor.total_lines - 1) {
         cursor.x = editor.margin;
         cursor.y++;
     } else {
@@ -83,7 +84,6 @@ void move_left(bool is_selecting) {
 }
 
 void clamp_cursor(void) {
-    int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
     int screen_width = getmaxx(stdscr);
     int screen_height = getmaxy(stdscr);
     editor.margin = int_len(editor.total_lines) + 2;
@@ -91,13 +91,26 @@ void clamp_cursor(void) {
     int x_limit = 5;
     int y_limit = 3;
 
-    if (cursor.x + cursor.x_offset < editor.margin) {
-        cursor.x = editor.margin;
-    } else if (cursor.x + cursor.x_offset > line_len + editor.margin) {
-        cursor.x = line_len + editor.margin - cursor.x_offset;
+    int line_index = cursor.y + cursor.y_offset;
+    if (line_index >= editor.total_lines) {
+        line_index = editor.total_lines - 1;
+        cursor.y = line_index - cursor.y_offset;
+        if (cursor.y < 0) {
+            cursor.y = 0;
+        }
     }
 
-    // y axis limit
+    int line_len = strlen(editor.lines[line_index]);
+
+    // Clamp X axis to line length
+    int max_x = line_len + editor.margin - cursor.x_offset;
+    if (cursor.x + cursor.x_offset < editor.margin) {
+        cursor.x = editor.margin;
+    } else if (cursor.x > max_x) {
+        cursor.x = max_x < editor.margin ? editor.margin : max_x;
+    }
+
+    // Y axis limit (scroll up)
     if (cursor.y < y_limit && cursor.y_offset > y_limit) {
         if (cursor.y_offset - (y_limit - cursor.y) < 0) {
             cursor.y_offset = 0;
@@ -108,25 +121,30 @@ void clamp_cursor(void) {
         }
     }
 
+    // Y axis limit (scroll down)
     if (cursor.y > screen_height - y_limit - 3) {
         cursor.y_offset += cursor.y - (screen_height - y_limit - 3);
         cursor.y = screen_height - y_limit - 3;
     }
 
-    // x axis limit
-    if (cursor.x < x_limit + editor.margin && cursor.x_offset > 0) {
-        if (cursor.x_offset - (x_limit + editor.margin - cursor.x) < 0) {
+    // X axis limit (scroll left)
+    int left_threshold = x_limit + editor.margin;
+    if (cursor.x < left_threshold && cursor.x_offset > 0) {
+        int diff = left_threshold - cursor.x;
+        if (cursor.x_offset < diff) {
             cursor.x_offset = 0;
             cursor.x = is_selecting() ? get_start().x : editor.margin;
         } else {
-            cursor.x_offset -= x_limit + editor.margin - cursor.x;
+            cursor.x_offset -= diff;
             cursor.x = x_limit;
         }
     }
 
-    if (cursor.x > screen_width - x_limit) {
-        cursor.x_offset += cursor.x - (screen_width - x_limit);
-        cursor.x = screen_width - x_limit;
+    // X axis limit (scroll right)
+    int right_threshold = screen_width - x_limit;
+    if (cursor.x > right_threshold) {
+        cursor.x_offset += cursor.x - right_threshold;
+        cursor.x = right_threshold;
     }
 }
 
@@ -183,4 +201,3 @@ size_t goto_line() {
     }
     return line - 1;
 }
-
