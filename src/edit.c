@@ -154,6 +154,23 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
+        // Tab deletion
+        if (!is_selecting() && start.x >= editor.indent_size) {
+            bool can_delete_tab = true;
+            for (int i = 0; i < editor.indent_size; i++) {
+                if (line[start.x - editor.indent_size + i] != ' ') {
+                    can_delete_tab = false;
+                    break;
+                }
+            }
+
+            if (can_delete_tab) {
+                memmove(&line[start.x - editor.indent_size], &line[start.x], strlen(line + start.x) + 1);
+                cursor.x -= editor.indent_size;
+                return;
+            }
+        }
+
         bool double_del = false;
 
         // Check if the cursor is in quotes or braces
@@ -183,12 +200,10 @@ void deletion(Point start, Point end) {
         } else if (double_del) {
             memmove(&line[start.x], &line[end.x + 2], len - end.x);
             line[len - (end.x - start.x + 2)] = '\0';
-
             cursor.x = start.x + editor.margin;
         } else {
             memmove(&line[start.x], &line[end.x + 1], len - end.x);
             line[len - (end.x - start.x + 1)] = '\0';
-
             cursor.x = start.x + editor.margin;
         }
     } else {
