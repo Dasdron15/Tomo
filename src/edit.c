@@ -22,13 +22,13 @@ void add_tab(void) {
         editor.lines[cursor.y + cursor.y_offset] = old;
     }
 
-    char *tab_str = mult_char(' ', TAB_SIZE);
+    char *tab_str = mult_char(' ', editor.indent_size);
 
     if (!tab_str) {
         return;
     }
 
-    char *new = malloc(strlen(old) + TAB_SIZE + 1);
+    char *new = malloc(strlen(old) + editor.indent_size + 1);
 
     if (new == NULL) {
         free(tab_str);
@@ -36,14 +36,14 @@ void add_tab(void) {
     }
 
     strncpy(new, old, pos);
-    memcpy(new + pos, tab_str, TAB_SIZE);
-    strcpy(new + pos + TAB_SIZE, old + pos);
+    memcpy(new + pos, tab_str, editor.indent_size);
+    strcpy(new + pos + editor.indent_size, old + pos);
 
     editor.lines[cursor.y + cursor.y_offset] = new;
     free(old);
     free(tab_str);
 
-    cursor.x += TAB_SIZE;
+    cursor.x += editor.indent_size;
 
     cursor.max_x = cursor.x + cursor.x_offset;
 
@@ -228,27 +228,27 @@ void deletion(Point start, Point end) {
 }
 
 void new_line(void) {
-    int pos = cursor.x + cursor.x_offset - editor.margin;
+    int x_pos = cursor.x + cursor.x_offset - editor.margin;
     int y_pos = cursor.y + cursor.y_offset;
 
     char *current = editor.lines[y_pos];
     int current_len = strlen(current);
 
-    char *left = malloc(pos + 1);
-    char *right = malloc(current_len - pos + 1);
+    char *left = malloc(x_pos + 1);
+    char *right = malloc(current_len - x_pos + 1);
 
-    if (pos > current_len) {
-        pos = current_len;
+    if (x_pos > current_len) {
+        x_pos = current_len;
     }
 
     if (!left || !right) {
         return;
     }
 
-    strncpy(left, current, pos);
-    left[pos] = '\0';
+    strncpy(left, current, x_pos);
+    left[x_pos] = '\0';
 
-    strcpy(right, current + pos);
+    strcpy(right, current + x_pos);
 
     free(editor.lines[y_pos]);
     editor.lines[y_pos] = NULL;

@@ -6,12 +6,12 @@
 
 #define MAX_LINES 1024
 #define MAX_LINE_LENGTH 1024
-#define TAB_SIZE 4
 
 typedef struct {
     char *lines[MAX_LINES * MAX_LINE_LENGTH]; // MAX_LINES * MAX_LINE_LENGTH
     int total_lines;
     int margin;
+    int indent_size;
     
     char *filename;
     bool is_saved;
