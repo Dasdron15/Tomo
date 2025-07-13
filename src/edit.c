@@ -265,13 +265,15 @@ void new_line(void) {
     if ((current_ch == '(' && next_ch == ')') ||
         (current_ch == '[' && next_ch == ']') ||
         (current_ch == '{' && next_ch == '}')) {
+        indent_count += editor.indent_size;
+        
         memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos], (editor.total_lines - y_pos - 2) * sizeof(char*));
 
-        char *indent1 = mult_char(' ', indent_count + editor.indent_size);
+        char *indent1 = mult_char(' ', indent_count);
         editor.lines[y_pos + 1] = strdup(indent1);
         free(indent1);
 
-        char *indent2 = mult_char(' ', indent_count);
+        char *indent2 = mult_char(' ', indent_count - editor.indent_size);
         strcpy(right, indent2);
         free(indent2);
         strcat(right, current + x_pos);
