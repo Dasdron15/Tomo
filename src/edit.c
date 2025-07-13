@@ -252,10 +252,9 @@ void new_line(void) {
         indent_count += editor.indent_size;
     }
 
-    char *left = malloc(x_pos + 1);
     char *right = malloc(indent_count + current_len - x_pos + 1);
 
-    if (!left || !right) {
+    if (!right) {
         endwin();
         reset();
         printf("Failed to allocate memory on the heap");
