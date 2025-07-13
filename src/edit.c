@@ -154,11 +154,11 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
-        // Tab deletion (Needs to be fixed!)
-        if (!is_selecting() && start.x >= editor.indent_size) {
+        // Tab deletion (It's fucking broken)
+        if (!is_selecting() && start.x >= editor.indent_size - 1) {
             bool can_delete_tab = true;
             for (int i = 0; i < editor.indent_size; i++) {
-                int idx = start.x - editor.indent_size + i;
+                int idx = start.x - editor.indent_size + i + 1;
                 
                 if (idx < 0 && line[idx] != ' ') {
                     can_delete_tab = false;
@@ -170,11 +170,6 @@ void deletion(Point start, Point end) {
                 size_t tail_len = strlen(line + start.x);
                 memmove(&line[start.x - editor.indent_size + 1], &line[start.x], tail_len + 1);
                 cursor.x -= editor.indent_size;
-
-                // endwin();
-                // reset();
-                // printw("%d", idx);
-                // exit(0);
 
                 return;
             }
