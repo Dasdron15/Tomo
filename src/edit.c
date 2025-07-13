@@ -64,24 +64,24 @@ void insert_char(char c) {
 
     if (c == '\'' || c == '"' || c == '{' || c == '[' || c == '(') {
         char close_ch;
-        switch(c) {
-            case '\'':
-                close_ch = '\'';
-                break;
-            case '"':
-                close_ch = '"';
-                break;
-            case '{':
-                close_ch = '}';
-                break;
-            case '[':
-                close_ch = ']';
-                break;
-            case '(':
-                close_ch = ')';
-                break;
+        switch (c) {
+        case '\'':
+            close_ch = '\'';
+            break;
+        case '"':
+            close_ch = '"';
+            break;
+        case '{':
+            close_ch = '}';
+            break;
+        case '[':
+            close_ch = ']';
+            break;
+        case '(':
+            close_ch = ')';
+            break;
         }
-        
+
         new = malloc(strlen(old) + 3);
         memset(new, 0, strlen(old) + 3);
 
@@ -234,38 +234,69 @@ void new_line(void) {
     char *current = editor.lines[y_pos];
     int current_len = strlen(current);
 
-    char *left = malloc(x_pos + 1);
-    char *right = malloc(current_len - x_pos + 1);
-
-    if (x_pos > current_len) {
-        x_pos = current_len;
+    int indent_count = 0;
+    if (current[0] == ' ' && current[1] == ' ') {
+        for (int i = 0; i < current_len; i++) {
+            if (current[i] == ' ') {
+                indent_count++;
+            } else {
+                break;
+            }
+        }
     }
+
+    char current_ch = editor.lines[y_pos][x_pos];
+    char next_ch = editor.lines[y_pos][x_pos + 1];
+
+    if (current_ch == ':') {
+        indent_count += editor.indent_size;
+    }
+
+    char *left = malloc(x_pos + 1);
+    char *right = malloc(indent_count + current_len - x_pos + 1);
 
     if (!left || !right) {
-        return;
+        endwin();
+        reset();
+        printf("Failed to allocate memory on the heap");
+        exit(0);
     }
+    
+    if ((current_ch == '(' && next_ch == ')') ||
+        (current_ch == '[' && next_ch == ']') ||
+        (current_ch == '{' && next_ch == '}')) {
+        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos], (editor.total_lines - y_pos - 2) * sizeof(char*));
 
-    strncpy(left, current, x_pos);
-    left[x_pos] = '\0';
+        char *indent1 = mult_char(' ', indent_count + editor.indent_size);
+        editor.lines[y_pos + 1] = strdup(indent1);
+        free(indent1);
 
-    strcpy(right, current + x_pos);
+        char *indent2 = mult_char(' ', indent_count);
+        strcpy(right, indent2);
+        free(indent2);
+        strcat(right, current + x_pos);
+        editor.lines[y_pos + 2] = strdup(right);
 
-    free(editor.lines[y_pos]);
-    editor.lines[y_pos] = NULL;
+        editor.lines[y_pos][x_pos] = '\0';
 
-    for (int i = editor.total_lines; i > y_pos; i--) {
-        editor.lines[i] = editor.lines[i - 1];
+        editor.total_lines += 2;
+    } else {
+        memmove(&editor.lines[y_pos + 1], &editor.lines[y_pos], (editor.total_lines - y_pos - 1) * sizeof(char*));
+
+        char *indent = mult_char(' ', indent_count);
+        strcpy(right, indent);
+        free(indent);
+        strcat(right, current + x_pos);
+        editor.lines[y_pos + 1] = strdup(right);
+
+        editor.lines[y_pos][x_pos] = '\0';
+        
+        editor.total_lines++;
     }
-
-    editor.lines[y_pos] = left;
-    editor.lines[y_pos + 1] = right;
-
-    editor.total_lines++;
 
     cursor.y++;
     editor.margin = int_len(editor.total_lines) + 2;
-    cursor.x = editor.margin;
-    cursor.x_offset = 0;
+    cursor.x = editor.margin + indent_count - cursor.x_offset;
     cursor.max_x = cursor.x + cursor.x_offset;
 
     clamp_cursor();
