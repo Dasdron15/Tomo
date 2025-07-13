@@ -245,8 +245,8 @@ void new_line(void) {
         }
     }
 
-    char current_ch = editor.lines[y_pos][x_pos];
-    char next_ch = editor.lines[y_pos][x_pos + 1];
+    char current_ch = editor.lines[y_pos][x_pos - 1];
+    char next_ch = editor.lines[y_pos][x_pos];
 
     if (current_ch == ':') {
         indent_count += editor.indent_size;
