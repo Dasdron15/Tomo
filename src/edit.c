@@ -12,7 +12,7 @@
 #include "select.h"
 
 void add_tab(void) {
-    int pos = cursor.x - editor.margin;
+    int pos = cursor.x + cursor.x_offset - editor.margin;
 
     char *old = editor.lines[cursor.y + cursor.y_offset];
 
