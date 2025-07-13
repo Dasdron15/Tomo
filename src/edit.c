@@ -154,19 +154,28 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
-        // Tab deletion
+        // Tab deletion (Needs to be fixed!)
         if (!is_selecting() && start.x >= editor.indent_size) {
             bool can_delete_tab = true;
             for (int i = 0; i < editor.indent_size; i++) {
-                if (line[start.x - editor.indent_size + i] != ' ') {
+                int idx = start.x - editor.indent_size + i;
+                
+                if (idx < 0 && line[idx] != ' ') {
                     can_delete_tab = false;
                     break;
                 }
             }
 
             if (can_delete_tab) {
-                memmove(&line[start.x - editor.indent_size], &line[start.x], strlen(line + start.x) + 1);
+                size_t tail_len = strlen(line + start.x);
+                memmove(&line[start.x - editor.indent_size + 1], &line[start.x], tail_len + 1);
                 cursor.x -= editor.indent_size;
+
+                // endwin();
+                // reset();
+                // printw("%d", idx);
+                // exit(0);
+
                 return;
             }
         }
