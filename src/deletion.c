@@ -1,6 +1,5 @@
 #include "deletion.h"
 
-#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
