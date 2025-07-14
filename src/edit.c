@@ -271,6 +271,7 @@ void new_line(void) {
         indent_count += editor.indent_size;
     }
 
+    char *original = strdup(editor.lines[y_pos]);
     char *right = malloc(indent_count + current_len - x_pos + 1);
 
     if (!right) {
@@ -285,7 +286,7 @@ void new_line(void) {
         (current_ch == '{' && next_ch == '}')) {
         indent_count += editor.indent_size;
         
-        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos], (editor.total_lines - y_pos - 2) * sizeof(char*));
+        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos], (editor.total_lines - y_pos) * sizeof(char*));
 
         char *indent1 = mult_char(' ', indent_count);
         editor.lines[y_pos + 1] = strdup(indent1);
@@ -297,11 +298,11 @@ void new_line(void) {
         strcat(right, current + x_pos);
         editor.lines[y_pos + 2] = strdup(right);
 
-        editor.lines[y_pos][x_pos] = '\0';
-
+        original[x_pos] = '\0';
+        editor.lines[y_pos] = original;        
         editor.total_lines += 2;
     } else {
-        memmove(&editor.lines[y_pos + 1], &editor.lines[y_pos], (editor.total_lines - y_pos - 1) * sizeof(char*));
+        memmove(&editor.lines[y_pos + 1], &editor.lines[y_pos], (editor.total_lines - y_pos) * sizeof(char*));
 
         char *indent = mult_char(' ', indent_count);
         strcpy(right, indent);
@@ -309,7 +310,8 @@ void new_line(void) {
         strcat(right, current + x_pos);
         editor.lines[y_pos + 1] = strdup(right);
 
-        editor.lines[y_pos][x_pos] = '\0';
+        original[x_pos] = '\0';
+        editor.lines[y_pos] = original; 
         
         editor.total_lines++;
     }
