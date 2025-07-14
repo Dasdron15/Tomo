@@ -120,7 +120,7 @@ void deletion(Point start, Point end) {
 
     normalize_range(&start, &end);
 
-    if (!is_selecting()) {
+    if (is_selecting()) {
         delete_range(start, end);
     } else if (is_at_line_start() && cursor.y > 0) {
         merge_lines(cursor.y - 1, cursor.y);
