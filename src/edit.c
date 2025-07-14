@@ -40,7 +40,6 @@ void add_tab(void) {
     strcpy(new + pos + editor.indent_size, old + pos);
 
     editor.lines[cursor.y + cursor.y_offset] = new;
-    free(old);
     free(tab_str);
 
     cursor.x += editor.indent_size;
@@ -155,23 +154,20 @@ void deletion(Point start, Point end) {
             return;
 
         // Tab deletion (It's fucking broken)
+        int indent_count = 0;
         if (!is_selecting() && start.x >= editor.indent_size - 1) {
-            bool can_delete_tab = true;
-            for (int i = start.x; i > start.x - editor.margin + 1; i--) {
-                if (line[i] != ' ') {
-                    can_delete_tab = false;
-                    endwin();
-                    reset();
-                    printf("%d\n", i);
-                    exit(0);
+            for (int i = start.x; i >= 0; i--) {
+                if (line[i] == ' ') {
+                    indent_count++;
+                } else {
+                    break;
                 }
             }
 
-            if (can_delete_tab) {
-                size_t tail_len = strlen(line + start.x);
-                memmove(&line[start.x - editor.indent_size + 1], &line[start.x], tail_len + 1);
+            if (indent_count >= editor.indent_size) {
+                size_t tail_len = strlen(line + start.x) + 1;
+                memmove(&line[start.x - editor.indent_size + 1], &line[start.x + 1], tail_len);
                 cursor.x -= editor.indent_size;
-
                 return;
             }
         }
