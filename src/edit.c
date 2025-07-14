@@ -10,6 +10,7 @@
 #include "cursor.h"
 #include "editor.h"
 #include "select.h"
+#include "new_line.h"
 
 void add_tab(void) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
@@ -250,83 +251,39 @@ void new_line(void) {
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     int y_pos = cursor.y + cursor.y_offset;
 
-    char *current = editor.lines[y_pos];
-    int current_len = strlen(current);
+    char *line = editor.lines[y_pos];
+    int indent = calculate_indent(line);
 
-    int indent_count = 0;
-    if (current[0] == ' ' && current[1] == ' ') {
-        for (int i = 0; i < current_len; i++) {
-            if (current[i] == ' ') {
-                indent_count++;
-            } else {
-                break;
-            }
-        }
-    }
-
-    char current_ch = x_pos > 0 ? current[x_pos - 1] : '\0';
-    char next_ch = current[x_pos];
-
-    if (current_ch == ':') {
-        indent_count += editor.indent_size;
-    }
-
-    char *original = strdup(editor.lines[y_pos]);
-    if (!original) {
-        endwin();
-        reset();
-        fprintf(stderr, "Failed to duplicate line for split\n");
-        exit(1);
-    }
+    char left = (x_pos > 0) ? line[x_pos - 1] : '\0';
+    char right = line[x_pos];
     
-    int right_len = indent_count + strlen(current + x_pos) + 1;
-    char *right = malloc(right_len);
-    if (!right) {
-        endwin();
-        reset();
-        fprintf(stderr, "Failed to allocate memory for right side of split\n");
-        exit(1);
-    }
-    
-    if ((current_ch == '(' && next_ch == ')') ||
-        (current_ch == '[' && next_ch == ']') ||
-        (current_ch == '{' && next_ch == '}')) {
-        indent_count += editor.indent_size;
-        
-        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos], (editor.total_lines - y_pos) * sizeof(char*));
+    if (is_enclosing_pair(left, right)) {
+        indent += editor.indent_size;
 
-        char *indent1 = mult_char(' ', indent_count);
-        editor.lines[y_pos + 1] = strdup(indent1);
-        free(indent1);
+        char *line_before = strndup(line, x_pos);
+        char *middle = mult_char(' ', indent);
+        char *line_after = create_right_side(line + x_pos, indent - editor.indent_size);
 
-        char *indent2 = mult_char(' ', indent_count - editor.indent_size);
-        strcpy(right, indent2);
-        free(indent2);
-        strcat(right, current + x_pos);
-        editor.lines[y_pos + 2] = strdup(right);
+        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos + 1], (editor.total_lines - y_pos) * sizeof(char*));
+        editor.lines[y_pos] = line_before;
+        editor.lines[y_pos + 1] = middle;
+        editor.lines[y_pos + 2] = line_after;
 
-        original[x_pos] = '\0';
-        editor.lines[y_pos] = original;
-        
         editor.total_lines += 2;
     } else {
+        char *line_before = strndup(line, x_pos);
+        char *right = create_right_side(line + x_pos, indent);
+
         memmove(&editor.lines[y_pos + 1], &editor.lines[y_pos], (editor.total_lines - y_pos) * sizeof(char*));
+        editor.lines[y_pos] = line_before;
+        editor.lines[y_pos + 1] = right;
 
-        char *indent = mult_char(' ', indent_count);
-        strcpy(right, indent);
-        free(indent);
-        strcat(right, current + x_pos);
-        editor.lines[y_pos + 1] = strdup(right);
-
-        original[x_pos] = '\0';
-        editor.lines[y_pos] = original; 
-        
         editor.total_lines++;
     }
 
     cursor.y++;
     editor.margin = int_len(editor.total_lines) + 2;
-    cursor.x = editor.margin + indent_count - cursor.x_offset;
+    cursor.x = editor.margin + indent - cursor.x_offset;
     cursor.max_x = cursor.x + cursor.x_offset;
 
     clamp_cursor();

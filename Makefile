@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra -O2 -g -lm
 LDFLAGS = -lcurses
 
-SRC = $(wildcard src/*.c src/*/*.c)
+SRC = $(wildcard src/*.c)
 OBJECTS = $(SRC:.c=.o)
 TARGET = cobalt
 INSTALL_DIR = /usr/local/bin
