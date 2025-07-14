@@ -129,7 +129,7 @@ void deletion(Point start, Point end) {
         // Poop
     } else if (delete_pair(start)) {
         // Poop
-    } else {
+    } else if (!is_at_line_start()) {
         delete_char(start);
     }
 
