@@ -157,12 +157,13 @@ void deletion(Point start, Point end) {
         // Tab deletion (It's fucking broken)
         if (!is_selecting() && start.x >= editor.indent_size - 1) {
             bool can_delete_tab = true;
-            for (int i = 0; i < editor.indent_size; i++) {
-                int idx = start.x - editor.indent_size + i + 1;
-                
-                if (idx < 0 && line[idx] != ' ') {
+            for (int i = start.x; i > start.x - editor.margin + 1; i--) {
+                if (line[i] != ' ') {
                     can_delete_tab = false;
-                    break;
+                    endwin();
+                    reset();
+                    printf("%d\n", i);
+                    exit(0);
                 }
             }
 
