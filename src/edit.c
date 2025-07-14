@@ -153,7 +153,7 @@ void deletion(Point start, Point end) {
         if (start.x >= len)
             return;
 
-        // Tab deletion (It's fucking broken)
+        // Tab deletion
         int indent_count = 0;
         if (!is_selecting() && start.x >= editor.indent_size - 1) {
             for (int i = start.x; i >= 0; i--) {
@@ -169,7 +169,7 @@ void deletion(Point start, Point end) {
                 int delete_size = editor.indent_size - (indent_count % editor.indent_size);
                 memmove(&line[start.x - delete_size + 1], &line[start.x + 1], tail_len);
                 cursor.x -= delete_size;
-                return;
+                goto tab_del;
             }
         }
 
@@ -235,6 +235,8 @@ void deletion(Point start, Point end) {
         cursor.x = start.x + editor.margin;
         cursor.y = start.y - cursor.y_offset;
     }
+
+tab_del:
 
     clamp_cursor();
     cancel_selection();
