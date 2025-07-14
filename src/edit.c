@@ -123,8 +123,10 @@ void deletion(Point start, Point end) {
     if (is_selecting()) {
         delete_range(start, end);
     } else if (is_at_line_start() && cursor.y > 0) {
+        size_t prev_len = strlen(editor.lines[start.y - 1]);
         merge_lines(cursor.y - 1, cursor.y);
         cursor.y--;
+        cursor.x = prev_len + editor.margin;
     } else if (delete_tab(start)) {
         // Poop
     } else if (delete_pair(start)) {
