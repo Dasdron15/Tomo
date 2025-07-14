@@ -1,11 +1,12 @@
 #include "deletion.h"
 
+#include <curses.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "editor.h"
 #include "cursor.h"
+#include "editor.h"
 
 void normalize_range(Point *a, Point *b) {
     if (a->y > b->y || (a->y == b->y && a->x > b->x)) {
@@ -15,9 +16,7 @@ void normalize_range(Point *a, Point *b) {
     }
 }
 
-bool is_at_line_start() {
-    return cursor.x - editor.margin <= 0;
-}
+bool is_at_line_start() { return cursor.x - editor.margin <= 0; }
 
 void merge_lines(int dst, int src) {
     char *a = editor.lines[dst];
@@ -26,7 +25,8 @@ void merge_lines(int dst, int src) {
     size_t len_a = strlen(a);
     size_t len_b = strlen(b);
     a = realloc(a, len_a + len_b + 1);
-    if (!a) return;
+    if (!a)
+        return;
 
     strcat(a, b);
     free(editor.lines[src]);
@@ -41,10 +41,11 @@ void merge_lines(int dst, int src) {
 
 bool delete_tab(Point pos) {
     char *line = editor.lines[pos.y];
-    if (pos.x < editor.indent_size) return false;
+    if (pos.x + 1 < editor.indent_size)
+        return false;
 
     int count = 0;
-    for (int i = pos.x - 1; i >= 0; i--) {
+    for (int i = pos.x; i >= 0; i--) {
         if (line[i] == ' ') {
             count++;
         } else {
@@ -53,8 +54,11 @@ bool delete_tab(Point pos) {
     }
 
     if (count >= editor.indent_size) {
-        memmove(&line[pos.x - editor.indent_size], &line[pos.x], strlen(line + pos.x + 1));
-        cursor.x -= editor.indent_size;
+        size_t tail_len = strlen(line + pos.x) + 1;
+        int delete_size = editor.indent_size - (count % editor.indent_size);
+
+        memmove(&line[pos.x - delete_size + 1], &line[pos.x + 1], tail_len);
+        cursor.x -= delete_size;
         return true;
     }
     return false;
@@ -66,10 +70,8 @@ bool delete_pair(Point pos) {
     char close = line[pos.x + 1];
 
     bool match =
-        (open == '(' && close == ')') ||
-        (open == '[' && close == ']') ||
-        (open == '{' && close == '}') ||
-        (open == '"' && close == '"') ||
+        (open == '(' && close == ')') || (open == '[' && close == ']') ||
+        (open == '{' && close == '}') || (open == '"' && close == '"') ||
         (open == '\'' && close == '\'');
 
     if (!match) {
@@ -128,4 +130,3 @@ void delete_range(Point start, Point end) {
     cursor.x = start.x + editor.margin;
     cursor.y = start.y - cursor.y_offset;
 }
-
