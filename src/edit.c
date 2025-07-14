@@ -11,6 +11,7 @@
 #include "editor.h"
 #include "select.h"
 #include "new_line.h"
+#include "deletion.h"
 
 void add_tab(void) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
@@ -115,135 +116,27 @@ void insert_char(char c) {
 }
 
 void deletion(Point start, Point end) {
-    if (start.y >= editor.total_lines || end.y >= editor.total_lines ||
-        (!is_selecting() && start.y <= 0 && start.x < 0))
-        return;
-    if (start.x < 0)
-        start.x = 0;
-    if (end.x < 0)
-        end.x = 0;
+    if (start.y >= editor.total_lines || end.y >= editor.total_lines) return;
 
-    if (start.y > end.y || (start.y == end.y && start.x > end.x)) {
-        Point tmp = start;
-        start = end;
-        end = tmp;
-    }
+    normalize_range(&start, &end);
 
-    if (!is_selecting() && cursor.x - editor.margin - 1 < 0 && cursor.y > 0) {
-        int prev_len = strlen(editor.lines[start.y - 1]);
-        int curr_len = strlen(editor.lines[start.y]);
-
-        editor.lines[start.y - 1] =
-            realloc(editor.lines[start.y - 1], prev_len + curr_len + 1);
-        strcat(editor.lines[start.y - 1], editor.lines[start.y]);
-        free(editor.lines[start.y]);
-
-        for (int i = start.y; i < editor.total_lines - 1; i++) {
-            editor.lines[i] = editor.lines[i + 1];
-        }
-
-        editor.total_lines--;
-
+    if (!is_selecting()) {
+        delete_range(start, end);
+    } else if (is_at_line_start() && cursor.y > 0) {
+        merge_lines(cursor.y - 1, cursor.y);
         cursor.y--;
-        cursor.x = prev_len + editor.margin;
-
-    } else if (start.y == end.y) {
-        char *line = editor.lines[start.y];
-        int len = strlen(line);
-
-        if (start.x >= len)
-            return;
-
-        // Tab deletion
-        int indent_count = 0;
-        if (!is_selecting() && start.x >= editor.indent_size - 1) {
-            for (int i = start.x; i >= 0; i--) {
-                if (line[i] == ' ') {
-                    indent_count++;
-                } else {
-                    break;
-                }
-            }
-
-            if (indent_count >= editor.indent_size) {
-                size_t tail_len = strlen(line + start.x) + 1;
-                int delete_size = editor.indent_size - (indent_count % editor.indent_size);
-                memmove(&line[start.x - delete_size + 1], &line[start.x + 1], tail_len);
-                cursor.x -= delete_size;
-                goto tab_del;
-            }
-        }
-
-        bool double_del = false;
-
-        // Check if the cursor is in quotes or braces
-        if (!is_selecting()) {
-            char open_ch = editor.lines[start.y][start.x];
-            char close_ch = editor.lines[start.y][start.x + 1];
-
-            if (open_ch == '\'' && close_ch == '\'') {
-                double_del = true;
-            }
-            if (open_ch == '"' && close_ch == '"') {
-                double_del = true;
-            }
-            if (open_ch == '{' && close_ch == '}') {
-                double_del = true;
-            }
-            if (open_ch == '[' && close_ch == ']') {
-                double_del = true;
-            }
-            if (open_ch == '(' && close_ch == ')') {
-                double_del = true;
-            }
-        }
-
-        if (end.x - start.x == len) { // If the whole line is selected
-            editor.lines[start.y][start.x] = '\0';
-        } else if (double_del) {
-            memmove(&line[start.x], &line[end.x + 2], len - end.x);
-            line[len - (end.x - start.x + 2)] = '\0';
-            cursor.x = start.x + editor.margin;
-        } else {
-            memmove(&line[start.x], &line[end.x + 1], len - end.x);
-            line[len - (end.x - start.x + 1)] = '\0';
-            cursor.x = start.x + editor.margin;
-        }
+    } else if (delete_tab(start)) {
+        // Poop
+    } else if (delete_pair(start)) {
+        // Poop
     } else {
-        char *first = editor.lines[start.y];
-        char *last = editor.lines[end.y];
-
-        first[start.x] = '\0';
-        char *rest = &last[end.x + 1];
-
-        size_t new_len = strlen(first) + strlen(rest) + 1;
-        char *merged = malloc(new_len);
-        snprintf(merged, new_len, "%s%s", first, rest);
-
-        free(editor.lines[start.y]);
-        editor.lines[start.y] = merged;
-
-        for (int i = start.y + 1; i <= end.y; i++) {
-            free(editor.lines[i]);
-        }
-
-        for (int i = end.y + 1; i < editor.total_lines; i++) {
-            editor.lines[start.y + 1 + (i - end.y - 1)] = editor.lines[i];
-        }
-
-        editor.total_lines -= (end.y - start.y);
-
-        cursor.x = start.x + editor.margin;
-        cursor.y = start.y - cursor.y_offset;
+        delete_char(start);
     }
 
-tab_del:
-
-    clamp_cursor();
     cancel_selection();
+    clamp_cursor();
 
     editor.margin = int_len(editor.total_lines) + 2;
-
     cursor.max_x = cursor.x + cursor.x_offset;
 }
 
