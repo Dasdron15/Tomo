@@ -67,6 +67,47 @@ void handle_key(int key) {
         return;
     }
 
+    if (key == 555) { // Shift + ctrl + LEFT_ARROW
+        start_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        cursor.x = editor.margin;
+        cursor.x_offset = 0;
+        update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        return;
+    }
+
+    if (key == 570) { // Shift + ctrl + LEFT_ARROW
+        start_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
+        cursor.x = editor.margin + line_len - cursor.x_offset;
+        clamp_cursor();
+        update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        return;
+    }
+
+    if (key == 576) { // Shift + ctrl + UP_ARROW
+        start_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        cursor.y_offset = 0;
+        cursor.y = 0;
+        clamp_cursor();
+        update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        return;
+    }
+
+    if (key == 535 &&
+        cursor.y + cursor.y_offset <
+            editor.total_lines +
+                1) { // CTRL + DOWN_ARROW (Jump to the end of the file)
+        start_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        if (editor.total_lines > getmaxy(stdscr) - 2) {
+            cursor.y_offset = editor.total_lines - getmaxy(stdscr) + 2;
+        }
+        cursor.y = editor.total_lines - cursor.y_offset - 1;
+        clamp_cursor();
+        update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
+        return;
+    }
+
+
     if (key == 27) { // Esc
         cancel_selection();
         return;
@@ -166,6 +207,7 @@ void handle_key(int key) {
         int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
         cursor.x = editor.margin + line_len - cursor.x_offset;
         clamp_cursor();
+        return;
     }
 
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
