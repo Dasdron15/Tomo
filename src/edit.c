@@ -166,8 +166,9 @@ void deletion(Point start, Point end) {
 
             if (indent_count >= editor.indent_size) {
                 size_t tail_len = strlen(line + start.x) + 1;
-                memmove(&line[start.x - editor.indent_size + 1], &line[start.x + 1], tail_len);
-                cursor.x -= editor.indent_size;
+                int delete_size = editor.indent_size - (indent_count % editor.indent_size);
+                memmove(&line[start.x - delete_size + 1], &line[start.x + 1], tail_len);
+                cursor.x -= delete_size;
                 return;
             }
         }
