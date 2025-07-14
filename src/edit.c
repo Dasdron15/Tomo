@@ -264,21 +264,28 @@ void new_line(void) {
         }
     }
 
-    char current_ch = editor.lines[y_pos][x_pos - 1];
-    char next_ch = editor.lines[y_pos][x_pos];
+    char current_ch = x_pos > 0 ? current[x_pos - 1] : '\0';
+    char next_ch = current[x_pos];
 
     if (current_ch == ':') {
         indent_count += editor.indent_size;
     }
 
     char *original = strdup(editor.lines[y_pos]);
-    char *right = malloc(indent_count + current_len - x_pos + 1);
-
+    if (!original) {
+        endwin();
+        reset();
+        fprintf(stderr, "Failed to duplicate line for split\n");
+        exit(1);
+    }
+    
+    int right_len = indent_count + strlen(current + x_pos) + 1;
+    char *right = malloc(right_len);
     if (!right) {
         endwin();
         reset();
-        printf("Failed to allocate memory on the heap");
-        exit(0);
+        fprintf(stderr, "Failed to allocate memory for right side of split\n");
+        exit(1);
     }
     
     if ((current_ch == '(' && next_ch == ')') ||
@@ -299,7 +306,8 @@ void new_line(void) {
         editor.lines[y_pos + 2] = strdup(right);
 
         original[x_pos] = '\0';
-        editor.lines[y_pos] = original;        
+        editor.lines[y_pos] = original;
+        
         editor.total_lines += 2;
     } else {
         memmove(&editor.lines[y_pos + 1], &editor.lines[y_pos], (editor.total_lines - y_pos) * sizeof(char*));
