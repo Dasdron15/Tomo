@@ -10,6 +10,7 @@
 #include "fileio.h"
 #include "select.h"
 #include "status_bar.h"
+#include "draw.h"
 
 EditorState editor;
 
@@ -101,15 +102,29 @@ void draw_editor() {
             int file_y = index;
 
             char ch = (symb < (int) strlen(line)) ? line[symb] : ' ';
+            char *tab = mult_char(' ', editor.indent_size);
 
             if (is_selected(file_y, file_x)) {
                 attron(COLOR_PAIR(3));
-                mvprintw(line_num_pos, col, "%c", ch);
+
+                if (ch == '\t') {
+                    mvprintw(line_num_pos, col, "%s", tab);
+                    col += editor.indent_size - 1;
+                } else {
+                    mvprintw(line_num_pos, col, "%c", ch);                   
+                }
+                
                 attroff(COLOR_PAIR(3));
             } else {
-                mvprintw(line_num_pos, col, "%c", ch);
+                if (ch == '\t') {
+                    mvprintw(line_num_pos, col, "%s", tab);
+                    col += editor.indent_size - 1;
+                } else {
+                    mvprintw(line_num_pos, col, "%c", ch);                   
+                }
             }
             col++;
+            free(tab);
         }
 
         line_num_pos++;
@@ -124,7 +139,9 @@ void draw_editor() {
 
     mvprintw(getmaxy(stdscr) - 1, 0, "%s", editor.bottom_text);
 
-    move(cursor.y, cursor.x);
+    char *line = editor.lines[cursor.y + cursor.y_offset];
+    int render_x = calc_render_x(line, cursor.x - editor.margin);
+    move(cursor.y, editor.margin + render_x - cursor.x_offset);
 }
 
 void ask_for_save() {
