@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <curses.h>
 
 #include "editor.h"
 
@@ -28,9 +29,16 @@ void load_file(const char *path) {
             buffer[len - 1] = '\0';
         }
 
-        if (buffer[0] == ' ' && buffer[1] == ' ' && !indent_measured) {
+        if (((buffer[0] == ' ' && buffer[1] == ' ') || buffer[0] == '\t') && !indent_measured) {
             indent_count = 0;
             for (int i = 0; i < (int) strlen(buffer); i++) {
+                if (buffer[i] == '\t') {
+                    editor.tab_indent = true;
+                    indent_measured = true;
+                    indent_count = DEFAULT_INDENT_SIZE;
+                    break;
+                }
+                
                 if (buffer[i] == ' ') {
                     indent_count++;
                 } else {

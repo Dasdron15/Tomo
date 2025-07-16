@@ -11,7 +11,9 @@ typedef struct {
     char *lines[MAX_LINES * MAX_LINE_LENGTH]; // MAX_LINES * MAX_LINE_LENGTH
     int total_lines;
     int margin;
+    
     int indent_size;
+    bool tab_indent;
     
     char *filename;
     bool is_saved;

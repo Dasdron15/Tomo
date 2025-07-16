@@ -24,28 +24,35 @@ void add_tab(void) {
         editor.lines[cursor.y + cursor.y_offset] = old;
     }
 
-    char *tab_str = mult_char(' ', editor.indent_size);
+    char *tab_str;
+    int tab_len;
 
-    if (!tab_str) {
-        return;
+    if (editor.tab_indent) {
+        tab_str = "\t";
+        tab_len = 1;
+    } else {
+        tab_str = mult_char(' ', editor.indent_size);
+        tab_len = editor.indent_size;
     }
 
-    char *new = malloc(strlen(old) + editor.indent_size + 1);
-
+    char *new = malloc(strlen(old) + tab_len + 1);
+    
     if (new == NULL) {
         free(tab_str);
         return;
     }
 
     strncpy(new, old, pos);
-    memcpy(new + pos, tab_str, editor.indent_size);
-    strcpy(new + pos + editor.indent_size, old + pos);
+    memcpy(new + pos, tab_str, tab_len);
+    strcpy(new + pos + tab_len, old + pos);
 
     editor.lines[cursor.y + cursor.y_offset] = new;
-    free(tab_str);
 
-    cursor.x += editor.indent_size;
+    if (!editor.tab_indent) {
+        free(tab_str);
+    }
 
+    cursor.x += tab_len;
     cursor.max_x = cursor.x + cursor.x_offset;
 
     clamp_cursor();

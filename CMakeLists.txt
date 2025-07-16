@@ -11,4 +11,5 @@ AUX_SOURCE_DIRECTORY(src SRC)
 
 add_executable(tomo ${SRC})
 target_link_libraries(tomo ${CURSES_LIBRARIES} m)
+add_compile_options(-Wall -Wextra -O2 -g)
 

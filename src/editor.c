@@ -83,11 +83,11 @@ void draw_editor() {
 
         // Draw line number
         if (index == cursor.y + cursor.y_offset) {
+            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
+        } else {
             attron(COLOR_PAIR(1));
             mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
             attroff(COLOR_PAIR(1));
-        } else {
-            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
         }
 
         free(spaces);
