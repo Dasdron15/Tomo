@@ -5,11 +5,14 @@
 
 #include "common.h"
 #include "editor.h"
+#include "cursor.h"
 
 int calculate_indent(const char *line) {
     int indent = 0;
     int len = strlen(line);
     char indent_symbol = ' ';
+    int index = cursor.y + cursor.y_offset;
+    int pos = cursor.x + cursor.x_offset - editor.margin;
 
     if (editor.tab_indent) {
         indent_symbol = '\t';
@@ -18,9 +21,15 @@ int calculate_indent(const char *line) {
     for (int i = 0; i < len && line[i] == indent_symbol; i++) {
         indent++;
     }
-    if (len > 0 && line[len - 1] == ':') {
-        indent += editor.indent_size;
-    }
+
+    if (editor.lines[index][pos - 1] == ':') {
+        if (indent_symbol == '\t') {
+            indent++;
+        } else {
+            indent += editor.indent_size;
+        }
+    } 
+    
     return indent;
 }
 
