@@ -13,6 +13,7 @@ typedef struct {
     int margin;
     
     int indent_size;
+    int tab_width;
     bool tab_indent;
     
     char *filename;

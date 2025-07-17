@@ -9,7 +9,13 @@
 int calculate_indent(const char *line) {
     int indent = 0;
     int len = strlen(line);
-    for (int i = 0; i < len && line[i] == ' '; i++) {
+    char indent_symbol = ' ';
+
+    if (editor.tab_indent) {
+        indent_symbol = '\t';
+    }
+    
+    for (int i = 0; i < len && line[i] == indent_symbol; i++) {
         indent++;
     }
     if (len > 0 && line[len - 1] == ':') {

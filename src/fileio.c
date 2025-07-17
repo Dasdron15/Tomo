@@ -7,8 +7,7 @@
 #include <curses.h>
 
 #include "editor.h"
-
-#define DEFAULT_INDENT_SIZE 4
+#include "init.h"
 
 void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
@@ -21,7 +20,6 @@ void load_file(const char *path) {
     }
 
     bool indent_measured = false;
-    int indent_count = 0;
 
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         size_t len = strlen(buffer);
@@ -29,32 +27,15 @@ void load_file(const char *path) {
             buffer[len - 1] = '\0';
         }
 
-        if (((buffer[0] == ' ' && buffer[1] == ' ') || buffer[0] == '\t') && !indent_measured) {
-            indent_count = 0;
-            for (int i = 0; i < (int) strlen(buffer); i++) {
-                if (buffer[i] == '\t') {
-                    editor.tab_indent = true;
-                    indent_measured = true;
-                    indent_count = DEFAULT_INDENT_SIZE;
-                    break;
-                }
-                
-                if (buffer[i] == ' ') {
-                    indent_count++;
-                } else {
-                    indent_measured = true;
-                    break;
-                }
-            }
-        }
-
         editor.lines[i++] = strdup(buffer);
+        if (!indent_measured) {
+            init_indent(buffer, &indent_measured);
+        }
     }
 
     if (!indent_measured) {
+        editor.tab_indent = false;
         editor.indent_size = DEFAULT_INDENT_SIZE;
-    } else {
-        editor.indent_size = indent_count;
     }
     
     fclose(fp);
