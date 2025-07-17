@@ -166,7 +166,10 @@ void new_line(void) {
         char *middle = mult_char(' ', indent);
         char *line_after = create_right_side(line + x_pos, indent - editor.indent_size);
 
-        memmove(&editor.lines[y_pos + 2], &editor.lines[y_pos + 1], (editor.total_lines - y_pos) * sizeof(char*));
+        memmove(&editor.lines[y_pos + 3], &editor.lines[y_pos + 1], (editor.total_lines - y_pos - 1) * sizeof(char*));
+
+        free(editor.lines[y_pos]);
+        
         editor.lines[y_pos] = line_before;
         editor.lines[y_pos + 1] = middle;
         editor.lines[y_pos + 2] = line_after;
