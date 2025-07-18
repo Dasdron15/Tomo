@@ -101,15 +101,17 @@ void draw_editor() {
             int file_x = symb;
             int file_y = index;
 
+            int tab_size = editor.tab_indent ? editor.tab_width : editor.indent_size;
+
             char ch = (symb < (int) strlen(line)) ? line[symb] : ' ';
-            char *tab = mult_char(' ', editor.indent_size);
+            char *tab = mult_char(' ', tab_size);
 
             if (is_selected(file_y, file_x)) {
                 attron(COLOR_PAIR(3));
 
                 if (ch == '\t') {
                     mvprintw(line_num_pos, col, "%s", tab);
-                    col += editor.indent_size - 1;
+                    col += tab_size - 1;
                 } else {
                     mvprintw(line_num_pos, col, "%c", ch);                   
                 }
@@ -118,7 +120,7 @@ void draw_editor() {
             } else {
                 if (ch == '\t') {
                     mvprintw(line_num_pos, col, "%s", tab);
-                    col += editor.indent_size - 1;
+                    col += tab_size - 1;
                 } else {
                     mvprintw(line_num_pos, col, "%c", ch);                   
                 }

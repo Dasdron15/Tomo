@@ -12,11 +12,11 @@ void init_editor_color() {
 
 void init_indent(char *line, bool *indent_measured) {
     int indent_count = 0;
+    editor.tab_width = DEFAULT_INDENT_SIZE;
 
     if (line[0] == '\t') {
         editor.tab_indent = true;
-        editor.tab_width = 1;
-        editor.indent_size = DEFAULT_INDENT_SIZE;
+        editor.indent_size = 1;
         *indent_measured = true;
         return;
     }
