@@ -9,6 +9,7 @@ void draw_line_with_number(int index, int y_pos);
 void draw_line_content(int index, char *line, int y);
 int syntax_color(char *line, int pos);
 bool is_keyword(char *string, const char *keyword);
+void draw_status_bar(void);
 void draw_bottom_text(void);
 void place_cursor(void);
 

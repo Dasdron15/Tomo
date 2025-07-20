@@ -9,7 +9,6 @@
 #include "cursor.h"
 #include "draw.h"
 #include "fileio.h"
-#include "status_bar.h"
 
 EditorState editor;
 
