@@ -13,6 +13,7 @@
 #include "new_line.h"
 #include "deletion.h"
 
+// Works perfectly
 void add_tab(void) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
 
@@ -150,6 +151,14 @@ void deletion(Point start, Point end) {
 }
 
 void new_line(void) {
+    char indent_symb;
+    
+    if (editor.tab_indent) {
+        indent_symb = '\t';
+    } else {
+        indent_symb = ' ';
+    }
+    
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     int y_pos = cursor.y + cursor.y_offset;
 
@@ -163,7 +172,7 @@ void new_line(void) {
         indent += editor.indent_size;
 
         char *line_before = strndup(line, x_pos);
-        char *middle = mult_char(' ', indent);
+        char *middle = mult_char(indent_symb, indent);
         char *line_after = create_right_side(line + x_pos, indent - editor.indent_size);
 
         memmove(&editor.lines[y_pos + 3], &editor.lines[y_pos + 1], (editor.total_lines - y_pos - 1) * sizeof(char*));

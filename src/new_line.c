@@ -10,9 +10,10 @@
 int calculate_indent(const char *line) {
     int indent = 0;
     int len = strlen(line);
-    char indent_symbol = ' ';
     int index = cursor.y + cursor.y_offset;
     int pos = cursor.x + cursor.x_offset - editor.margin;
+
+    char indent_symbol = ' ';
 
     if (editor.tab_indent) {
         indent_symbol = '\t';
@@ -40,7 +41,14 @@ bool is_enclosing_pair(char left, char right) {
 }
 
 char *create_right_side(const char *rest_of_line, int indent) {
-    char *indent_str = mult_char(' ', indent);
+    char indent_symb;
+
+    if (editor.tab_indent) {
+        indent_symb = '\t';
+    } else {
+        indent_symb = ' ';
+    }
+    char *indent_str = mult_char(indent_symb, indent);
     size_t total_len = strlen(indent_str) + strlen(rest_of_line) + 1;
     char *result = malloc(total_len);
     if (!result)
