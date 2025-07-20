@@ -4,4 +4,4 @@ cobalt
 *.o
 
 build/
-.idea
+.idea/
