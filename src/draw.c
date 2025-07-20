@@ -1,6 +1,14 @@
 #include "draw.h"
 
+#include <ctype.h>
+#include <curses.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "common.h"
+#include "cursor.h"
 #include "editor.h"
+#include "select.h"
 
 int calc_render_x(const char *line, int cursor_x) {
     int render_x = 0;
@@ -14,6 +22,101 @@ int calc_render_x(const char *line, int cursor_x) {
     return render_x;
 }
 
-void draw_line(int row) {
+void draw_text_area(void) {
+    int screen_width = getmaxx(stdscr);
+    int screen_height = getmaxy(stdscr);
+
+    int line_num_pos = 0;
+    editor.margin = int_len(editor.total_lines) + 2;
+
+    for (int index = cursor.y_offset;
+         index < cursor.y_offset + screen_height - 2 &&
+         index < editor.total_lines;
+         index++) {
+
+        char *line = editor.lines[index];
+        draw_line_with_number(index, line_num_pos);
+        draw_line_content(index, line, line_num_pos);
+
+        line_num_pos++;
+    }
+}
+
+void draw_line_with_number(int index, int y_pos) {
+    char *spaces =
+        mult_char(' ', int_len(editor.total_lines) - int_len(index + 1));
+
+    if (index == cursor.y + cursor.y_offset) {
+        mvprintw(y_pos, 0, " %s%d ", spaces, index + 1);
+    } else {
+        attron(COLOR_PAIR(1));
+        mvprintw(y_pos, 0, " %s%d ", spaces, index + 1);
+        attroff(COLOR_PAIR(1));
+    }
+
+    free(spaces);
+}
+
+void draw_line_content(int index, char *line, int y) {
+    int screen_width = getmaxx(stdscr);
+    int col = editor.margin;
+
+    for (int symb = cursor.x_offset;
+         symb <= (int) strlen(line) && symb < cursor.x_offset + screen_width;
+         symb++) {
+        int file_x = symb;
+        int file_y = index;
+
+        char ch = (symb < (int) strlen(line)) ? line[symb] : ' ';
+        int tab_size =
+            editor.tab_indent ? editor.tab_width : editor.indent_size;
+
+        char *tab = mult_char(' ', tab_size);
+
+        int color = syntax_color(line, symb);
+
+        if (is_selected(file_y, file_x)) attron(COLOR_PAIR(3));
+        else attron(COLOR_PAIR(color));
+
+        if (ch == '\t') {
+            mvprintw(y, col, "%s", tab);
+            col += tab_size - 1;
+        } else {
+            mvprintw(y, col, "%c", ch);
+        }
+
+        if (is_selected(file_y, file_x)) attroff(COLOR_PAIR(3));
+        else attroff(COLOR_PAIR(color));
+
+        col++;
+        free(tab);
+    }
+}
+
+int syntax_color(char *line, int pos) {
+    char c = line[pos];
     
+    if (isdigit(c)) return 4; // Highlight numbers
+    if (c == '/' && line[pos + 1] == '/') return 5; // Highlight comments
+    if (isalpha(c)) {
+        if (is_keyword(&line[pos], "int")) return 6; // Highlight keyword
+    }
+
+    return 2; // Default
+}
+
+bool is_keyword(char *str, const char *keyword) {
+    int len = strlen(keyword);
+    return strncmp(str, keyword, len) == 0 && (str[len] == '\0') || !isalnum(str[len]);
+}
+
+void draw_bottom_text(void) {
+    int screen_height = getmaxy(stdscr);
+    mvprintw(screen_height - 1, 0, "%s", editor.bottom_text);
+}
+
+void place_cursor(void) {
+    char *line = editor.lines[cursor.y + cursor.y_offset];
+    int render_x = calc_render_x(line, cursor.x - editor.margin);
+    move(cursor.y, editor.margin + render_x - cursor.x_offset);
 }

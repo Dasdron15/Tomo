@@ -7,10 +7,9 @@
 
 #include "common.h"
 #include "cursor.h"
-#include "fileio.h"
-#include "select.h"
-#include "status_bar.h"
 #include "draw.h"
+#include "fileio.h"
+#include "status_bar.h"
 
 EditorState editor;
 
@@ -53,10 +52,13 @@ void init_editor(void) {
     init_color(10, rgb_to_ncurses(142), rgb_to_ncurses(145),
                rgb_to_ncurses(154));
     init_color(11, rgb_to_ncurses(31), rgb_to_ncurses(48), rgb_to_ncurses(70));
+    init_color(12, rgb_to_ncurses(130), rgb_to_ncurses(180), rgb_to_ncurses(235));
+
 
     init_pair(1, 8, -1);   // Unactive text color
     init_pair(2, 10, 9);   // Status bar color
     init_pair(3, 255, 11); // Selected text
+    init_pair(4, use_default_colors(), 12);
 
     // Disable default terminal text selection
     printf("\033[?1006h");
@@ -67,83 +69,10 @@ void init_editor(void) {
 void draw_editor() {
     erase();
 
-    int screen_width = getmaxx(stdscr);
-    int screen_height = getmaxy(stdscr);
-
-    int line_num_pos = 0;
-    int margin = int_len(editor.total_lines) + 2;
-
-    for (int index = cursor.y_offset;
-         index < cursor.y_offset + screen_height - 2 &&
-         index < editor.total_lines;
-         index++) {
-        char *line = editor.lines[index];
-        char *spaces =
-            mult_char(' ', int_len(editor.total_lines) - int_len(index + 1));
-
-        // Draw line number
-        if (index == cursor.y + cursor.y_offset) {
-            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
-        } else {
-            attron(COLOR_PAIR(1));
-            mvprintw(line_num_pos, 0, " %s%d ", spaces, index + 1);
-            attroff(COLOR_PAIR(1));
-        }
-
-        free(spaces);
-
-        // Draw line content with wrapping
-        int col = margin;
-
-        for (int symb = cursor.x_offset;
-             symb <= (int) strlen(line) && symb < cursor.x_offset + screen_width;
-             symb++) {
-            int file_x = symb;
-            int file_y = index;
-
-            int tab_size = editor.tab_indent ? editor.tab_width : editor.indent_size;
-
-            char ch = (symb < (int) strlen(line)) ? line[symb] : ' ';
-            char *tab = mult_char(' ', tab_size);
-
-            if (is_selected(file_y, file_x)) {
-                attron(COLOR_PAIR(3));
-
-                if (ch == '\t') {
-                    mvprintw(line_num_pos, col, "%s", tab);
-                    col += tab_size - 1;
-                } else {
-                    mvprintw(line_num_pos, col, "%c", ch);                   
-                }
-                
-                attroff(COLOR_PAIR(3));
-            } else {
-                if (ch == '\t') {
-                    mvprintw(line_num_pos, col, "%s", tab);
-                    col += tab_size - 1;
-                } else {
-                    mvprintw(line_num_pos, col, "%c", ch);                   
-                }
-            }
-            col++;
-            free(tab);
-        }
-
-        line_num_pos++;
-        if (line_num_pos >= screen_height - 1) {
-            break; // Don't draw beyond screen bottom
-        }
-    }
-
-    attron(COLOR_PAIR(2));
+    draw_text_area();
     draw_status_bar();
-    attroff(COLOR_PAIR(2));
-
-    mvprintw(getmaxy(stdscr) - 1, 0, "%s", editor.bottom_text);
-
-    char *line = editor.lines[cursor.y + cursor.y_offset];
-    int render_x = calc_render_x(line, cursor.x - editor.margin);
-    move(cursor.y, editor.margin + render_x - cursor.x_offset);
+    draw_bottom_text();
+    place_cursor();
 }
 
 void ask_for_save() {
