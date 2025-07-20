@@ -96,13 +96,13 @@ void draw_line_content(int index, char *line, int y) {
 int syntax_color(char *line, int pos) {
     char c = line[pos];
     
-    if (isdigit(c)) return 4; // Highlight numbers
-    if (c == '/' && line[pos + 1] == '/') return 5; // Highlight comments
+    if (isdigit(c)) return 5; // Highlight numbers
+    if (c == '/' && line[pos + 1] == '/') return 1; // Highlight comments
     if (isalpha(c)) {
-        if (is_keyword(&line[pos], "int")) return 6; // Highlight keyword
+        if (is_keyword(&line[pos], "int")) return 5; // Highlight keyword
     }
 
-    return 2; // Default
+    return 4; // Default
 }
 
 bool is_keyword(char *str, const char *keyword) {
