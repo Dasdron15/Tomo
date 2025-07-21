@@ -12,7 +12,6 @@
 #include "new_line.h"
 #include "deletion.h"
 
-// Works perfectly
 void add_tab(void) {
     int pos = cursor.x + cursor.x_offset - editor.margin;
 

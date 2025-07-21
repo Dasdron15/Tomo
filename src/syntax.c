@@ -128,11 +128,24 @@ bool is_function(const char *str, int pos) {
 
 bool is_quoted(const char *str, int pos) {
     bool in_string = false;
+    bool escaped = false;
 
-    for (int i = 0; str[i] && i <= pos; i++) {
-        if (str[i] == '"' && (i == 0 || str[i - 1] != '\\')) {
+    for (int i = 0; str[i] && i <= strlen(str); i++) {
+        if (str[i] == '\\') {
+            escaped = !escaped;
+            continue;
+        }
+        if (str[i] == '"' && !escaped) {
             in_string = !in_string;
         }
+        if (i == pos && str[i] == '"') {
+            return true;
+        }
+        if (i == pos) {
+            return in_string;
+        }
+
+        escaped = false;
     }
     
     return in_string;
