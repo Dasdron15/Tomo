@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "clip.h"
-#include "common.h"
+#include "utils.h"
 #include "cursor.h"
 #include "editor.h"
 #include "select.h"

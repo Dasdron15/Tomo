@@ -5,7 +5,7 @@
 
 #include <curses.h>
 
-#include "common.h"
+#include "utils.h"
 #include "cursor.h"
 #include "draw.h"
 #include "fileio.h"

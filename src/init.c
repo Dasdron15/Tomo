@@ -1,10 +1,21 @@
 #include "init.h"
 
-#include "editor.h"
-
 #include <string.h>
 
+#include "editor.h"
+#include "utils.h"
 
+void init_vars(void) {
+    editor.is_saved = true;
+    editor.bottom_text = "";
+
+    if (editor.total_lines == 0) {
+        editor.lines[0] = strdup("");
+        editor.total_lines++;
+    }
+
+    editor.margin = int_len(editor.total_lines) + 2;
+}
 
 void init_editor_color() {
     
