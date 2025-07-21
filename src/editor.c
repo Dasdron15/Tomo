@@ -29,8 +29,6 @@ void init_editor(void) {
     cursor.x_offset = 0;
     cursor.y_offset = 0;
 
-    editor.file_ext = strchr(editor.filename, '.');
-
     printf("\033[5 q"); // Set cursor to line
     initscr();
     raw();

@@ -74,7 +74,7 @@ void draw_line_content(int index, char *line, int y) {
 
         char *tab = mult_char(' ', tab_size);
 
-        int color = syntax_color(line, symb);
+        int color = syntax_color(line, symb, get_syntax());
 
         if (is_selected(file_y, file_x)) attron(COLOR_PAIR(3));
         else attron(COLOR_PAIR(color));

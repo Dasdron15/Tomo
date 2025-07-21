@@ -17,7 +17,6 @@ typedef struct {
     bool tab_indent;
     
     char *filename;
-    char *file_ext;
     bool is_saved;
 
     char *bottom_text;
