@@ -18,6 +18,35 @@ const char *C_types[] = {
     "char", "short", "double", "int", "float",
     "void", "signed", "unsigned", "long", NULL};
 
+
+int syntax_color(char *line, int pos) {
+    char c = line[pos];
+    int line_len = (int) strlen(line);
+    int comment_start = -1;
+
+    for (int i = 0; i < line_len - 1; i++) {
+        if (line[i] == '/' && line[i + 1] == '/') {
+            comment_start = i;
+            break;
+        }
+    }
+
+    if (comment_start != -1 && pos >= comment_start) return 1; // Highlight comments
+    if (isdigit(c) || c == '*' || is_quoted(line, pos)) return 5; // Highlight numbers or '*' symbol
+
+    int start = pos;
+    while (start > 0 && isalpha(line[start - 1])) start--;
+    int end = pos;
+    while (isalpha(line[end]) || line[end] == '_') end++;
+
+    if (is_keyword(line, pos)) return 6;
+    if (is_type(line, pos)) return 7;
+    if (is_function(line, pos)) return 8;
+
+    return 4; // Default
+}
+
+
 bool is_keyword(const char *str, int pos) {
     const char **keywords;
     
@@ -33,8 +62,9 @@ bool is_keyword(const char *str, int pos) {
     int end = pos;
     while (isalnum(str[end]) || str[end] == '_') end++;
 
-    int len = end - start;
+    if (pos >= end) return false;
 
+    int len = end - start;
     for (int i = 0; keywords[i]; i++) {
         if (strlen(keywords[i]) == len && strncmp(str + start, keywords[i], len) == 0) {
             return true;
@@ -59,8 +89,9 @@ bool is_type(const char *str, int pos) {
     int end = pos;
     while (isalnum(str[end]) || str[end] == '_') end++;
 
-    int len = end - start;
+    if (pos >= end) return false;
 
+    int len = end - start;
     for (int i = 0; types[i]; i++) {
         if (strlen(types[i]) == len && strncmp(str + start, types[i], len) == 0) {
             return true;
@@ -80,6 +111,8 @@ bool is_function(const char *str, int pos) {
     if (end <= start) return false;
 
     while (str[end] && isspace(str[end])) end++;
+
+    if (pos >= end) return false;
 
     if (str[end] != '(') return false;
 
