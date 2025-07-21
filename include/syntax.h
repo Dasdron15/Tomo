@@ -4,18 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-enum SyntaxColors {
-    COLOR_DEFAULT = 1,
-    COLOR_KEYWORD = 2,
-    COLOR_TYPE = 3,
-    COLOR_STRING = 4,
-    COLOR_NUMBER = 5,
-    COLOR_CHAR = 6,
-    COLOR_COMMENT = 7,
-    COLOR_FUNCTION = 8,
-    COLOR_PREPROCESSOR = 9,
-};
-
 typedef struct {
     const char *file_ext;
     const char **keywords;

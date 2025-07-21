@@ -7,6 +7,7 @@
 
 #include "editor.h"
 #include "fileio.h"
+#include "init.h"
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
 
     load_file(editor.filename);
     init_editor();
+    init_colors();
 
     while (1) {
         draw_editor();

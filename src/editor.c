@@ -5,60 +5,10 @@
 
 #include <curses.h>
 
-#include "utils.h"
-#include "cursor.h"
 #include "draw.h"
 #include "fileio.h"
 
 EditorState editor;
-
-void init_editor(void) {
-    editor.is_saved = true;
-    editor.bottom_text = "";
-
-    if (editor.total_lines == 0) {
-        editor.lines[0] = strdup("");
-        editor.total_lines = 1;
-    }
-
-    editor.margin = int_len(editor.total_lines) + 2;
-
-    cursor.x = editor.margin;
-    cursor.max_x = editor.margin;
-    cursor.y = 0;
-    cursor.x_offset = 0;
-    cursor.y_offset = 0;
-
-    printf("\033[5 q"); // Set cursor to line
-    initscr();
-    raw();
-    set_escdelay(0);
-    keypad(stdscr, true);
-    noecho();
-
-    if (has_colors() == FALSE) {
-        endwin();
-        printf("Error: Terminal does not support colors");
-        exit(1);
-    }
-
-    start_color();
-    use_default_colors();
-
-    init_pair(8, COLOR_WHITE, -1);
-    init_pair(9, COLOR_BLUE, -1);
-    init_pair(10, COLOR_CYAN, -1);
-    init_pair(11, COLOR_GREEN, -1);
-    init_pair(12, COLOR_YELLOW, -1);
-    init_pair(13, COLOR_RED, -1);
-    
-    init_pair(15, COLOR_MAGENTA, -1);
-
-    // Disable default terminal text selection
-    printf("\033[?1006h");
-    mousemask(ALL_MOUSE_EVENTS, NULL);
-    mouseinterval(0);
-}
 
 void draw_editor() {
     erase();
@@ -69,7 +19,7 @@ void draw_editor() {
     place_cursor();
 }
 
-void ask_for_save() {
+void ask_for_save(void) {
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 
@@ -115,9 +65,7 @@ void ask_for_save() {
     }
 }
 
-void reset() {
-    printf("\033[?1006l"); // Reset mouse selection
-
+void reset(void) {
     printf("\033[2 q");
     fflush(stdout);
 }

@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "editor.h"
+#include "init.h"
 
 /* C KEYWORDSSSSSS!!! (I UFCKING LOVE C) */
 static const char *C_keywords[] = {
@@ -69,28 +70,28 @@ int syntax_color(char *line, int pos, const SyntaxDef *syntax) {
         if (dest != NULL) {
             int comment_start = dest - line;
             if (pos >= comment_start) {
-                return COLOR_COMMENT;
+                return PAIR_UNACTIVE;
             }
         }
     }
 
     if (is_quoted(line, pos)) {
-        return COLOR_STRING;
+        return PAIR_STRING;
     }
     if (isdigit(c) || (c == '.' && isdigit(line[pos + 1]))) {
-        return COLOR_NUMBER;
+        return PAIR_NUM;
     }
     if (syntax->keywords && is_keyword(line, pos, syntax->keywords)) {
-        return COLOR_KEYWORD;
+        return PAIR_KEYWORD;
     }
     if (syntax->types && is_type(line, pos, syntax->types)) {
-        return COLOR_TYPE;
+        return PAIR_TYPE;
     }
     if (is_function(line, pos)) {
-        return COLOR_FUNCTION;
+        return PAIR_FUNCTION;
     }
 
-    return COLOR_DEFAULT;
+    return PAIR_DEFAULT;
 }
 
 bool is_keyword(const char *str, int pos, const char **keywords) {

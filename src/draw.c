@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "init.h"
 #include "utils.h"
 #include "cursor.h"
 #include "editor.h"
@@ -50,9 +51,9 @@ void draw_line_with_number(int index, int y_pos) {
     if (index == cursor.y + cursor.y_offset) {
         mvprintw(y_pos, 0, " %s%d ", spaces, index + 1);
     } else {
-        attron(COLOR_PAIR(1));
+        attron(COLOR_PAIR(PAIR_UNACTIVE));
         mvprintw(y_pos, 0, " %s%d ", spaces, index + 1);
-        attroff(COLOR_PAIR(1));
+        attroff(COLOR_PAIR(PAIR_UNACTIVE));
     }
 
     free(spaces);
@@ -95,7 +96,7 @@ void draw_line_content(int index, char *line, int y) {
 }
 
 void draw_status_bar(void) {
-    attron(COLOR_PAIR(2));
+    attron(COLOR_PAIR(PAIR_STATUS_BAR));
     
     int max_x, max_y;
     getmaxyx(stdscr, max_y, max_x);
@@ -120,7 +121,7 @@ void draw_status_bar(void) {
     mvprintw(max_y - 2, 0, "%s%s%s", path, padding, cursor_info);
     free(padding);
 
-    attroff(COLOR_PAIR(2));
+    attroff(COLOR_PAIR(PAIR_STATUS_BAR));
 }
 
 void draw_bottom_text(void) {
