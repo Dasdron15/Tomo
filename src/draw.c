@@ -96,19 +96,26 @@ void draw_line_content(int index, char *line, int y) {
 
 int syntax_color(char *line, int pos) {
     char c = line[pos];
-    
     int line_len = (int) strlen(line);
-    int comment_start;
+    int comment_start = -1;
 
-    for (int i = line_len; i > 0; i--) {
-        if (line[i + 1] == '/' && line[i + 2] == '/') {
+    for (int i = 0; i < line_len - 1; i++) {
+        if (line[i] == '/' && line[i + 1] == '/') {
             comment_start = i;
+            break;
         }
     }
-    
-    if (isdigit(c) && pos <= comment_start) return 5; // Highlight numbers
-    if (pos > comment_start) return 1; // Highlight comments
+
+    if (comment_start != -1 && pos >= comment_start) return 1; // Highlight comments
+    if (isdigit(c)) return 5; // Highlight numbers
+
+    int start = pos;
+    while (start > 0 && isalpha(line[start - 1])) start--;
+    int end = pos;
+    while (isalpha(line[end]) || line[end] == '_') end++;
+
     if (is_keyword(line, pos)) return 6;
+    if (is_type(line, pos)) return 7;
 
     return 4; // Default
 }
