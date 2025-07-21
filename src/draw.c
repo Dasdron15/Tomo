@@ -9,6 +9,7 @@
 #include "cursor.h"
 #include "editor.h"
 #include "select.h"
+#include "syntax.h"
 
 int calc_render_x(const char *line, int cursor_x) {
     int render_x = 0;
@@ -107,13 +108,9 @@ int syntax_color(char *line, int pos) {
     
     if (isdigit(c) && pos <= comment_start) return 5; // Highlight numbers
     if (pos > comment_start) return 1; // Highlight comments
+    if (is_keyword(line, pos)) return 6;
 
     return 4; // Default
-}
-
-bool is_keyword(char *str, const char *keyword) {
-    int len = strlen(keyword);
-    return strncmp(str, keyword, len) == 0 && (str[len] == '\0') || !isalnum(str[len]);
 }
 
 void draw_status_bar(void) {
