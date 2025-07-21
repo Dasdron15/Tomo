@@ -59,13 +59,16 @@ void init_editor(void) {
 
     init_color(14, rgb_to_ncurses(137), rgb_to_ncurses(190), rgb_to_ncurses(250));
 
+    init_color(15,rgb_to_ncurses(182), rgb_to_ncurses(152), rgb_to_ncurses(223));
+
     init_pair(1, 8, -1);   // Unactive text color
     init_pair(2, 10, 9);   // Status bar color
     init_pair(3, 255, 11); // Selected text
     init_pair(4, 255, -1); // Default text color
     init_pair(5, 12, -1); // Numbers color
     init_pair(6, 13, -1); // Keyword color
-    init_pair(7, 14, -1);
+    init_pair(7, 14, -1); // Type color
+    init_pair(8, 15, -1);
 
     // Disable default terminal text selection
     printf("\033[?1006h");

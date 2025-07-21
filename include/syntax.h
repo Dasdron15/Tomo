@@ -11,5 +11,6 @@ extern const char *C_types[];
 bool is_keyword(const char *str, int pos);
 bool is_type(const char *str, int pos);
 bool is_function(const char *str, int pos);
+bool is_quoted(const char *str, int pos);
 
 #endif

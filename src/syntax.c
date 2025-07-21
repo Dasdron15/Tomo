@@ -69,3 +69,39 @@ bool is_type(const char *str, int pos) {
     
     return false;
 }
+
+bool is_function(const char *str, int pos) {
+    int start = pos;
+    while (start > 0 && (isalnum(str[start - 1]) || str[start - 1] == '_')) start--;
+
+    int end = pos;
+    while (isalnum(str[end]) || str[end] == '_') end++;
+
+    if (end <= start) return false;
+
+    while (str[end] && isspace(str[end])) end++;
+
+    if (str[end] != '(') return false;
+
+    int paren_depth = 0;
+    for (int i = end - 1; str[i]; i++) {    
+        if (str[i] == ')') paren_depth--;
+        if (str[i] == '(') paren_depth++;
+    }
+    if (paren_depth == 0) return true;
+    
+    return false;
+}
+
+bool is_quoted(const char *str, int pos) {
+    bool in_string = false;
+
+    for (int i = 0; str[i] && i <= pos; i++) {
+        if (str[i] == '"' && (i == 0 || str[i - 1] != '\\')) {
+            in_string = !in_string;
+        }
+    }
+    
+    return in_string;
+}
+

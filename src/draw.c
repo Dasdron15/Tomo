@@ -107,7 +107,7 @@ int syntax_color(char *line, int pos) {
     }
 
     if (comment_start != -1 && pos >= comment_start) return 1; // Highlight comments
-    if (isdigit(c)) return 5; // Highlight numbers
+    if (isdigit(c) || c == '*' || is_quoted(line, pos)) return 5; // Highlight numbers or '*' symbol
 
     int start = pos;
     while (start > 0 && isalpha(line[start - 1])) start--;
@@ -116,6 +116,7 @@ int syntax_color(char *line, int pos) {
 
     if (is_keyword(line, pos)) return 6;
     if (is_type(line, pos)) return 7;
+    if (is_function(line, pos)) return 8;
 
     return 4; // Default
 }
