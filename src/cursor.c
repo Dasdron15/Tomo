@@ -8,7 +8,6 @@
 #include "common.h"
 #include "editor.h"
 #include "select.h"
-#include "draw.h"
 
 CursorState cursor;
 

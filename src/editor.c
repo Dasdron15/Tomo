@@ -45,28 +45,14 @@ void init_editor(void) {
     start_color();
     use_default_colors();
 
-    init_color(8, rgb_to_ncurses(111), rgb_to_ncurses(118),
-               rgb_to_ncurses(125));
-    init_color(9, rgb_to_ncurses(15), rgb_to_ncurses(17), rgb_to_ncurses(22));
-    init_color(10, rgb_to_ncurses(142), rgb_to_ncurses(145),
-               rgb_to_ncurses(154));
-    init_color(11, rgb_to_ncurses(31), rgb_to_ncurses(48), rgb_to_ncurses(70));
-    init_color(12, rgb_to_ncurses(130), rgb_to_ncurses(180), rgb_to_ncurses(235));
-
-    init_color(13, rgb_to_ncurses(238), rgb_to_ncurses(130), rgb_to_ncurses(119));
-
-    init_color(14, rgb_to_ncurses(137), rgb_to_ncurses(190), rgb_to_ncurses(250));
-
-    init_color(15,rgb_to_ncurses(182), rgb_to_ncurses(152), rgb_to_ncurses(223));
-
-    init_pair(1, 8, -1);   // Unactive text color
-    init_pair(2, 10, 9);   // Status bar color
-    init_pair(3, 255, 11); // Selected text
-    init_pair(4, 255, -1); // Default text color
-    init_pair(5, 12, -1); // Numbers color
-    init_pair(6, 13, -1); // Keyword color
-    init_pair(7, 14, -1); // Type color
-    init_pair(8, 15, -1);
+    init_pair(8, COLOR_WHITE, -1);
+    init_pair(9, COLOR_BLUE, -1);
+    init_pair(10, COLOR_CYAN, -1);
+    init_pair(11, COLOR_GREEN, -1);
+    init_pair(12, COLOR_YELLOW, -1);
+    init_pair(13, COLOR_RED, -1);
+    
+    init_pair(15, COLOR_MAGENTA, -1);
 
     // Disable default terminal text selection
     printf("\033[?1006h");

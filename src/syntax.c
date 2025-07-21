@@ -14,9 +14,9 @@ static const char *C_keywords[] = {
     "do",     "goto",     "if",     "typedef", "union",  "register",
     "return", "volatile", "while",  NULL};
 
-static const char *C_types[] = {"char",  "short",  "double", "int",
-                                "float", "void",   "signed", "unsigned",
-                                "long",  "static", "const",  NULL};
+static const char *C_types[] = {"char",   "short", "double", "int",      "bool",
+                                "float",  "void",  "signed", "unsigned", "long",
+                                "static", "const", NULL};
 
 /*
 char *language = "Python";
@@ -41,10 +41,10 @@ const SyntaxDef LANGUAGES[] = {{.file_ext = ".c",
 
                                {NULL, NULL, NULL, 0}};
 
-
 const SyntaxDef *get_syntax() {
     char *ext = strrchr(editor.filename, '.');
-    if (!ext) return NULL;
+    if (!ext)
+        return NULL;
 
     for (int i = 0; LANGUAGES[i].file_ext != NULL; i++) {
         if (strcmp(LANGUAGES[i].file_ext, ext) == 0) {
@@ -56,7 +56,8 @@ const SyntaxDef *get_syntax() {
 }
 
 int syntax_color(char *line, int pos, const SyntaxDef *syntax) {
-    if (!syntax) return COLOR_DEFAULT;
+    if (!syntax)
+        return COLOR_DEFAULT;
 
     char c = line[pos];
     int line_len = (int)strlen(line);
@@ -76,7 +77,9 @@ int syntax_color(char *line, int pos, const SyntaxDef *syntax) {
     if (is_quoted(line, pos)) {
         return COLOR_STRING;
     }
-
+    if (isdigit(c) || (c == '.' && isdigit(line[pos + 1]))) {
+        return COLOR_NUMBER;
+    }
     if (syntax->keywords && is_keyword(line, pos, syntax->keywords)) {
         return COLOR_KEYWORD;
     }

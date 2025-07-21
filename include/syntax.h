@@ -5,12 +5,15 @@
 #include <stddef.h>
 
 enum SyntaxColors {
-    COLOR_COMMENT = 1,
-    COLOR_STRING = 5,
-    COLOR_KEYWORD = 6,
-    COLOR_TYPE = 7,
+    COLOR_DEFAULT = 1,
+    COLOR_KEYWORD = 2,
+    COLOR_TYPE = 3,
+    COLOR_STRING = 4,
+    COLOR_NUMBER = 5,
+    COLOR_CHAR = 6,
+    COLOR_COMMENT = 7,
     COLOR_FUNCTION = 8,
-    COLOR_DEFAULT = 4,
+    COLOR_PREPROCESSOR = 9,
 };
 
 typedef struct {
