@@ -82,7 +82,7 @@ void init_colors() {
     init_pair(PAIR_SELECT_PREPROCESSOR, COLOR_PREPROCESSOR, COLOR_SELECT);
     init_pair(PAIR_SELECT_UNACTIVE, COLOR_UNACTIVE, COLOR_SELECT);
 
-    wbkgd(stdscr, COLOR_PAIR(PAIR_BACKGROUND));
+    bkgd(COLOR_PAIR(PAIR_BACKGROUND));
 }
 
 void init_indent(char *line, bool *indent_measured) {

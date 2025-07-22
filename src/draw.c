@@ -193,6 +193,6 @@ void draw_bottom_text(void) {
 
 void place_cursor(void) {
     char *line = editor.lines[cursor.y + cursor.y_offset];
-    int render_x = calc_render_x(line, cursor.x - editor.margin);
+    int render_x = calc_render_x(line, cursor.x + cursor.x_offset - editor.margin);
     move(cursor.y, editor.margin + render_x - cursor.x_offset);
 }
