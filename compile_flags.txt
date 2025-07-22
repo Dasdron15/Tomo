@@ -1,1 +1,3 @@
 -I./include
+-Iexternal/tree-sitter/lib/include
+-Iexternal/tree-sitter-c/src
