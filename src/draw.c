@@ -77,8 +77,39 @@ void draw_line_content(int index, char *line, int y) {
 
         int color = syntax_color(line, symb, get_syntax());
 
-        if (is_selected(file_y, file_x)) attron(COLOR_PAIR(3));
-        else attron(COLOR_PAIR(color));
+        if (is_selected(file_y, file_x)) {
+            switch(color) {
+                case PAIR_DEFAULT: 
+                    attron(COLOR_PAIR(PAIR_SELECT_DEFAULT));
+                    break;
+                case PAIR_KEYWORD:
+                    attron(COLOR_PAIR(PAIR_SELECT_KEYWORD));
+                    break;
+                case PAIR_TYPE:
+                    attron(COLOR_PAIR(PAIR_SELECT_TYPE));
+                    break;
+                case PAIR_STRING:
+                    attron(COLOR_PAIR(PAIR_SELECT_STRING));
+                    break;
+                case PAIR_NUM:
+                    attron(COLOR_PAIR(PAIR_SELECT_NUM));
+                    break;
+                case PAIR_CHAR:
+                    attron(COLOR_PAIR(PAIR_SELECT_CHAR));
+                    break;
+                case PAIR_FUNCTION:
+                    attron(COLOR_PAIR(PAIR_SELECT_FUNCTION));
+                    break;
+                case PAIR_PREPROCESSOR:
+                    attron(COLOR_PAIR(PAIR_SELECT_PREPROCESSOR));
+                    break;
+                case PAIR_UNACTIVE:
+                    attron(COLOR_PAIR(PAIR_SELECT_UNACTIVE));
+                    break;
+            }
+        } else {
+            attron(COLOR_PAIR(color));
+        }
 
         if (ch == '\t') {
             mvprintw(y, col, "%s", tab);
@@ -87,8 +118,39 @@ void draw_line_content(int index, char *line, int y) {
             mvprintw(y, col, "%c", ch);
         }
 
-        if (is_selected(file_y, file_x)) attroff(COLOR_PAIR(3));
-        else attroff(COLOR_PAIR(color));
+        if (is_selected(file_y, file_x)) {
+            switch(color) {
+                case PAIR_DEFAULT: 
+                    attroff(COLOR_PAIR(PAIR_SELECT_DEFAULT));
+                    break;
+                case PAIR_KEYWORD:
+                    attroff(COLOR_PAIR(PAIR_SELECT_KEYWORD));
+                    break;
+                case PAIR_TYPE:
+                    attroff(COLOR_PAIR(PAIR_SELECT_TYPE));
+                    break;
+                case PAIR_STRING:
+                    attroff(COLOR_PAIR(PAIR_SELECT_STRING));
+                    break;
+                case PAIR_NUM:
+                    attroff(COLOR_PAIR(PAIR_SELECT_NUM));
+                    break;
+                case PAIR_CHAR:
+                    attroff(COLOR_PAIR(PAIR_SELECT_CHAR));
+                    break;
+                case PAIR_FUNCTION:
+                    attroff(COLOR_PAIR(PAIR_SELECT_FUNCTION));
+                    break;
+                case PAIR_PREPROCESSOR:
+                    attroff(COLOR_PAIR(PAIR_SELECT_PREPROCESSOR));
+                    break;
+                case PAIR_UNACTIVE:
+                    attroff(COLOR_PAIR(PAIR_SELECT_UNACTIVE));
+                    break;
+            }
+        } else {
+            attroff(COLOR_PAIR(color));
+        }
 
         col++;
         free(tab);

@@ -17,7 +17,9 @@
 #define COLOR_UNACTIVE 16
 #define COLOR_STATUS_BAR 17
 #define COLOR_BACKGROUND 18
+#define COLOR_SELECT 19
 
+/* Default color pairs */
 #define PAIR_DEFAULT 0
 #define PAIR_KEYWORD 1
 #define PAIR_TYPE 2
@@ -29,6 +31,18 @@
 #define PAIR_UNACTIVE 8
 #define PAIR_STATUS_BAR 9
 #define PAIR_BACKGROUND 10
+#define PAIR_SELECT 11
+
+/* Selection color pairs */
+#define PAIR_SELECT_DEFAULT 12
+#define PAIR_SELECT_KEYWORD 13
+#define PAIR_SELECT_TYPE 14
+#define PAIR_SELECT_STRING 15
+#define PAIR_SELECT_NUM 16
+#define PAIR_SELECT_CHAR 17
+#define PAIR_SELECT_FUNCTION 18
+#define PAIR_SELECT_PREPROCESSOR 19
+#define PAIR_SELECT_UNACTIVE 20
 
 void init_editor(void);
 void init_colors(void);
