@@ -10,12 +10,12 @@ include_directories(${CURSES_INCLUDE_DIRS})
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/external/tree-sitter/include
-    ${CMAKE_SOURCE_DIR}/external/tree-sitter-c/src
+    ${CMAKE_SOURCE_DIR}/external/c
 )
 
 AUX_SOURCE_DIRECTORY(src SRC)
 
-set(TS_C_SOURCES external/tree-sitter-c/src/parser.c)
+set(TS_C_SOURCES external/c/parser.c)
 
 add_library(tree_sitter STATIC IMPORTED)
 set_target_properties(tree_sitter PROPERTIES
