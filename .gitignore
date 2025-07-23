@@ -1,7 +1,9 @@
-*.DS_Store
-*.out
-cobalt
-*.o
+/build/
 
-build/
-.idea/
+# Tree sitter
+/external/tree-sitter
+
+
+/.vscode/
+/.idea/
+.DS_Store
