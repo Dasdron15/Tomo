@@ -19,16 +19,16 @@ int main(int argc, char *argv[]) {
     char resolved_path[PATH_MAX];
     editor.filename = realpath(argv[1], resolved_path);
 
-    load_file(editor.filename);;
+    load_file(editor.filename);
     init_editor();
     init_colors();
     syntax_init();
 
     while (1) {
+        syntax_reparse();
         draw_editor();
         int key = getch();
         handle_key(key);
-        syntax_reparse();
     }
 
     endwin();

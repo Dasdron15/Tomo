@@ -38,7 +38,7 @@ void init_editor(void) {
 void init_colors() {
     if (has_colors() == FALSE) {
         endwin();
-        printf("Error: terminal does not support colors");
+        printf("Error: terminal does not support colors\n");
         exit(0);
     }
 

@@ -146,7 +146,7 @@ void clamp_cursor(void) {
     }
 }
 
-size_t goto_line() {
+size_t goto_line(void) {
     const size_t height = 3;
     const size_t width = 30;
 

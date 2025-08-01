@@ -78,8 +78,14 @@ bool is_selected(int file_y, int file_x) {
     return true;
 }
 
-bool is_selecting() { return selecting; }
+bool is_selecting(void) {
+    return selecting;
+}
 
-void cancel_selection() { selecting = false; }
+void cancel_selection(void) {
+    selecting = false;
+}
 
-Point get_start() { return selection_start; }
+Point get_start(void) {
+    return selection_start;
+}

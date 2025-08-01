@@ -19,9 +19,7 @@ void move_up(bool is_selecting);
 void move_down(bool is_selecting);
 void move_right(bool is_selecting);
 void move_left(bool is_selecting);
-
 void clamp_cursor(void);
-
-size_t goto_line();
+size_t goto_line(void);
 
 #endif

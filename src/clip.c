@@ -68,7 +68,7 @@ void set_clipboard(const char* text) {
 #endif
 }
 
-char* get_clipboard() {
+char* get_clipboard(void) {
     const char* cmd = NULL;
 
 #ifdef __APPLE__

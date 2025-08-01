@@ -231,7 +231,7 @@ void copy_text(Point start, Point end) {
     set_clipboard(clipboard);
 }
 
-void paste_text() {
+void paste_text(void) {
     char *clipboard = strdup(get_clipboard());
     if (!clipboard)
         return;

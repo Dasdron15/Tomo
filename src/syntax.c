@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include <curses.h>
 
 #include "editor.h"
 #include "init.h"
@@ -44,7 +45,7 @@ static int color_for_node_type(const char *type) {
     if (strcmp(type, "number_literal") == 0 || strcmp(type, "number") == 0) return PAIR_NUM;
     if (strcmp(type, "char_literal") == 0) return PAIR_CHAR;
     if (strcmp(type, "function_definition") == 0) return PAIR_FUNCTION;
-    if (strcmp(type, "preproc_directive") == 0 || strcmp(type, "preproc_include")) return PAIR_PREPROCESSOR;
+    if (strcmp(type, "preproc_directive") == 0 || strcmp(type, "preproc_include")) return PAIR_UNACTIVE;
     if (strcmp(type, "comment") == 0) return PAIR_UNACTIVE;
 
     return PAIR_DEFAULT;
@@ -60,5 +61,6 @@ int get_color_for_pos(int line, int col) {
     if (!ts_node_is_named(node)) return PAIR_DEFAULT;
 
     const char *type = ts_node_type(node);
+
     return color_for_node_type(type);
 }

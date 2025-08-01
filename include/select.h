@@ -8,8 +8,8 @@ void start_selection(int y, int x);
 void update_selection(int y, int x);
 void get_selection_bounds(Point* start, Point* end);
 bool is_selected(int file_y, int file_x);
-bool is_selecting();
-void cancel_selection();
-Point get_start();
+bool is_selecting(void);
+void cancel_selection(void);
+Point get_start(void);
 
 #endif

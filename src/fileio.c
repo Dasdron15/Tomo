@@ -42,7 +42,7 @@ void load_file(const char *path) {
     editor.total_lines = i;
 }
 
-void save_file() {
+void save_file(void) {
     FILE *fp = fopen(editor.filename, "w");
 
     for (int i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {

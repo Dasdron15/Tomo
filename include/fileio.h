@@ -4,6 +4,6 @@
 struct Editor_State;
 
 void load_file(const char *path);
-void save_file();
+void save_file(void);
 
 #endif
