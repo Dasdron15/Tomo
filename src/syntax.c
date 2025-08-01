@@ -27,12 +27,21 @@ void syntax_reparse(void) {
     }
 
     char *src = malloc(len + 1);
+    if (!src) return;
+
+    src[0] = '\0';
+
     for (int i = 0; i < editor.total_lines; i++) {
         strcat(src, editor.lines[i]);
         strcat(src, "\n");
     }
 
     TSTree *new_tree = ts_parser_parse_string(parser, tree, src, strlen(src));
+    if (!new_tree) {
+        free(src);
+        return;
+    }
+
     if (tree) ts_tree_delete(tree);
     tree = new_tree;
 
@@ -40,7 +49,7 @@ void syntax_reparse(void) {
 }
 
 static int color_for_node_type(const char *type) {
-    if (strcmp(type, "primitive_type") == 0 || strcmp(type, "type_identifier")) return PAIR_TYPE;
+    if (strcmp(type, "primitive_type") == 0 || strcmp(type, "type_identifier") == 0) return PAIR_TYPE;
     if (strcmp(type, "string_literal") == 0) return PAIR_STRING;
     if (strcmp(type, "number_literal") == 0 || strcmp(type, "number") == 0) return PAIR_NUM;
     if (strcmp(type, "char_literal") == 0) return PAIR_CHAR;
@@ -58,9 +67,15 @@ int get_color_for_pos(int line, int col) {
 
     TSPoint point = { .row = (uint32_t)line, .column = (uint32_t)col };
     TSNode node = ts_node_descendant_for_point_range(root, point, point);
-    if (!ts_node_is_named(node)) return PAIR_DEFAULT;
+    
+    while (!ts_node_is_null(node) && !ts_node_is_named(node)) {
+        node = ts_node_parent(node);
+    }
+
+    if (ts_node_is_null(node)) return PAIR_DEFAULT;
 
     const char *type = ts_node_type(node);
+    if (!type) return PAIR_DEFAULT;
 
     return color_for_node_type(type);
 }
