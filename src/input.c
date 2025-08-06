@@ -116,7 +116,7 @@ void handle_key(int key) {
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
-        if (!editor.is_saved) {
+        if (!is_saved()) {
             ask_for_save();
         } else {
             reset();
@@ -137,14 +137,12 @@ void handle_key(int key) {
         }
         
         insert_char((char) key);
-        editor.is_saved = false;
         return;
     }
 
     if (key == '\t') {
         add_tab();
         cursor.max_x = cursor.x + cursor.x_offset;
-        editor.is_saved = false;
         return;
     }
 
@@ -153,16 +151,13 @@ void handle_key(int key) {
         Point end_select;
 
         get_selection_bounds(&start_select, &end_select);
-        
         deletion(start_select, end_select);
-        editor.is_saved = false;
         
         return;
     }
 
     if (key == KEY_ENTER || key == 10) {
         new_line();
-        editor.is_saved = false;
         return;
     }
 
@@ -232,7 +227,6 @@ void handle_key(int key) {
         copy_text(start_select, end_select);
         deletion(start_select, end_select);
 
-        editor.is_saved = false;
         editor.bottom_text = "Cut selection";
         return;
     }
@@ -249,7 +243,6 @@ void handle_key(int key) {
         
         paste_text();
 
-        editor.is_saved = false;
         editor.bottom_text = "Clipboard pasted";
         return;
     }

@@ -106,7 +106,7 @@ void draw_status_bar(void) {
     char cursor_info[64];
 
     sprintf(path, " %s%s", get_filename(editor.filename),
-            editor.is_saved ? "" : " [+]");
+            is_saved() ? "" : " [+]");
     sprintf(cursor_info, "Ln %d, Col %d", cursor.y + cursor.y_offset + 1,
             pos + 1);
 

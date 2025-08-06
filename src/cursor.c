@@ -163,7 +163,7 @@ size_t goto_line(void) {
     int ch;
     while ((ch = wgetch(box)) != '\n') {
         if (ch == 17) {
-            if (!editor.is_saved) {
+            if (!is_saved()) {
                 ask_for_save();
             }
             endwin();

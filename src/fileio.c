@@ -53,5 +53,4 @@ void save_file(void) {
         }
     }
     fclose(fp);
-    editor.is_saved = true;
 }

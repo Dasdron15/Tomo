@@ -10,7 +10,6 @@
 #include "cursor.h"
 
 void init_editor(void) {
-    editor.is_saved = true;
     editor.bottom_text = "";
 
     if (editor.total_lines == 0) {
@@ -54,7 +53,7 @@ void init_colors() {
     init_color(COLOR_FUNCTION, rgb_to_ncurses(220), rgb_to_ncurses(220), rgb_to_ncurses(175));
     init_color(COLOR_PREPROCESSOR, rgb_to_ncurses(188), rgb_to_ncurses(137), rgb_to_ncurses(189));
     init_color(COLOR_UNACTIVE, rgb_to_ncurses(111), rgb_to_ncurses(118), rgb_to_ncurses(128));
-    init_color(COLOR_STATUS_BAR, rgb_to_ncurses(34), rgb_to_ncurses(38), rgb_to_ncurses(44));
+    init_color(COLOR_STATUS_BAR, rgb_to_ncurses(92), rgb_to_ncurses(92), rgb_to_ncurses(92));
     init_color(COLOR_BACKGROUND, rgb_to_ncurses(31), rgb_to_ncurses(31), rgb_to_ncurses(31));
     init_color(COLOR_SELECT, rgb_to_ncurses(30), rgb_to_ncurses(64), rgb_to_ncurses(151));
     init_color(COLOR_COMMENT, rgb_to_ncurses(116), rgb_to_ncurses(152), rgb_to_ncurses(93));
@@ -69,7 +68,7 @@ void init_colors() {
     init_pair(PAIR_FUNCTION, COLOR_FUNCTION, COLOR_BACKGROUND);
     init_pair(PAIR_PREPROCESSOR, COLOR_PREPROCESSOR, COLOR_BACKGROUND);
     init_pair(PAIR_UNACTIVE, COLOR_UNACTIVE, COLOR_BACKGROUND);
-    init_pair(PAIR_STATUS_BAR, COLOR_UNACTIVE, COLOR_STATUS_BAR);
+    init_pair(PAIR_STATUS_BAR, COLOR_DEFAULT, COLOR_STATUS_BAR);
     init_pair(PAIR_BACKGROUND, COLOR_DEFAULT, COLOR_BACKGROUND);
     init_pair(PAIR_COMMENT, COLOR_COMMENT, COLOR_BACKGROUND);
 
