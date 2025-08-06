@@ -66,7 +66,7 @@ void ask_for_save(void) {
 }
 
 void is_saved() {
-    FILE
+
 }
 
 void reset(void) {

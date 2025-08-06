@@ -11,6 +11,8 @@
 #include "fileio.h"
 
 void handle_key(int key) {
+    editor.bottom_text = "";
+    
     if (key == KEY_UP) {
         move_up(false);
         return;
