@@ -16,8 +16,7 @@ const char *c_keywords[] = {
     "if",   "else",    "while",    "for",      "return", "switch",
     "case", "break",   "continue", "struct",   "enum",   "union",
     "goto", "sizeof",  "typedef",  "const",    "static", "extern",
-    "do",   "default", "signed",   "unsigned", NULL
-};
+    "do",   "default", "signed",   "unsigned", NULL};
 
 const TSLanguage *tree_sitter_c();
 
@@ -73,14 +72,15 @@ static bool is_keyword(const char *text) {
 static char *get_node_text(TSNode node) {
     TSPoint start = ts_node_start_point(node);
     TSPoint end = ts_node_end_point(node);
-    if (start.row != end.row) return NULL;
+    if (start.row != end.row)
+        return NULL;
 
     int len = end.column - start.column;
     char *buf = malloc(len + 1);
     memcpy(buf, editor.lines[start.row] + start.column, len);
     buf[len] = '\0';
     return buf;
-} 
+}
 
 static int color_for_node_type(const char *type) {
     if (strcmp(type, "primitive_type") == 0 ||
@@ -109,54 +109,61 @@ int get_color_for_pos(int line, int col) {
     const char *text_line = editor.lines[line];
 
     TSNode root = ts_tree_root_node(tree);
-    TSPoint point = {.row = (uint32_t)line, .column = (uint32_t)col};
+    TSPoint point = { .row = (uint32_t)line, .column = (uint32_t)col };
     TSNode node = ts_node_descendant_for_point_range(root, point, point);
 
-    if (ts_node_is_named(node) &&
-        strcmp(ts_node_type(node), "identifier") == 0) {
-        TSNode parent = ts_node_parent(node);
-        if (!ts_node_is_null(parent)) {
-            const char *parent_type = ts_node_type(parent);
-            char *text = get_node_text(node);
-
-            if (text && is_keyword(text)) {
-                free(text);
-                return PAIR_KEYWORD;
-            }
-
+    char *text = get_node_text(node);
+    if (text) {
+        if (is_keyword(text)) {
             free(text);
-
-            if (strcmp(parent_type, "function_declarator") == 0) {
-                return PAIR_FUNCTION;
-            }
-            if (strcmp(parent_type, "call_expression") == 0) {
-                return PAIR_FUNCTION;
-            }
+            return PAIR_KEYWORD;
         }
+        free(text);
     }
 
-    while (!ts_node_is_null(node)) {
-        if (ts_node_is_named(node)) {
-            int color = color_for_node_type(ts_node_type(node));
+    if (ts_node_is_named(node)) {
+
+        // Проверка функций
+        const char *node_type = ts_node_type(node);
+        if (strcmp(node_type, "identifier") == 0) {
+            TSNode parent = ts_node_parent(node);
+            if (!ts_node_is_null(parent)) {
+                const char *parent_type = ts_node_type(parent);
+                if (strcmp(parent_type, "function_declarator") == 0 ||
+                    strcmp(parent_type, "call_expression") == 0) {
+                    return PAIR_FUNCTION;
+                }
+            }
+        }
+
+        // Цвет по типу
+        int color = color_for_node_type(node_type);
+        if (color != PAIR_DEFAULT)
+            return color;
+    }
+
+    // Поднимаемся вверх по дереву, если в текущем узле цвет не найден
+    TSNode parent = node;
+    while (!ts_node_is_null(parent)) {
+        if (ts_node_is_named(parent)) {
+            int color = color_for_node_type(ts_node_type(parent));
             if (color != PAIR_DEFAULT) {
                 return color;
             }
         }
-        node = ts_node_parent(node);
+        parent = ts_node_parent(parent);
     }
 
-    // Preprocessors!!!
-    const char *line_text = editor.lines[line];
+    // Preprocessor
     int i = 0;
-    while (line_text[i] == ' ' || line_text[i] == '\t')
+    while (text_line[i] == ' ' || text_line[i] == '\t')
         i++;
     if (text_line[i] == '#') {
         int start = i;
         while (text_line[i] && text_line[i] != ' ' && text_line[i] != '\t')
             i++;
-        if (col >= start && col < i) {
+        if (col >= start && col < i)
             return PAIR_PREPROCESSOR;
-        }
     }
 
     return PAIR_DEFAULT;
