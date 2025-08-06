@@ -57,7 +57,7 @@ static int color_for_node_type(const char *type) {
     if (strcmp(type, "string_literal") == 0) return PAIR_STRING;
     if (strcmp(type, "number_literal") == 0 || strcmp(type, "number") == 0) return PAIR_NUM;
     if (strcmp(type, "char_literal") == 0) return PAIR_CHAR;
-    if (strcmp(type, "comment") == 0) return PAIR_UNACTIVE;
+    if (strcmp(type, "comment") == 0) return PAIR_COMMENT;
     return PAIR_DEFAULT;
 }
 
@@ -75,7 +75,7 @@ int get_color_for_pos(int line, int col) {
         if (!ts_node_is_null(parent)) {
             const char *parent_type = ts_node_type(parent);
 
-            if (strcmp(parent_type, "function_declaration") == 0) {
+            if (strcmp(parent_type, "function_declarator") == 0) {
                 return PAIR_FUNCTION;
             }
             if (strcmp(parent_type, "call_expression") == 0) {
