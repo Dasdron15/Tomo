@@ -1,9 +1,5 @@
 /build/
 
-# Tree sitter
-/external/tree-sitter
-
-
 /.vscode/
 /.idea/
 .DS_Store
