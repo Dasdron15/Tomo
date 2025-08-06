@@ -23,9 +23,7 @@ void ask_for_save(void) {
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 
-    attron(A_BOLD);
     mvwprintw(stdscr, getmaxy(stdscr) - 1, 0, "Save changes? (y/n): ");
-    attroff(A_BOLD);
 
     curs_set(1);
 
