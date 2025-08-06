@@ -1,14 +1,23 @@
 #include "syntax.h"
 
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
 #include <assert.h>
 #include <curses.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "editor.h"
 #include "init.h"
 #include "tree_sitter/api.h"
+
+/* I fucking hate making this stupid syntax highlighting */
+
+const char *c_keywords[] = {
+    "if",   "else",    "while",    "for",      "return", "switch",
+    "case", "break",   "continue", "struct",   "enum",   "union",
+    "goto", "sizeof",  "typedef",  "const",    "static", "extern",
+    "do",   "default", "signed",   "unsigned", NULL
+};
 
 const TSLanguage *tree_sitter_c();
 
@@ -27,7 +36,8 @@ void syntax_reparse(void) {
     }
 
     char *src = malloc(len + 1);
-    if (!src) return;
+    if (!src)
+        return;
 
     size_t pos = 0;
     for (int i = 0; i < editor.total_lines; i++) {
@@ -44,36 +54,77 @@ void syntax_reparse(void) {
         return;
     }
 
-    if (tree) ts_tree_delete(tree);
+    if (tree)
+        ts_tree_delete(tree);
     tree = new_tree;
 
     free(src);
 }
 
+static bool is_keyword(const char *text) {
+    for (int i = 0; c_keywords[i]; i++) {
+        if (strcmp(text, c_keywords[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static char *get_node_text(TSNode node) {
+    TSPoint start = ts_node_start_point(node);
+    TSPoint end = ts_node_end_point(node);
+    if (start.row != end.row) return NULL;
+
+    int len = end.column - start.column;
+    char *buf = malloc(len + 1);
+    memcpy(buf, editor.lines[start.row] + start.column, len);
+    buf[len] = '\0';
+    return buf;
+} 
+
 static int color_for_node_type(const char *type) {
-    if (strcmp(type, "primitive_type") == 0 || strcmp(type, "type_identifier") == 0) return PAIR_TYPE;
-    if (strcmp(type, "preproc_directive") == 0 || strcmp(type, "preproc_call") == 0) return PAIR_PREPROCESSOR;
-    if (strcmp(type, "system_lib_string") == 0) return PAIR_STRING;
-    if (strcmp(type, "string_literal") == 0) return PAIR_STRING;
-    if (strcmp(type, "number_literal") == 0 || strcmp(type, "number") == 0) return PAIR_NUM;
-    if (strcmp(type, "char_literal") == 0) return PAIR_CHAR;
-    if (strcmp(type, "comment") == 0) return PAIR_COMMENT;
+    if (strcmp(type, "primitive_type") == 0 ||
+        strcmp(type, "type_identifier") == 0)
+        return PAIR_TYPE;
+    if (strcmp(type, "preproc_directive") == 0 ||
+        strcmp(type, "preproc_call") == 0)
+        return PAIR_PREPROCESSOR;
+    if (strcmp(type, "system_lib_string") == 0)
+        return PAIR_STRING;
+    if (strcmp(type, "string_literal") == 0)
+        return PAIR_STRING;
+    if (strcmp(type, "number_literal") == 0 || strcmp(type, "number") == 0)
+        return PAIR_NUM;
+    if (strcmp(type, "char_literal") == 0)
+        return PAIR_CHAR;
+    if (strcmp(type, "comment") == 0)
+        return PAIR_COMMENT;
     return PAIR_DEFAULT;
 }
 
 int get_color_for_pos(int line, int col) {
-    if (!tree) return PAIR_DEFAULT;
+    if (!tree)
+        return PAIR_DEFAULT;
 
     const char *text_line = editor.lines[line];
 
     TSNode root = ts_tree_root_node(tree);
-    TSPoint point = { .row = (uint32_t)line, .column = (uint32_t)col };
+    TSPoint point = {.row = (uint32_t)line, .column = (uint32_t)col};
     TSNode node = ts_node_descendant_for_point_range(root, point, point);
 
-    if (ts_node_is_named(node) && strcmp(ts_node_type(node), "identifier") == 0) {
+    if (ts_node_is_named(node) &&
+        strcmp(ts_node_type(node), "identifier") == 0) {
         TSNode parent = ts_node_parent(node);
         if (!ts_node_is_null(parent)) {
             const char *parent_type = ts_node_type(parent);
+            char *text = get_node_text(node);
+
+            if (text && is_keyword(text)) {
+                free(text);
+                return PAIR_KEYWORD;
+            }
+
+            free(text);
 
             if (strcmp(parent_type, "function_declarator") == 0) {
                 return PAIR_FUNCTION;
@@ -82,7 +133,6 @@ int get_color_for_pos(int line, int col) {
                 return PAIR_FUNCTION;
             }
         }
-
     }
 
     while (!ts_node_is_null(node)) {
@@ -98,10 +148,12 @@ int get_color_for_pos(int line, int col) {
     // Preprocessors!!!
     const char *line_text = editor.lines[line];
     int i = 0;
-    while (line_text[i] == ' ' || line_text[i] == '\t') i++;
+    while (line_text[i] == ' ' || line_text[i] == '\t')
+        i++;
     if (text_line[i] == '#') {
         int start = i;
-        while (text_line[i] && text_line[i] != ' ' && text_line[i] != '\t') i++;
+        while (text_line[i] && text_line[i] != ' ' && text_line[i] != '\t')
+            i++;
         if (col >= start && col < i) {
             return PAIR_PREPROCESSOR;
         }

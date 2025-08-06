@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+extern const char *c_keywords[];
+
 void syntax_init(void);
 void syntax_reparse(void);
 static int color_for_node_type(const char *type);
