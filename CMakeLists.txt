@@ -1,33 +1,39 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(tomo C)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_BUILD_TYPE Debug)
+enable_language(CXX)
 
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIRS})
+include_directories(external/tree-sitter/lib/include)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/external/tree-sitter/include
-    ${CMAKE_SOURCE_DIR}/external/c
+set(TREE_SITTER_CORE
+    external/tree-sitter/lib/src/lib.c
 )
 
-AUX_SOURCE_DIRECTORY(src SRC)
+file(GLOB_RECURSE SRC src/*.c)
 
-set(TS_C_SOURCES external/c/parser.c)
+add_executable(${PROJECT_NAME} ${SRC} ${TREE_SITTER_CORE})
+target_link_libraries(${PROJECT_NAME} dl ncurses)
 
-add_library(tree_sitter STATIC IMPORTED)
-set_target_properties(tree_sitter PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/tree-sitter/libtree-sitter.a
-    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/external/tree-sitter/lib/include
+# Динамические библиотеки для грамматик
+add_library(tree-sitter-c SHARED
+    external/tree-sitter-c/src/parser.c
+    external/tree-sitter-c/src/scanner.c
 )
-
-add_executable(tomo ${SRC} ${TS_C_SOURCES})
-
-target_link_libraries(tomo
-    ${CURSES_LIBRARIES}
-    tree_sitter
-    m
+set_target_properties(tree-sitter-c PROPERTIES
+    OUTPUT_NAME "c"
+    PREFIX ""
 )
+install(TARGETS tree-sitter-c DESTINATION lib/tomo-parsers)
 
+add_library(tree-sitter-python SHARED
+    external/tree-sitter-python/src/parser.c
+    external/tree-sitter-python/src/scanner.c
+)
+set_target_properties(tree-sitter-python PROPERTIES
+    OUTPUT_NAME "python"
+    PREFIX ""
+)
+install(TARGETS tree-sitter-python DESTINATION lib/tomo-parsers)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
