@@ -1,5 +1,43 @@
+# CMake build files
 /build/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/*.cmake
 
-/.vscode/
-/.idea/
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic and static libraries
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+
+# Executables
+tomo
+*.exe
+
+# Editor files
+*~
+*.swp
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*.tmp
+
+# Logs
+*.log
+
+# Tree-sitter generated files (if any)
+/external/tree-sitter/src/parser.c
+/external/tree-sitter/src/parser.h
+
+# MacOS specific files
 .DS_Store
+
