@@ -112,15 +112,6 @@ int get_color_for_pos(int line, int col) {
     TSPoint point = { .row = (uint32_t)line, .column = (uint32_t)col };
     TSNode node = ts_node_descendant_for_point_range(root, point, point);
 
-    char *text = get_node_text(node);
-    if (text) {
-        if (is_keyword(text)) {
-            free(text);
-            return PAIR_KEYWORD;
-        }
-        free(text);
-    }
-
     if (ts_node_is_named(node)) {
 
         const char *node_type = ts_node_type(node);
@@ -149,6 +140,17 @@ int get_color_for_pos(int line, int col) {
             }
         }
         parent = ts_node_parent(parent);
+    }
+
+
+
+    char *text = get_node_text(node);
+    if (text) {
+        if (is_keyword(text)) {
+            free(text);
+            return PAIR_KEYWORD;
+        }
+        free(text);
     }
 
     // Preprocessor
