@@ -146,48 +146,49 @@ void clamp_cursor(void) {
     }
 }
 
+
 size_t goto_line(void) {
-    const size_t height = 3;
-    const size_t width = 30;
+    int screen_height = getmaxy(stdscr);
+    char *prompt = "Go to line: ";
+    
+    move(getmaxy(stdscr) - 1, 0);
+    clrtoeol();
 
-    WINDOW *box = newwin(height, width, 1, getmaxx(stdscr) - 33);
-
-    box(box, 0, 0);
-    mvwprintw(box, 1, 2, "Go to line: ");
+    mvprintw(screen_height - 1, 0, prompt);
 
     curs_set(1);
 
-    char input[15] = {'\0'};
+    char input[16] = {0};
     int pos = 0;
 
     int ch;
-    while ((ch = wgetch(box)) != '\n') {
+    while ((ch = wgetch(stdscr)) != '\n') {
         if (ch == 17) {
             if (!is_saved()) {
                 ask_for_save();
             }
             endwin();
+            reset();
             exit(0);
             return 0;
         }
 
         if (ch == 27) {
-            delwin(box);
             return -1;
-        } else if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') &&
-                   pos > 0) {
-            input[--pos] = '\0';
-            mvwprintw(box, 1, 14 + pos, " ");
-            wmove(box, 1, 14 + pos);
-        } else if (isdigit(ch) && pos < (int)sizeof(input) - 1) {
-            input[pos++] = ch;
-            mvwprintw(box, 1, 13 + pos, "%c", ch);
-            wmove(box, 1, 14 + pos);
         }
-        wrefresh(box);
-    }
 
-    delwin(box);
+        if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') && pos > 0) {
+            input[--pos] = '\0';
+            mvprintw(screen_height - 1, strlen(prompt) + pos, " ");
+            move(screen_height - 1, strlen(prompt) + pos);
+        }
+
+        if (isdigit(ch) && pos < (int)sizeof(input) - 1) {
+            input[pos++] = ch;
+            mvprintw(screen_height - 1, strlen(prompt) + pos - 1, "%c", ch);
+            move(screen_height - 1, strlen(prompt) + pos);
+        }
+    }
 
     int line = atoi(input);
     if (line < 1) {
@@ -197,5 +198,6 @@ size_t goto_line(void) {
     if (line > editor.total_lines) {
         return editor.total_lines - 1;
     }
+
     return line - 1;
 }
