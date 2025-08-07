@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "editor.h"
 #include "init.h"
@@ -143,15 +144,12 @@ int get_color_for_pos(int line, int col) {
     }
 
 
-
     char *text = get_node_text(node);
-    if (text) {
-        if (is_keyword(text)) {
-            free(text);
-            return PAIR_KEYWORD;
-        }
+    if (text && is_keyword(text)) {
         free(text);
+        return PAIR_KEYWORD;
     }
+    free(text);
 
     // Preprocessor
     int i = 0;
