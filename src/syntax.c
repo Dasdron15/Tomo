@@ -123,7 +123,6 @@ int get_color_for_pos(int line, int col) {
 
     if (ts_node_is_named(node)) {
 
-        // Проверка функций
         const char *node_type = ts_node_type(node);
         if (strcmp(node_type, "identifier") == 0) {
             TSNode parent = ts_node_parent(node);
@@ -136,13 +135,11 @@ int get_color_for_pos(int line, int col) {
             }
         }
 
-        // Цвет по типу
         int color = color_for_node_type(node_type);
         if (color != PAIR_DEFAULT)
             return color;
     }
 
-    // Поднимаемся вверх по дереву, если в текущем узле цвет не найден
     TSNode parent = node;
     while (!ts_node_is_null(parent)) {
         if (ts_node_is_named(parent)) {
