@@ -1,4 +1,4 @@
-/build/
+/build
 
 # Compiled object files
 *.o
@@ -27,10 +27,6 @@ tomo
 
 # Logs
 *.log
-
-# Tree-sitter generated files (if any)
-/external/tree-sitter/src/parser.c
-/external/tree-sitter/src/parser.h
 
 # MacOS specific files
 .DS_Store
