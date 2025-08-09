@@ -19,14 +19,33 @@ const char *c_keywords[] = {
     "goto", "sizeof",  "typedef",  "const",    "static", "extern",
     "do",   "default", "signed",   "unsigned", NULL};
 
+const char *py_keywords[] = {
+    "False", "True", NULL
+};
+
 const TSLanguage *tree_sitter_c();
+const TSLanguage *tree_sitter_python();
 
 static TSParser *parser = NULL;
 static TSTree *tree = NULL;
+static const char *file_ext = NULL;
+
+const TSLanguage *get_language(const char *file_ext) {
+    if (file_ext == NULL) return NULL;
+
+    if (strcmp(file_ext, ".c") == 0) {
+        return tree_sitter_c();
+    } else if (strcmp(file_ext, ".py") == 0) {
+        return tree_sitter_python();
+    }
+
+    return NULL;
+}
 
 void syntax_init(void) {
     parser = ts_parser_new();
-    ts_parser_set_language(parser, tree_sitter_c());
+    file_ext = strchr(editor.filename, '.');
+    ts_parser_set_language(parser, get_language(file_ext));
 }
 
 void syntax_reparse(void) {
@@ -62,11 +81,20 @@ void syntax_reparse(void) {
 }
 
 static bool is_keyword(const char *text) {
-    for (int i = 0; c_keywords[i]; i++) {
-        if (strcmp(text, c_keywords[i]) == 0) {
-            return true;
+    if (strcmp(file_ext, ".c") == 0) {
+        for (int i = 0; c_keywords[i]; i++) {
+            if (strcmp(text, c_keywords[i]) == 0) {
+                return true;
+            }
+        }
+    } else if (strcmp(file_ext, ".py") == 0) {
+        for (int i = 0; py_keywords[i]; i++) {
+            if (strcmp(text, py_keywords[i]) == 0) {
+                return true;
+            }
         }
     }
+
     return false;
 }
 
@@ -83,7 +111,7 @@ static char *get_node_text(TSNode node) {
     return buf;
 }
 
-static int color_for_node_type(const char *type) {
+static int color_for_node_type_c(const char *type) {
     if (strcmp(type, "primitive_type") == 0 ||
         strcmp(type, "type_identifier") == 0)
         return PAIR_TYPE;
@@ -100,6 +128,38 @@ static int color_for_node_type(const char *type) {
         return PAIR_CHAR;
     if (strcmp(type, "comment") == 0)
         return PAIR_COMMENT;
+
+    return PAIR_DEFAULT;
+}
+
+static int color_for_node_type_py(const char *type) {
+    if (strcmp(type, "comment") == 0) {
+        return PAIR_COMMENT;
+    }
+    if (strcmp(type, "function_definition") == 0) {
+        return PAIR_FUNCTION;
+    }
+    if (strcmp(type, "class_definition") == 0) {
+        return PAIR_TYPE;
+    }
+    if (strcmp(type, "string") == 0 || strcmp(type, "string_literal") == 0) {
+        return PAIR_STRING;
+    }
+    if (strcmp(type, "number") == 0) {
+        return PAIR_NUM;
+    }
+
+    return PAIR_DEFAULT;
+}
+
+static int color_for_node_type_lang(const char *type) {
+    if (strcmp(file_ext, ".c") == 0) {
+        return color_for_node_type_c(type);
+    }
+    if (strcmp(file_ext, ".py") == 0) {
+        return color_for_node_type_py(type);
+    }
+
     return PAIR_DEFAULT;
 }
 
@@ -120,14 +180,22 @@ int get_color_for_pos(int line, int col) {
             TSNode parent = ts_node_parent(node);
             if (!ts_node_is_null(parent)) {
                 const char *parent_type = ts_node_type(parent);
-                if (strcmp(parent_type, "function_declarator") == 0 ||
-                    strcmp(parent_type, "call_expression") == 0) {
-                    return PAIR_FUNCTION;
+
+                if (strcmp(file_ext, ".c") == 0) {
+                    if (strcmp(parent_type, "function_declarator") == 0 ||
+                        strcmp(parent_type, "call_expression") == 0) {
+                        return PAIR_FUNCTION;
+                    }
+                } else if (strcmp(file_ext, ".py") == 0) {
+                    if (strcmp(parent_type, "call") == 0) {
+                        return PAIR_FUNCTION;
+                    }
                 }
+
             }
         }
 
-        int color = color_for_node_type(node_type);
+        int color = color_for_node_type_lang(node_type);
         if (color != PAIR_DEFAULT)
             return color;
     }
@@ -135,7 +203,7 @@ int get_color_for_pos(int line, int col) {
     TSNode parent = node;
     while (!ts_node_is_null(parent)) {
         if (ts_node_is_named(parent)) {
-            int color = color_for_node_type(ts_node_type(parent));
+            int color = color_for_node_type_lang(ts_node_type(parent));
             if (color != PAIR_DEFAULT) {
                 return color;
             }
