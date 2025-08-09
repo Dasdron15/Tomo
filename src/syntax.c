@@ -31,7 +31,7 @@ static TSTree *tree = NULL;
 static const char *file_ext = NULL;
 
 const TSLanguage *get_language(const char *file_ext) {
-    if (file_ext == NULL) return NULL;
+    if (!file_ext) return NULL;
 
     if (strcmp(file_ext, ".c") == 0) {
         return tree_sitter_c();
@@ -81,6 +81,8 @@ void syntax_reparse(void) {
 }
 
 static bool is_keyword(const char *text) {
+    if (!file_ext) return NULL;
+
     if (strcmp(file_ext, ".c") == 0) {
         for (int i = 0; c_keywords[i]; i++) {
             if (strcmp(text, c_keywords[i]) == 0) {
@@ -153,6 +155,8 @@ static int color_for_node_type_py(const char *type) {
 }
 
 static int color_for_node_type_lang(const char *type) {
+    if (!file_ext) return PAIR_DEFAULT;
+
     if (strcmp(file_ext, ".c") == 0) {
         return color_for_node_type_c(type);
     }
@@ -164,8 +168,7 @@ static int color_for_node_type_lang(const char *type) {
 }
 
 int get_color_for_pos(int line, int col) {
-    if (!tree)
-        return PAIR_DEFAULT;
+    if (!tree || !file_ext) return PAIR_DEFAULT;
 
     const char *text_line = editor.lines[line];
 

@@ -104,13 +104,15 @@ bool is_saved(void) {
     unsaved_code[0] = '\0';
     for (size_t i = 0; i < editor.total_lines; i++) {
         strcat(unsaved_code, editor.lines[i]);
-        strcat(unsaved_code, "\n");
+        if (editor.total_lines > 1) {
+            strcat(unsaved_code, "\n");
+        }
     }
 
     if (strcmp(saved_code, unsaved_code) == 0) {
         return true;
     }
-    
+
     return false;
 }
 
