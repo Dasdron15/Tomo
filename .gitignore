@@ -1,10 +1,4 @@
-# CMake build files
 /build/
-/CMakeFiles/
-/CMakeCache.txt
-/cmake_install.cmake
-/Makefile
-/*.cmake
 
 # Compiled object files
 *.o
