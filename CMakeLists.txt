@@ -46,6 +46,7 @@ target_link_libraries(tomo PRIVATE tree_sitter ts_c)
 find_package(Curses REQUIRED)
 target_include_directories(tomo PRIVATE ${CURSES_INCLUDE_DIR})
 target_link_libraries(tomo PRIVATE ${CURSES_LIBRARIES})
+target_link_libraries(tomo PRIVATE m)
 
 install(TARGETS tomo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
