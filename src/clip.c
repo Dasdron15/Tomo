@@ -78,7 +78,7 @@ char* get_clipboard(void) {
 #else
     if (system("command -v xclip > /dev/null 2>&1") == 0) {
         cmd = "xclip -selection clipboard -out";
-    } else if (system("command -v xcel > /dev/null 2>&1") == 0) {
+    } else if (system("command -v xsel > /dev/null 2>&1") == 0) {
         cmd = "xsel --clipboard --output";
     } else {
         return NULL;
