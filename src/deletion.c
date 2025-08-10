@@ -53,7 +53,7 @@ bool delete_tab(Point pos) {
     }
 
     if (count >= editor.indent_size) {
-        size_t tail_len = strlen(line + pos.x) + 1;
+        size_t tail_len = strlen(line + pos.x + 1) + 1;
         int delete_size = editor.indent_size - (count % editor.indent_size);
 
         memmove(&line[pos.x - delete_size + 1], &line[pos.x + 1], tail_len);
@@ -64,6 +64,8 @@ bool delete_tab(Point pos) {
 }
 
 bool delete_pair(Point pos) {
+    if (pos.x < 0) return false;
+
     char *line = editor.lines[pos.y];
     char open = line[pos.x];
     char close = line[pos.x + 1];

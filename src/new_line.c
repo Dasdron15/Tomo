@@ -23,7 +23,7 @@ int calculate_indent(const char *line) {
         indent++;
     }
 
-    if (editor.lines[index][pos - 1] == ':') {
+    if (pos && editor.lines[index][pos - 1] == ':') {
         if (indent_symbol == '\t') {
             indent++;
         } else {
