@@ -1,0 +1,44 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Запустится при пуше тега вида v1.0.0, v1.1.0 и т.д.
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y build-essential libncurses-dev
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install ncurses
+
+      - name: Build
+        run: make
+
+      - name: Archive binary
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            tar -czvf tomo-linux.tar.gz tomo
+          else
+            tar -czvf tomo-macos.tar.gz tomo
+          fi
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            *.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
