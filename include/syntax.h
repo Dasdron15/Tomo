@@ -5,7 +5,6 @@
 #include <stddef.h>
 
 extern const char *c_keywords[];
-extern const char *py_keywords[];
 
 void syntax_init(void);
 void syntax_reparse(void);

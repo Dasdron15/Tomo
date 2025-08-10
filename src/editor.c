@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
 #include <curses.h>
 
 #include "draw.h"

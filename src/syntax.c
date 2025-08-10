@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "editor.h"
 #include "init.h"
@@ -18,10 +19,6 @@ const char *c_keywords[] = {
     "case", "break",   "continue", "struct",   "enum",   "union",
     "goto", "sizeof",  "typedef",  "const",    "static", "extern",
     "do",   "default", "signed",   "unsigned", NULL};
-
-const char *py_keywords[] = {
-    "False", "True", NULL
-};
 
 const TSLanguage *tree_sitter_c();
 const TSLanguage *tree_sitter_python();
@@ -80,20 +77,13 @@ void syntax_reparse(void) {
     free(src);
 }
 
-static bool is_keyword(const char *text) {
+static bool is_keyword(TSNode node) {
     if (!file_ext) return NULL;
 
-    if (strcmp(file_ext, ".c") == 0) {
-        for (int i = 0; c_keywords[i]; i++) {
-            if (strcmp(text, c_keywords[i]) == 0) {
-                return true;
-            }
-        }
-    } else if (strcmp(file_ext, ".py") == 0) {
-        for (int i = 0; py_keywords[i]; i++) {
-            if (strcmp(text, py_keywords[i]) == 0) {
-                return true;
-            }
+    if (!ts_node_is_named(node)) {
+        const char *t = ts_node_type(node);
+        if (isalpha((unsigned char)t[0])) {
+            return true;
         }
     }
 
@@ -138,17 +128,15 @@ static int color_for_node_type_py(const char *type) {
     if (strcmp(type, "comment") == 0) {
         return PAIR_COMMENT;
     }
-    if (strcmp(type, "function_definition") == 0) {
-        return PAIR_FUNCTION;
-    }
-    if (strcmp(type, "class_definition") == 0) {
-        return PAIR_TYPE;
-    }
-    if (strcmp(type, "string") == 0 || strcmp(type, "string_literal") == 0) {
+    if (strcmp(type, "string") == 0) {
         return PAIR_STRING;
     }
-    if (strcmp(type, "number") == 0) {
+    if (strcmp(type, "integer") == 0 || 
+        strcmp(type, "float") == 0) {
         return PAIR_NUM;
+    }
+    if (strcmp(type, "boolean") == 0) {
+        return PAIR_KEYWORD;
     }
 
     return PAIR_DEFAULT;
@@ -176,31 +164,41 @@ int get_color_for_pos(int line, int col) {
     TSPoint point = { .row = (uint32_t)line, .column = (uint32_t)col };
     TSNode node = ts_node_descendant_for_point_range(root, point, point);
 
-    if (ts_node_is_named(node)) {
+    if (is_keyword(node)) {
+        return PAIR_KEYWORD;
+    }
 
-        const char *node_type = ts_node_type(node);
-        if (strcmp(node_type, "identifier") == 0) {
-            TSNode parent = ts_node_parent(node);
-            if (!ts_node_is_null(parent)) {
-                const char *parent_type = ts_node_type(parent);
+    if (ts_node_is_named(node) && strcmp(ts_node_type(node), "identifier") == 0) {
+        TSNode parent = ts_node_parent(node);
+        if (!ts_node_is_null(parent)) {
+            const char *parent_type = ts_node_type(parent);
 
-                if (strcmp(file_ext, ".c") == 0) {
-                    if (strcmp(parent_type, "function_declarator") == 0 ||
-                        strcmp(parent_type, "call_expression") == 0) {
-                        return PAIR_FUNCTION;
-                    }
-                } else if (strcmp(file_ext, ".py") == 0) {
-                    if (strcmp(parent_type, "call") == 0) {
-                        return PAIR_FUNCTION;
-                    }
+            if (strcmp(file_ext, ".c") == 0) {
+                if (strcmp(parent_type, "function_declarator") == 0 ||
+                    strcmp(parent_type, "call_expression") == 0) {
+                    return PAIR_FUNCTION;
                 }
-
+                if (strcmp(parent_type, "type_identifier") == 0) {
+                    return PAIR_TYPE;
+                }
+            }
+            if (strcmp(file_ext, ".py") == 0) {
+                if (strcmp(parent_type, "function_definition") == 0 ||
+                    strcmp(parent_type, "call") == 0) {
+                    return PAIR_FUNCTION;
+                }
+                if (strcmp(parent_type, "class_definition") == 0) {
+                    return PAIR_TYPE;
+                }
             }
         }
+    }
 
-        int color = color_for_node_type_lang(node_type);
-        if (color != PAIR_DEFAULT)
+    if (ts_node_is_named(node)) {
+        int color = color_for_node_type_lang(ts_node_type(node));
+        if (color != PAIR_DEFAULT) {
             return color;
+        }
     }
 
     TSNode parent = node;
@@ -213,14 +211,6 @@ int get_color_for_pos(int line, int col) {
         }
         parent = ts_node_parent(parent);
     }
-
-
-    char *text = get_node_text(node);
-    if (text && is_keyword(text)) {
-        free(text);
-        return PAIR_KEYWORD;
-    }
-    free(text);
 
     // Preprocessor
     int i = 0;
