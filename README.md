@@ -42,6 +42,8 @@ Currently, folder/project opening is not supported but planned for future releas
 - Mouse support
 - Syntax highlighting for more languages
 - Auto-completion
+- Theme support
+- Vim mode
 
 ## Contribution
 
