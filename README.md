@@ -7,7 +7,7 @@
 
 Image of Tomo code editor in action:
 
-![Screenshot][./assets/preview.png]
+![Screenshot](./assets/preview.png)
 
 ## Features
 
