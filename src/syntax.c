@@ -14,12 +14,6 @@
 
 /* I fucking hate making this stupid syntax highlighting */
 
-const char *c_keywords[] = {
-    "if",   "else",    "while",    "for",      "return", "switch",
-    "case", "break",   "continue", "struct",   "enum",   "union",
-    "goto", "sizeof",  "typedef",  "const",    "static", "extern",
-    "do",   "default", "signed",   "unsigned", NULL};
-
 const TSLanguage *tree_sitter_c();
 const TSLanguage *tree_sitter_python();
 
@@ -27,7 +21,7 @@ static TSParser *parser = NULL;
 static TSTree *tree = NULL;
 static const char *file_ext = NULL;
 
-const TSLanguage *get_language(const char *file_ext) {
+static const TSLanguage *get_language(const char *file_ext) {
     if (!file_ext) return NULL;
 
     if (strcmp(file_ext, ".c") == 0) {
@@ -212,7 +206,6 @@ int get_color_for_pos(int line, int col) {
         parent = ts_node_parent(parent);
     }
 
-    // Preprocessor
     int i = 0;
     while (text_line[i] == ' ' || text_line[i] == '\t')
         i++;
