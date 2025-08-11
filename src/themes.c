@@ -99,7 +99,7 @@ bool parse_ini(const char *filename) {
             else if (strcmp(key, "status_bar_bg") == 0)
                 set_theme_color(COLOR_STATUS_BAR, hex);
             else if (strcmp(key, "status_bar_text") == 0)
-                set_theme_color(COLOR_STATUS_BAR, hex);
+                set_theme_color(COLOR_STATUS_TEXT, hex);
             else if (strcmp(key, "background") == 0)
                 set_theme_color(COLOR_BACKGROUND, hex);
             else if (strcmp(key, "select") == 0)
