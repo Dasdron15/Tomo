@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
     init_editor();
     init_colors();
     syntax_init();
-    load_theme("theme.ini");
 
     while (1) {
         syntax_reparse();

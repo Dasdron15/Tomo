@@ -37,7 +37,6 @@ typedef struct {
     double b;
 } RGB;
 
-bool parse_ini(const char *filename);
-bool load_theme(char *theme_path);
+void init_colors(void);
 
 #endif

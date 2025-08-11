@@ -52,7 +52,7 @@ static void set_theme_color(int idx, int hex) {
 
 
 
-bool parse_ini(const char *filename) {
+static bool load_theme(const char *filename) {
     FILE *fp = fopen(filename, "r");
     if (!fp) return false;
 
@@ -111,39 +111,7 @@ bool parse_ini(const char *filename) {
     return true;
 }
 
-bool load_theme(char *theme_path) {
-    char *theme_name = get_filename(theme_path);
-    char *theme_ext = strchr(theme_name, '.');
-
-    if (strcmp(theme_ext, ".ini") != 0) {
-        return false;
-    } else {
-        parse_ini(theme_path);
-    }
-
-
-
-    return true;
-}
-
-// enum {
-//     COLOR_DEFAULT,
-//     COLOR_KEYWORD,
-//     COLOR_TYPE,
-//     COLOR_STRING,
-//     COLOR_NUM,
-//     COLOR_CHAR,
-//     COLOR_FUNCTION,
-//     COLOR_PREPROCESSOR,
-//     COLOR_COMMENT,
-//     COLOR_UNACTIVE,
-//     COLOR_STATUS_BAR,
-//     COLOR_STATUS_TEXT,
-//     COLOR_BACKGROUND,
-//     COLOR_SELECT,
-// };
-
-void init_colors() {
+void init_colors(void) {
     if (has_colors() == FALSE) {
         endwin();
         printf("Error: terminal does not support colors\n");
