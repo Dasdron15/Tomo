@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #include "editor.h"
-#include "init.h"
+#include "themes.h"
 #include "utils.h"
 #include "tree_sitter/api.h"
 

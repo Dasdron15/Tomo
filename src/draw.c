@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "init.h"
+#include "themes.h"
 #include "utils.h"
 #include "cursor.h"
 #include "editor.h"
