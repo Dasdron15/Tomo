@@ -1,7 +1,9 @@
 #include "utils.h"
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 char *mult_char(char c, int count) {
     if (count <= 0) {
@@ -77,4 +79,21 @@ char **split(char *str, char delim) {
     tokens[count++] = token;
 
     return tokens;
+}
+
+char *strip(char *string, char ch) {
+    char *res = string;
+
+    // Left
+    while (*res && res[0] == ch) {
+        memmove(res, res + 1, strlen(res + 1) + 1);
+    }
+
+    // Right
+    size_t len = strlen(res);
+    while (len > 0 && res[len - 1] == ch) {
+        res[--len] = '\0';
+    }
+
+    return res;
 }
