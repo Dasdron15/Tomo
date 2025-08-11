@@ -1,6 +1,6 @@
 # Tomo
 
-![Static Badge](https://img.shields.io/badge/release-v0.1.1-blue)
+![Static Badge](https://img.shields.io/badge/release-v0.1.0-blue)
 ![Static Badge](https://img.shields.io/badge/licence-MIT-blue)
 
 **Tomo** is a terminal-based code editor focused on simplicity and working out of the box without any configuration. Inspired by the lightweight nature of Helix and the intuitiveness of VS Code, it uses `ncurses` for terminal UI and `tree-sitter` for fast syntax highlighting.
