@@ -10,6 +10,7 @@
 
 #include "editor.h"
 #include "init.h"
+#include "utils.h"
 #include "tree_sitter/api.h"
 
 /* I fucking hate making this stupid syntax highlighting */
@@ -35,7 +36,7 @@ static const TSLanguage *get_language(const char *file_ext) {
 
 void syntax_init(void) {
     parser = ts_parser_new();
-    file_ext = strchr(editor.filename, '.');
+    file_ext = strchr(get_filename(editor.filename), '.');
     ts_parser_set_language(parser, get_language(file_ext));
 }
 
