@@ -1,44 +1,93 @@
-name: Build and Release
+name: build
 
 on:
   push:
     tags:
-      - 'v*' # Запустится при пуше тега вида v1.0.0, v1.1.0 и т.д.
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  INSTALL_PREFIX: ${{ github.workspace }}/tomo-install
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y build-essential libncurses-dev
-
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install ncurses
-
-      - name: Build
-        run: make
-
-      - name: Archive binary
+      - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            tar -czvf tomo-linux.tar.gz tomo
+            sudo apt-get update && sudo apt-get install -y cmake build-essential libncurses-dev zip tar
           else
-            tar -czvf tomo-macos.tar.gz tomo
+            brew install cmake zip
           fi
 
-      - name: Upload Release Asset
+      - name: Configure (Release)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Install
+        run: cmake --install build --prefix $INSTALL_PREFIX
+
+      - name: Create archives
+        run: |
+          cd $INSTALL_PREFIX
+          zip -r tomo-${{ matrix.os }}.zip .
+          tar czf tomo-${{ matrix.os }}.tar.gz .
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: tomo-${{ matrix.os }}
+          path: |
+            ${{ env.INSTALL_PREFIX }}/tomo-${{ matrix.os }}.zip
+            ${{ env.INSTALL_PREFIX }}/tomo-${{ matrix.os }}.tar.gz
+
+      - name: Upload source archives
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          git archive --format=tar.gz --prefix=tomo-${GITHUB_REF_NAME}/ HEAD > tomo-${GITHUB_REF_NAME}.tar.gz
+          git archive --format=zip --prefix=tomo-${GITHUB_REF_NAME}/ HEAD > tomo-${GITHUB_REF_NAME}.zip
+        continue-on-error: false
+
+      - name: Upload source archives artifact
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: tomo-source
+          path: |
+            tomo-${{ github.ref_name }}.zip
+            tomo-${{ github.ref_name }}.tar.gz
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            *.tar.gz
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload all artifacts to release
