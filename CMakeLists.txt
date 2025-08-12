@@ -53,3 +53,6 @@ install(TARGETS tomo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 add_ts_grammar(c https://github.com/tree-sitter/tree-sitter-c.git)
 add_ts_grammar(py https://github.com/tree-sitter/tree-sitter-python.git)
 # For every new grammar add_ts_grammar(<name> <git-url>)
+
+install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.config/tomo/themes\")")
+
