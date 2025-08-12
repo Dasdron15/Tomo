@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <curses.h>
 #include <stdlib.h>
+#include <dirent.h>
+#include <limits.h>
 
 #include "utils.h"
 
@@ -49,8 +51,6 @@ static void set_theme_color(int idx, int hex) {
         init_color(idx, rgb_to_ncurses(color.r), rgb_to_ncurses(color.g), rgb_to_ncurses(color.b));
     }
 }
-
-
 
 static bool load_theme(const char *filename) {
     FILE *fp = fopen(filename, "r");
@@ -120,7 +120,39 @@ void init_colors(void) {
 
     start_color();
 
-    if (!load_theme("theme.ini")) {
+    DIR *d;
+    struct dirent *dir;
+
+    char path[PATH_MAX];
+    snprintf(path, sizeof(path), "%s/.config/tomo/themes", getenv("HOME"));
+
+    d = opendir(path);
+
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            if (dir->d_type == DT_REG) {
+                sprintf(path, "%s/%s", path, dir->d_name);
+
+                if (!load_theme(path)) {
+                    theme_colors[COLOR_DEFAULT] = COLOR_WHITE;
+                    theme_colors[COLOR_KEYWORD] = COLOR_CYAN;
+                    theme_colors[COLOR_TYPE] = COLOR_GREEN;
+                    theme_colors[COLOR_STRING] = COLOR_YELLOW;
+                    theme_colors[COLOR_NUM] = COLOR_MAGENTA;
+                    theme_colors[COLOR_CHAR] = COLOR_YELLOW;
+                    theme_colors[COLOR_FUNCTION] = COLOR_RED;
+                    theme_colors[COLOR_PREPROCESSOR] = COLOR_MAGENTA;
+                    theme_colors[COLOR_COMMENT] = COLOR_GREEN;
+                    theme_colors[COLOR_UNACTIVE] = COLOR_BLUE;
+                    theme_colors[COLOR_STATUS_BAR] = COLOR_BLACK;
+                    theme_colors[COLOR_STATUS_TEXT] = COLOR_WHITE;
+                    theme_colors[COLOR_BACKGROUND] = -1;
+                    theme_colors[COLOR_SELECT] = COLOR_BLUE;
+                }
+            }
+        }
+        closedir(d);
+    } else {
         theme_colors[COLOR_DEFAULT] = COLOR_WHITE;
         theme_colors[COLOR_KEYWORD] = COLOR_CYAN;
         theme_colors[COLOR_TYPE] = COLOR_GREEN;

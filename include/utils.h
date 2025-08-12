@@ -6,6 +6,6 @@ int int_len(int num);
 char *get_filename(char *path);
 int count_char(char *string, char ch);
 char **split(char *str, char delim);
-char *strip(char *string, char ch);
+
 
 #endif
