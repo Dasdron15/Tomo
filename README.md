@@ -11,10 +11,19 @@ Image of Tomo code editor in action:
 
 ## Features
 
-- Go to line (<kbd>Ctrl-g</kbd>)  
-- Copy, paste, cut (<kbd>Ctrl-c</kbd>, <kbd>Ctrl-v</kbd>, <kbd>Ctrl-x</kbd>)  
 - Syntax highlighting (basic support for Python and C)  
 - Smart indentation
+
+## Shortcuts
+
+- <kbd>Ctrl + C</kbd> - Copy selected text
+- <kbd>Ctrl + V</kbd> - Paste selected text
+- <kbd>Ctrl + X</kbd> - Cut selected text
+- <kbd>Ctrl + G</kbd> - Go to line
+- <kbd>Ctrl + Q</kbd> - Quit the editor
+- <kbd>Ctrl + S</kbd> - Save the file
+- <kbd>Arrow keys</kbd> - Move cursor
+- <kbd>Arrow keys + Shift</kbd> - Start text selection
 
 ## Installation
 
