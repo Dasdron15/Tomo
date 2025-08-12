@@ -1,5 +1,6 @@
 #include "themes.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -9,8 +10,12 @@
 #include <limits.h>
 
 #include "utils.h"
+#include "editor.h"
+#include "tree_sitter/api.h"
 
 #define NUM_COLORS 21
+
+extern const TSLanguage *tree_sitter_ini();
 
 enum {
     COLOR_DEFAULT,
@@ -53,61 +58,31 @@ static void set_theme_color(int idx, int hex) {
 }
 
 static bool load_theme(const char *filename) {
-    FILE *fp = fopen(filename, "r");
-    if (!fp) return false;
+    char *src = file_to_string(filename);
 
-    char line[256];
+    TSParser *parser = ts_parser_new();
+    ts_parser_set_language(parser, tree_sitter_ini());
+    TSTree *tree = ts_parser_parse_string(parser, NULL, src, strlen(src));
 
-    while (fgets(line, sizeof(line), fp)) {
-        char *stripped_line = strip(line, ' ');
+    TSNode root = ts_tree_root_node(tree);
+    uint32_t count = ts_node_child_count(root);
+    for (uint32_t i = 0; i < count; i++) {
+        TSNode child = ts_node_child(root, i);
 
-        if (stripped_line[0] == '\0') continue;
-        if (stripped_line[0] == '#' || line[0] == ';') continue;
-        if (stripped_line[0] == '[') continue;
+        if (strcmp(ts_node_type(child), "setting") == 0) {
+            TSNode key = ts_node_child_by_field_name(child, "setting_key", strlen("setting_key"));
+            TSNode value = ts_node_child_by_field_name(child, "setting_value", strlen("setting_value"));
 
-        char *eq = strchr(stripped_line, '=');
-        if (eq) {
-            *eq = '\0';
-            char *key = strip(stripped_line, ' ');
-            char *value = strip(eq + 1, ' ');
+            uint32_t key_start = ts_node_start_byte(key);
+            uint32_t key_end = ts_node_end_byte(key);
+            uint32_t value_start = ts_node_start_byte(value);
+            uint32_t value_end = ts_node_end_byte(value);
 
-            value = strip(value, '"');
-            value = strip(value, '#');
-            
-            int hex = (int)strtol(value, NULL, 16);
-
-            if (strcmp(key, "default") == 0)
-                set_theme_color(COLOR_DEFAULT, hex);
-            else if (strcmp(key, "keyword") == 0)
-                set_theme_color(COLOR_KEYWORD, hex);
-            else if (strcmp(key, "type") == 0)
-                set_theme_color(COLOR_TYPE, hex);
-            else if (strcmp(key, "string") == 0)
-                set_theme_color(COLOR_STRING, hex);
-            else if (strcmp(key, "number") == 0)
-                set_theme_color(COLOR_NUM, hex);
-            else if (strcmp(key, "char") == 0)
-                set_theme_color(COLOR_CHAR, hex);
-            else if (strcmp(key, "function") == 0)
-                set_theme_color(COLOR_FUNCTION, hex);
-            else if (strcmp(key, "preprocessor") == 0)
-                set_theme_color(COLOR_PREPROCESSOR, hex);
-            else if (strcmp(key, "comment") == 0)
-                set_theme_color(COLOR_COMMENT, hex);
-            else if (strcmp(key, "unactive") == 0)
-                set_theme_color(COLOR_UNACTIVE, hex);
-            else if (strcmp(key, "status_bar_bg") == 0)
-                set_theme_color(COLOR_STATUS_BAR, hex);
-            else if (strcmp(key, "status_bar_text") == 0)
-                set_theme_color(COLOR_STATUS_TEXT, hex);
-            else if (strcmp(key, "background") == 0)
-                set_theme_color(COLOR_BACKGROUND, hex);
-            else if (strcmp(key, "select") == 0)
-                set_theme_color(COLOR_SELECT, hex);
+            printf("%.*s = %.*s\n", key_end - key_start, src + key_start, value_end - value_start, src + value_start);
         }
     }
 
-    fclose(fp);
+    free(src);
     return true;
 }
 

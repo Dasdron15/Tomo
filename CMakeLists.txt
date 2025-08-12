@@ -41,7 +41,7 @@ endfunction()
 
 add_executable(tomo ${SRC})
 target_include_directories(tomo PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(tomo PRIVATE tree_sitter ts_c ts_py) # For every new grammar add ts_<language_name>
+target_link_libraries(tomo PRIVATE tree_sitter ts_c ts_py ts_ini) # For every new grammar add ts_<language_name>
 
 find_package(Curses REQUIRED)
 target_include_directories(tomo PRIVATE ${CURSES_INCLUDE_DIR})
@@ -52,6 +52,7 @@ install(TARGETS tomo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_ts_grammar(c https://github.com/tree-sitter/tree-sitter-c.git)
 add_ts_grammar(py https://github.com/tree-sitter/tree-sitter-python.git)
+add_ts_grammar(ini https://github.com/justinmk/tree-sitter-ini.git)
 # For every new grammar add_ts_grammar(<name> <git-url>)
 
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.config/tomo/themes\")")

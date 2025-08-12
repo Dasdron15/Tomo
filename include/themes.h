@@ -37,6 +37,11 @@ typedef struct {
     double b;
 } RGB;
 
+typedef struct {
+    char key[256];
+    char value[256];
+} Values;
+
 void init_colors(void);
 
 #endif

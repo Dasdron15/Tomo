@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 
 char *mult_char(char c, int count) {
     if (count <= 0) {
@@ -79,4 +80,20 @@ char **split(char *str, char delim) {
     return tokens;
 }
 
+char *file_to_string(const char *filename) {
+    FILE *fp = fopen(filename, "rb");
+    if (!fp) return NULL;
+    fseek(fp, 0, SEEK_END);
+    size_t size = ftell(fp);
+    rewind(fp);
+    char *buffer = malloc(size + 1);
+    if (!buffer) {
+        fclose(fp);
+        return NULL;
+    }
+
+    fread(buffer, 1, size, fp);
+    fclose(fp);
+    buffer[size] = '\0';
+    return buffer;
 }
