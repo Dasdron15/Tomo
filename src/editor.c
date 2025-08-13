@@ -47,8 +47,11 @@ void ask_for_save(void) {
     }
 
     if (strcasecmp(input, "y") == 0 || strcasecmp(input, "yes") == 0) {
+        if (!save_file()) {
+            return;
+        }
+
         reset();
-        save_file();
         endwin();
         exit(0);
         return;
