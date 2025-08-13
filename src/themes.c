@@ -11,6 +11,7 @@
 #include <ctype.h>
 
 #include "utils.h"
+#include "editor.h"
 #include "tree_sitter/api.h"
 
 #define NUM_COLORS 21
@@ -146,7 +147,8 @@ static void load_theme(const char *filename) {
 void init_colors(void) {
     if (has_colors() == FALSE) {
         endwin();
-        printf("Error: terminal does not support colors\n");
+        reset();
+        fprintf(stderr, "Error: terminal does not support colors\n");
         exit(0);
     }
 

@@ -15,7 +15,7 @@ void load_file(const char *path) {
     int i = 0;
 
     if (fp == NULL) {
-        printf("File not found\n");
+        fprintf(stderr, "Error: File not found\n");
         exit(1);
     }
 

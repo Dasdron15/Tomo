@@ -68,6 +68,7 @@ bool is_saved(void) {
     FILE *fp = fopen(editor.filename, "r");
     if (!fp) {
         endwin();
+        reset();
         fprintf(stderr, "Error: Cannot open file\n");
         exit(1);
     }
@@ -80,6 +81,7 @@ bool is_saved(void) {
     if (!saved_code) {
         fclose(fp);
         endwin();
+        reset();
         fprintf(stderr, "Error: Memory not allocated\n");
         exit(0);
     }
@@ -96,6 +98,7 @@ bool is_saved(void) {
     char *unsaved_code = malloc(total_len + 1);
     if (!unsaved_code) {
         endwin();
+        reset();
         fprintf(stderr, "Error: Memory not allocated\n");
         exit(0);
     }
