@@ -11,7 +11,6 @@
 #include <ctype.h>
 
 #include "utils.h"
-#include "editor.h"
 #include "tree_sitter/api.h"
 
 #define NUM_COLORS 21
