@@ -162,8 +162,8 @@ void init_colors(void) {
     set_theme_color(COLOR_FUNCTION, 0x268bd2);
     set_theme_color(COLOR_PREPROCESSOR, 0x6c71c4);
     set_theme_color(COLOR_COMMENT, 0x586e75);
-    set_theme_color(COLOR_UNACTIVE, 0x073642);
-    set_theme_color(COLOR_STATUS_BAR, 0x002b36);
+    set_theme_color(COLOR_UNACTIVE, 0x073f49);
+    set_theme_color(COLOR_STATUS_BAR, 0x003948);
     set_theme_color(COLOR_STATUS_TEXT, 0x93a1a1);
     set_theme_color(COLOR_BACKGROUND, 0x002b36);
     set_theme_color(COLOR_SELECT, 0x073642);
@@ -180,10 +180,10 @@ void init_colors(void) {
         while ((dir = readdir(d)) != NULL) {
             if (dir->d_type == DT_REG) {
                 sprintf(path, "%s/%s", path, dir->d_name);
+                load_theme(path);
             }
-
-            closedir(d);
         }
+        closedir(d);
     }
 
     /* Default color pairs */
