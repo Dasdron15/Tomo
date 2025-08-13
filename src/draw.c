@@ -94,6 +94,43 @@ void draw_line_content(int index, char *line, int y) {
     }
 }
 
+void draw_command_palette(void) {
+    int max_x, max_y;
+    getmaxyx(stdscr, max_y, max_x);
+
+    int height = 3;
+    int width = max_x - 20;
+    int startx = (max_x - width) / 2;
+    int starty = height / 2;
+
+    WINDOW *palette = newwin(height, width, starty, startx);
+    refresh();
+
+    box(palette, 0, 0);
+    mvwprintw(palette, 1, 1, "> ");
+    wbkgd(palette, COLOR_PAIR(PAIR_BACKGROUND));
+
+    char input[128];
+    int pos = 0;
+
+    int ch;
+    while ((ch = wgetch(palette)) != '\n') {
+        if (ch == 27) break;
+        else if ((ch == KEY_BACKSPACE || ch == 127) && pos > 2) {
+            input[--pos] = '\0';
+            mvwprintw(palette, 1, 1 + pos, " ");
+            wmove(palette, 1, 1 + pos);
+        } else if (pos < (int)sizeof(input) - 1 && ch < 127 && ch > 31) {
+            input[pos++] = ch;
+            mvwprintw(palette, 1, 1 + pos, "%c", ch);
+            wmove(palette, 1, 1 + pos);
+        }
+        wrefresh(palette);
+    }
+
+    delwin(palette);
+}
+
 void draw_status_bar(void) {
     attron(COLOR_PAIR(PAIR_STATUS_BAR));
     

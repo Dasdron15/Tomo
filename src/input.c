@@ -9,6 +9,7 @@
 #include "editor.h"
 #include "edit.h"
 #include "fileio.h"
+#include "draw.h"
 
 void handle_key(int key) {
     editor.bottom_text = "";
@@ -112,6 +113,11 @@ void handle_key(int key) {
 
     if (key == 27) { // Esc
         cancel_selection();
+        return;
+    }
+
+    if (key == 16) {
+        draw_command_palette();
         return;
     }
 
