@@ -58,7 +58,7 @@ static void set_theme_color(int idx, int hex) {
     }
 }
 
-static bool load_theme(const char *filename) {
+static void load_theme(const char *filename) {
     char *src = file_to_string(filename);
 
     TSParser *parser = ts_parser_new();
@@ -141,8 +141,6 @@ static bool load_theme(const char *filename) {
     ts_tree_delete(tree);
     ts_parser_delete(parser);
     free(src);
-
-    return true;
 }
 
 void init_colors(void) {
@@ -153,6 +151,22 @@ void init_colors(void) {
     }
 
     start_color();
+
+    // Default theme
+    set_theme_color(COLOR_DEFAULT, 0x93a1a1);
+    set_theme_color(COLOR_KEYWORD, 0x859900);
+    set_theme_color(COLOR_TYPE, 0xb58900);
+    set_theme_color(COLOR_STRING, 0x2aa198);
+    set_theme_color(COLOR_NUM, 0xd33682);
+    set_theme_color(COLOR_CHAR, 0x2aa198);
+    set_theme_color(COLOR_FUNCTION, 0x268bd2);
+    set_theme_color(COLOR_PREPROCESSOR, 0x6c71c4);
+    set_theme_color(COLOR_COMMENT, 0x586e75);
+    set_theme_color(COLOR_UNACTIVE, 0x073642);
+    set_theme_color(COLOR_STATUS_BAR, 0x002b36);
+    set_theme_color(COLOR_STATUS_TEXT, 0x93a1a1);
+    set_theme_color(COLOR_BACKGROUND, 0x002b36);
+    set_theme_color(COLOR_SELECT, 0x073642);
 
     DIR *d;
     struct dirent *dir;
@@ -166,43 +180,10 @@ void init_colors(void) {
         while ((dir = readdir(d)) != NULL) {
             if (dir->d_type == DT_REG) {
                 sprintf(path, "%s/%s", path, dir->d_name);
-
-                if (!load_theme(path)) {
-                    theme_colors[COLOR_DEFAULT] = COLOR_WHITE;
-                    theme_colors[COLOR_KEYWORD] = COLOR_CYAN;
-                    theme_colors[COLOR_TYPE] = COLOR_GREEN;
-                    theme_colors[COLOR_STRING] = COLOR_YELLOW;
-                    theme_colors[COLOR_NUM] = COLOR_MAGENTA;
-                    theme_colors[COLOR_CHAR] = COLOR_YELLOW;
-                    theme_colors[COLOR_FUNCTION] = COLOR_RED;
-                    theme_colors[COLOR_PREPROCESSOR] = COLOR_MAGENTA;
-                    theme_colors[COLOR_COMMENT] = COLOR_GREEN;
-                    theme_colors[COLOR_UNACTIVE] = COLOR_BLUE;
-                    theme_colors[COLOR_STATUS_BAR] = COLOR_BLACK;
-                    theme_colors[COLOR_STATUS_TEXT] = COLOR_WHITE;
-                    theme_colors[COLOR_BACKGROUND] = -1;
-                    theme_colors[COLOR_SELECT] = COLOR_BLUE;
-                }
             }
+
+            closedir(d);
         }
-        closedir(d);
-    } else {
-
-
-        theme_colors[COLOR_DEFAULT] = COLOR_WHITE;
-        theme_colors[COLOR_KEYWORD] = COLOR_CYAN;
-        theme_colors[COLOR_TYPE] = COLOR_GREEN;
-        theme_colors[COLOR_STRING] = COLOR_YELLOW;
-        theme_colors[COLOR_NUM] = COLOR_MAGENTA;
-        theme_colors[COLOR_CHAR] = COLOR_YELLOW;
-        theme_colors[COLOR_FUNCTION] = COLOR_RED;
-        theme_colors[COLOR_PREPROCESSOR] = COLOR_MAGENTA;
-        theme_colors[COLOR_COMMENT] = COLOR_GREEN;
-        theme_colors[COLOR_UNACTIVE] = COLOR_BLUE;
-        theme_colors[COLOR_STATUS_BAR] = COLOR_BLACK;
-        theme_colors[COLOR_STATUS_TEXT] = COLOR_WHITE;
-        theme_colors[COLOR_BACKGROUND] = -1;
-        theme_colors[COLOR_SELECT] = COLOR_BLUE;
     }
 
     /* Default color pairs */
