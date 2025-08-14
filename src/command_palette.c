@@ -58,8 +58,17 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         int ch = wgetch(palette);
         if (ch == KEY_UP) highlight = (highlight - 1 + n_items) % n_items;
         else if (ch == KEY_DOWN) highlight = (highlight + 1) % n_items;
-        else if (ch == '\n') { delwin(palette); return highlight; }
-        else if (ch == 27)    { delwin(palette); return -1; }
+        else if (ch == '\n') {
+            delwin(palette);
+            touchwin(stdscr);
+            wrefresh(stdscr);
+            return highlight;
+        } else if (ch == 27) {
+            delwin(palette);
+            touchwin(stdscr);
+            wrefresh(stdscr);
+            return -1;
+        }
         else if (ch > 31 && ch < 127 && pos < (int)buf_size - 1) buf[pos++] = ch, buf[pos] = '\0';
         else if ((ch == 127 || ch == KEY_BACKSPACE) && pos > 0) buf[--pos] = '\0';
 
