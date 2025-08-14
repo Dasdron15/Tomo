@@ -14,7 +14,10 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
     getmaxyx(stdscr, max_y, max_x);
 
     int highlight = 0, pos = 0;
-    int height = n_items + 3;
+    char *filtered[1024];
+    int filtered_count = n_items;
+
+    int height = filtered_count + 3;
     int width = max_x - 20;
     int startx = (max_x - width) / 2;
     int starty = max_y / 10;
@@ -24,9 +27,18 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
     wbkgd(palette, COLOR_PAIR(PAIR_BACKGROUND));
 
     while (1) {
+        filtered_count = 0;
+        for (int i = 0; i < n_items; i++) {
+            if (buf[0] == '\0' || strcasestr(items[i], buf)) {
+                filtered[filtered_count++] = items[i];
+            }
+        }
+        if (highlight >= filtered_count) highlight = filtered_count - 1;
+        if (highlight < 0) highlight = 0;
+
         getmaxyx(stdscr, max_y, max_x);
         width = max_x - 20;
-        height = n_items + 3;
+        height = filtered_count + 3;
         startx = (max_x - width) / 2;
         starty = max_y / 10;
         wresize(palette, height, width);
@@ -35,17 +47,17 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         werase(palette);
         box(palette, 0, 0);
 
-        for (int i = 0; i < n_items; i++) {
+        for (int i = 0; i < filtered_count; i++) {
             if (i == highlight) {
                 wattron(palette, COLOR_PAIR(PAIR_STATUS_BAR));
                 mvwhline(palette, i + 2, 1, ' ', width - 2);
             }
 
-            char *theme_name = strrchr(items[i], '/');
+            char *theme_name = strrchr(filtered[i], '/');
             if (theme_name) {
                 theme_name++;
             } else {
-                theme_name = items[i];
+                theme_name = filtered[i];
             }
 
             mvwprintw(palette, i + 2, 2, "%s", theme_name);
@@ -56,13 +68,18 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         mvwprintw(palette, 1, 3, "%s", buf);
 
         int ch = wgetch(palette);
-        if (ch == KEY_UP) highlight = (highlight - 1 + n_items) % n_items;
-        else if (ch == KEY_DOWN) highlight = (highlight + 1) % n_items;
+        if (ch == KEY_UP) highlight = (highlight - 1 + filtered_count) % filtered_count;
+        else if (ch == KEY_DOWN) highlight = (highlight + 1) % filtered_count;
         else if (ch == '\n') {
             delwin(palette);
             touchwin(stdscr);
             wrefresh(stdscr);
-            return highlight;
+            if (filtered_count > 0) {
+                for (int i = 0; i < n_items; i++) {
+                    if (items[i] == filtered[highlight]) return i;
+                }
+            }
+            return -1;
         } else if (ch == 27) {
             delwin(palette);
             touchwin(stdscr);
