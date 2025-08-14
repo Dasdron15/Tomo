@@ -124,6 +124,7 @@ bool is_saved(void) {
 void exit_editor(void) {
     if (!is_saved()) {
         ask_for_save();
+        return;
     }
     endwin();
     reset();
