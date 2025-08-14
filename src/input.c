@@ -9,7 +9,7 @@
 #include "editor.h"
 #include "edit.h"
 #include "fileio.h"
-#include "draw.h"
+#include "command_palette.h"
 
 void handle_key(int key) {
     editor.bottom_text = "";
