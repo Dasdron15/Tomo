@@ -1,6 +1,7 @@
 #include <curses.h>
 
 #include "command_palette.h"
+#include "editor.h"
 #include "themes.h"
 
 int draw_command_palette(void) {
@@ -60,8 +61,17 @@ int draw_command_palette(void) {
         } else if (ch == KEY_DOWN) {
             highlight = (highlight + 1) % n_options;
         } else if (ch == '\n') {
-            break;
+            delwin(palette);
+            touchwin(stdscr);
+            wrefresh(stdscr);
+            refresh();
+            draw_editor();
+            return highlight;
         } else if (ch == 27) {
+            delwin(palette);
+            touchwin(stdscr);
+            wrefresh(stdscr);
+            draw_editor();
             return -1;
         } else if (ch > 31 && ch < 127 && pos < (int)sizeof(buf) - 1) {
             buf[pos++] = ch;
@@ -72,7 +82,4 @@ int draw_command_palette(void) {
 
         refresh();
     }
-
-    delwin(palette);
-    return highlight;
 }

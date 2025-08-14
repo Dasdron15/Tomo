@@ -150,7 +150,7 @@ void clamp_cursor(void) {
 size_t goto_line(void) {
     int screen_height = getmaxy(stdscr);
     char *prompt = "Go to line: ";
-    
+
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 

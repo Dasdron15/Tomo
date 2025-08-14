@@ -16,22 +16,18 @@ void handle_key(int key) {
     
     if (key == KEY_UP) {
         move_up(false);
-        return;
     }
 
     if (key == KEY_DOWN) {
         move_down(false);
-        return;
     }
 
     if (key == KEY_RIGHT) {
         move_right(false);
-        return;
     }
 
     if (key == KEY_LEFT) {
         move_left(false);
-        return;
     }
 
     if (key == 402) { // Shift + RIGHT_ARROW (Right arrow selection)
@@ -40,7 +36,6 @@ void handle_key(int key) {
         move_right(true);
         update_selection(cursor.y + cursor.y_offset,
                          cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 393) { // Shift + LEFT_ARROW (Left arrow selection)
@@ -49,7 +44,6 @@ void handle_key(int key) {
         move_left(true);
         update_selection(cursor.y + cursor.y_offset,
                          cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
@@ -58,7 +52,6 @@ void handle_key(int key) {
         move_up(true);
         update_selection(cursor.y + cursor.y_offset,
                          cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
@@ -67,7 +60,6 @@ void handle_key(int key) {
         move_down(true);
         update_selection(cursor.y + cursor.y_offset,
                          cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 555) { // Shift + ctrl + LEFT_ARROW
@@ -75,7 +67,6 @@ void handle_key(int key) {
         cursor.x = editor.margin;
         cursor.x_offset = 0;
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 570) { // Shift + ctrl + LEFT_ARROW
@@ -84,7 +75,6 @@ void handle_key(int key) {
         cursor.x = editor.margin + line_len - cursor.x_offset;
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 576) { // Shift + ctrl + UP_ARROW
@@ -93,7 +83,6 @@ void handle_key(int key) {
         cursor.y = 0;
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
     if (key == 535 &&
@@ -107,13 +96,11 @@ void handle_key(int key) {
         cursor.y = editor.total_lines - cursor.y_offset - 1;
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
-        return;
     }
 
 
     if (key == 27) { // Esc
         cancel_selection();
-        return;
     }
 
     if (key == 16) {
@@ -123,7 +110,7 @@ void handle_key(int key) {
             case 0:
                 break;
             case 1:
-                handle_key(7);
+                handle_key(7); // 7 - Ctrl + g
                 break;
             case 2:
                 save_file();
@@ -132,13 +119,10 @@ void handle_key(int key) {
                 exit_editor();
                 break;
         }
-
-        return;
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
         exit_editor();
-        return;
     }
 
     if ((key >= 32 && key <= 126)) {
@@ -152,13 +136,11 @@ void handle_key(int key) {
         }
         
         insert_char((char) key);
-        return;
     }
 
     if (key == '\t') {
         add_tab();
         cursor.max_x = cursor.x + cursor.x_offset;
-        return;
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
@@ -167,18 +149,14 @@ void handle_key(int key) {
 
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);
-        
-        return;
     }
 
     if (key == KEY_ENTER || key == 10) {
         new_line();
-        return;
     }
 
     if (key == 19) { // CTRL + S (Save file)
         save_file();
-        return;
     }
 
     if (key == 7) { // CTRL + G (Goto line)
@@ -187,7 +165,6 @@ void handle_key(int key) {
             cursor.y = target - cursor.y_offset;
             clamp_cursor();
         }
-        return;
     }
 
     if (key == 534 &&
@@ -199,27 +176,23 @@ void handle_key(int key) {
         }
         cursor.y = editor.total_lines - cursor.y_offset - 1;
         clamp_cursor();
-        return;
     }
 
     if (key == 575) { // CTRL + UP_ARROW (Jump to the beggining of the file)
         cursor.y_offset = 0;
         cursor.y = 0;
         clamp_cursor();
-        return;
     }
 
     if (key == 554) { // CTRL + RIGHT_ARROW (Jump to the beggining of the line)
         cursor.x = editor.margin;
         cursor.x_offset = 0;
-        return;
     }
 
     if (key == 569) { // CTRL + LEFT_ARROW (Jump to the end of the line)
         int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
         cursor.x = editor.margin + line_len - cursor.x_offset;
         clamp_cursor();
-        return;
     }
 
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
@@ -230,7 +203,6 @@ void handle_key(int key) {
         copy_text(start_select, end_select);
 
         editor.bottom_text = "Selection copied";
-        return;
     }
 
     if (key == 24 && is_selecting()) { // CTRL + X (Cut)
@@ -243,7 +215,6 @@ void handle_key(int key) {
         deletion(start_select, end_select);
 
         editor.bottom_text = "Cut selection";
-        return;
     }
 
     if (key == 22) { // CTRL + V (Paste)
@@ -259,7 +230,6 @@ void handle_key(int key) {
         paste_text();
 
         editor.bottom_text = "Clipboard pasted";
-        return;
     }
 }
 
