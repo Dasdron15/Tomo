@@ -85,6 +85,7 @@ int draw_command_palette(void) {
             buf[--pos] = '\0';
         }
 
+        draw_editor();
         refresh();
     }
 }
@@ -203,6 +204,7 @@ char *draw_theme_palette(void) {
             buf[--pos] = '\0';
         }
 
+        draw_editor();
         refresh();
     }
 }
