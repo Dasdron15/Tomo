@@ -117,18 +117,27 @@ void handle_key(int key) {
     }
 
     if (key == 16) {
-        draw_command_palette();
+        int command = draw_command_palette();
+
+        switch (command) {
+            case 0:
+                break;
+            case 1:
+                handle_key(7);
+                break;
+            case 2:
+                save_file();
+                break;
+            case 3:
+                exit_editor();
+                break;
+        }
+
         return;
     }
 
     if (key == 17) { // CTRL + Q (Quit the editor)
-        if (!is_saved()) {
-            ask_for_save();
-        } else {
-            reset();
-            endwin();
-            exit(0);
-        }
+        exit_editor();
         return;
     }
 

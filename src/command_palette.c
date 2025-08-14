@@ -3,7 +3,7 @@
 #include "command_palette.h"
 #include "themes.h"
 
-void draw_command_palette(void) {
+int draw_command_palette(void) {
     int max_x, max_y;
     getmaxyx(stdscr, max_y, max_x);
 
@@ -62,7 +62,7 @@ void draw_command_palette(void) {
         } else if (ch == '\n') {
             break;
         } else if (ch == 27) {
-            break;
+            return -1;
         } else if (ch > 31 && ch < 127 && pos < (int)sizeof(buf) - 1) {
             buf[pos++] = ch;
             buf[pos] = '\0';
@@ -74,4 +74,5 @@ void draw_command_palette(void) {
     }
 
     delwin(palette);
+    return highlight;
 }

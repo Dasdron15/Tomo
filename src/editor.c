@@ -121,6 +121,15 @@ bool is_saved(void) {
     return false;
 }
 
+void exit_editor(void) {
+    if (!is_saved()) {
+        ask_for_save();
+    }
+    endwin();
+    reset();
+    exit(0);
+}
+
 void reset(void) {
     printf("\033[2 q");
     fflush(stdout);
