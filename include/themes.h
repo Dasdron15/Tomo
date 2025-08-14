@@ -38,5 +38,6 @@ typedef struct {
 } RGB;
 
 void init_colors(void);
+void load_theme(const char *filename);
 
 #endif

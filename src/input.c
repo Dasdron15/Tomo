@@ -10,6 +10,7 @@
 #include "edit.h"
 #include "fileio.h"
 #include "command_palette.h"
+#include "themes.h"
 
 void handle_key(int key) {
     editor.bottom_text = "";
@@ -108,6 +109,10 @@ void handle_key(int key) {
 
         switch (command) {
             case 0:
+                {
+                    char *selected_theme = draw_theme_palette();
+                    load_theme(selected_theme);
+                }
                 break;
             case 1:
                 handle_key(7); // 7 - Ctrl + g

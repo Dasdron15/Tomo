@@ -59,7 +59,9 @@ static void set_theme_color(int idx, int hex) {
     }
 }
 
-static void load_theme(const char *filename) {
+void load_theme(const char *filename) {
+    if (filename == NULL) return;
+
     char *src = file_to_string(filename);
 
     TSParser *parser = ts_parser_new();
@@ -155,38 +157,20 @@ void init_colors(void) {
     start_color();
 
     // Default theme
-    set_theme_color(COLOR_DEFAULT, 0x93a1a1);
-    set_theme_color(COLOR_KEYWORD, 0x859900);
-    set_theme_color(COLOR_TYPE, 0xb58900);
-    set_theme_color(COLOR_STRING, 0x2aa198);
-    set_theme_color(COLOR_NUM, 0xd33682);
-    set_theme_color(COLOR_CHAR, 0x2aa198);
-    set_theme_color(COLOR_FUNCTION, 0x268bd2);
-    set_theme_color(COLOR_PREPROCESSOR, 0x6c71c4);
-    set_theme_color(COLOR_COMMENT, 0x586e75);
-    set_theme_color(COLOR_UNACTIVE, 0x073f49);
-    set_theme_color(COLOR_STATUS_BAR, 0x003948);
-    set_theme_color(COLOR_STATUS_TEXT, 0x93a1a1);
-    set_theme_color(COLOR_BACKGROUND, 0x002b36);
-    set_theme_color(COLOR_SELECT, 0x073642);
-
-    DIR *d;
-    struct dirent *dir;
-
-    char path[PATH_MAX];
-    snprintf(path, sizeof(path), "%s/.config/tomo/themes", getenv("HOME"));
-
-    d = opendir(path);
-
-    if (d) {
-        while ((dir = readdir(d)) != NULL) {
-            if (dir->d_type == DT_REG) {
-                sprintf(path, "%s/%s", path, dir->d_name);
-                load_theme(path);
-            }
-        }
-        closedir(d);
-    }
+    set_theme_color(COLOR_DEFAULT, 0xd0d0d0);
+    set_theme_color(COLOR_KEYWORD, 0xff5555);
+    set_theme_color(COLOR_TYPE, 0x87cefa);
+    set_theme_color(COLOR_STRING, 0x98fb98);
+    set_theme_color(COLOR_NUM, 0xf0e68c);
+    set_theme_color(COLOR_CHAR, 0x98fb98);
+    set_theme_color(COLOR_FUNCTION, 0xdda0dd);
+    set_theme_color(COLOR_PREPROCESSOR, 0x7fffd4);
+    set_theme_color(COLOR_COMMENT, 0x808080);
+    set_theme_color(COLOR_UNACTIVE, 0x555555);
+    set_theme_color(COLOR_STATUS_BAR, 0x202020);
+    set_theme_color(COLOR_STATUS_TEXT, 0xd0d0d0);
+    set_theme_color(COLOR_BACKGROUND, 0x121212);
+    set_theme_color(COLOR_SELECT, 0x333333);
 
     /* Default color pairs */
     init_pair(PAIR_DEFAULT, COLOR_DEFAULT, COLOR_BACKGROUND);
