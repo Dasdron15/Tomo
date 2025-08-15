@@ -22,6 +22,7 @@ enum {
     COLOR_DEFAULT,
     COLOR_KEYWORD,
     COLOR_TYPE,
+    COLOR_CUSTOM_TYPE,
     COLOR_STRING,
     COLOR_NUM,
     COLOR_CHAR,
@@ -160,6 +161,7 @@ void init_colors(void) {
     set_theme_color(COLOR_DEFAULT, 0xd0d0d0);
     set_theme_color(COLOR_KEYWORD, 0xff5555);
     set_theme_color(COLOR_TYPE, 0x87cefa);
+    set_theme_color(COLOR_CUSTOM_TYPE, 0xffa500);
     set_theme_color(COLOR_STRING, 0x98fb98);
     set_theme_color(COLOR_NUM, 0xf0e68c);
     set_theme_color(COLOR_CHAR, 0x98fb98);
@@ -176,6 +178,7 @@ void init_colors(void) {
     init_pair(PAIR_DEFAULT, COLOR_DEFAULT, COLOR_BACKGROUND);
     init_pair(PAIR_KEYWORD, COLOR_KEYWORD, COLOR_BACKGROUND);
     init_pair(PAIR_TYPE, COLOR_TYPE, COLOR_BACKGROUND);
+    init_pair(PAIR_CUSTOM_TYPE, COLOR_CUSTOM_TYPE, COLOR_BACKGROUND);
     init_pair(PAIR_STRING, COLOR_STRING, COLOR_BACKGROUND);
     init_pair(PAIR_NUM, COLOR_NUM, COLOR_BACKGROUND);
     init_pair(PAIR_CHAR, COLOR_CHAR, COLOR_BACKGROUND);
@@ -190,6 +193,7 @@ void init_colors(void) {
     init_pair(PAIR_SELECT_DEFAULT, COLOR_DEFAULT, COLOR_SELECT);
     init_pair(PAIR_SELECT_KEYWORD, COLOR_KEYWORD, COLOR_SELECT);
     init_pair(PAIR_SELECT_TYPE, COLOR_TYPE, COLOR_SELECT);
+    init_pair(PAIR_SELECT_CUSTOM_TYPE, COLOR_CUSTOM_TYPE, COLOR_SELECT);
     init_pair(PAIR_SELECT_STRING, COLOR_STRING, COLOR_SELECT);
     init_pair(PAIR_SELECT_NUM, COLOR_NUM, COLOR_SELECT);
     init_pair(PAIR_SELECT_CHAR, COLOR_CHAR, COLOR_SELECT);
