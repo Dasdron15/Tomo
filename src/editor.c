@@ -47,8 +47,11 @@ void ask_for_save(void) {
     }
 
     if (strcasecmp(input, "y") == 0 || strcasecmp(input, "yes") == 0) {
+        if (!save_file()) {
+            return;
+        }
+
         reset();
-        save_file();
         endwin();
         exit(0);
         return;
@@ -68,6 +71,7 @@ bool is_saved(void) {
     FILE *fp = fopen(editor.filename, "r");
     if (!fp) {
         endwin();
+        reset();
         fprintf(stderr, "Error: Cannot open file\n");
         exit(1);
     }
@@ -80,6 +84,7 @@ bool is_saved(void) {
     if (!saved_code) {
         fclose(fp);
         endwin();
+        reset();
         fprintf(stderr, "Error: Memory not allocated\n");
         exit(0);
     }
@@ -96,6 +101,7 @@ bool is_saved(void) {
     char *unsaved_code = malloc(total_len + 1);
     if (!unsaved_code) {
         endwin();
+        reset();
         fprintf(stderr, "Error: Memory not allocated\n");
         exit(0);
     }
@@ -113,6 +119,16 @@ bool is_saved(void) {
     }
 
     return false;
+}
+
+void exit_editor(void) {
+    if (!is_saved()) {
+        ask_for_save();
+        return;
+    }
+    endwin();
+    reset();
+    exit(0);
 }
 
 void reset(void) {

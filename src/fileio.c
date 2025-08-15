@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curses.h>
+#include <unistd.h>
 
 #include "editor.h"
 #include "init.h"
@@ -15,7 +16,7 @@ void load_file(const char *path) {
     int i = 0;
 
     if (fp == NULL) {
-        printf("File not found\n");
+        fprintf(stderr, "Error: File not found\n");
         exit(1);
     }
 
@@ -42,8 +43,19 @@ void load_file(const char *path) {
     editor.total_lines = i;
 }
 
-void save_file(void) {
+bool save_file(void) {
+    if (access(editor.filename, W_OK) != 0) {
+        editor.bottom_text = "Cannot save: file is read-only";
+        return false;
+    }
+
     FILE *fp = fopen(editor.filename, "w");
+    if (!fp) {
+        endwin();
+        reset();
+        fprintf(stderr, "Error: file was not found");
+        exit(0);
+    }
 
     for (int i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {
         if (i != editor.total_lines - 1) {
@@ -53,4 +65,5 @@ void save_file(void) {
         }
     }
     fclose(fp);
+    return true;
 }

@@ -12,6 +12,7 @@ install:
 uninstall:
 	sudo rm -f /usr/local/bin/tomo
 	sudo rm -rf /usr/local/lib/tomo-parsers
+	sudo rm -rf ~/.config/tomo
 
 clean:
 	rm -rf build

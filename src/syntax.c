@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #include "editor.h"
-#include "init.h"
+#include "themes.h"
 #include "utils.h"
 #include "tree_sitter/api.h"
 
@@ -17,6 +17,8 @@
 
 const TSLanguage *tree_sitter_c();
 const TSLanguage *tree_sitter_python();
+const TSLanguage *tree_sitter_cpp();
+const TSLanguage *tree_sitter_ini();
 
 static TSParser *parser = NULL;
 static TSTree *tree = NULL;
@@ -29,6 +31,10 @@ static const TSLanguage *get_language(const char *file_ext) {
         return tree_sitter_c();
     } else if (strcmp(file_ext, ".py") == 0) {
         return tree_sitter_python();
+    } else if (strcmp(file_ext, ".cpp") == 0) {
+        return tree_sitter_cpp();
+    } else if (strcmp(file_ext, ".ini") == 0) {
+        return tree_sitter_ini();
     }
 
     return NULL;
@@ -99,9 +105,11 @@ static char *get_node_text(TSNode node) {
 }
 
 static int color_for_node_type_c(const char *type) {
-    if (strcmp(type, "primitive_type") == 0 ||
-        strcmp(type, "type_identifier") == 0)
+    if (strcmp(type, "primitive_type") == 0) {
         return PAIR_TYPE;
+    } else if (strcmp(type, "type_identifier") == 0) {
+        return PAIR_CUSTOM_TYPE;
+    }
     if (strcmp(type, "preproc_directive") == 0 ||
         strcmp(type, "preproc_call") == 0)
         return PAIR_PREPROCESSOR;
@@ -115,6 +123,9 @@ static int color_for_node_type_c(const char *type) {
         return PAIR_CHAR;
     if (strcmp(type, "comment") == 0)
         return PAIR_COMMENT;
+    if (strcmp(type, "identifier") == 0) {
+        return PAIR_IDENTIFIER;
+    }
 
     return PAIR_DEFAULT;
 }
@@ -137,6 +148,23 @@ static int color_for_node_type_py(const char *type) {
     return PAIR_DEFAULT;
 }
 
+static int color_for_node_type_ini(const char *type) {
+    if (strcmp(type, "comment") == 0) {
+        return PAIR_COMMENT;
+    }
+    if (strcmp(type, "setting_name") == 0) {
+        return PAIR_TYPE;
+    }
+    if (strcmp(type, "setting_value") == 0) {
+        return PAIR_STRING;
+    }
+    if (strcmp(type, "section_name") == 0) {
+        return PAIR_CUSTOM_TYPE;
+    }
+
+    return PAIR_DEFAULT;
+}
+
 static int color_for_node_type_lang(const char *type) {
     if (!file_ext) return PAIR_DEFAULT;
 
@@ -145,6 +173,9 @@ static int color_for_node_type_lang(const char *type) {
     }
     if (strcmp(file_ext, ".py") == 0) {
         return color_for_node_type_py(type);
+    }
+    if (strcmp(file_ext, ".ini") == 0) {
+        return color_for_node_type_ini(type);
     }
 
     return PAIR_DEFAULT;
