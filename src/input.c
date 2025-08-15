@@ -126,6 +126,11 @@ void handle_key(int key) {
         }
     }
 
+    if (key == 20) {
+        char *selected_theme = draw_theme_palette();
+        load_theme(selected_theme);
+    }
+
     if (key == 17) { // CTRL + Q (Quit the editor)
         exit_editor();
     }

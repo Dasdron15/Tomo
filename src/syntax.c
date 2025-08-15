@@ -17,6 +17,7 @@
 
 const TSLanguage *tree_sitter_c();
 const TSLanguage *tree_sitter_python();
+const TSLanguage *tree_sitter_cpp();
 
 static TSParser *parser = NULL;
 static TSTree *tree = NULL;
@@ -29,6 +30,8 @@ static const TSLanguage *get_language(const char *file_ext) {
         return tree_sitter_c();
     } else if (strcmp(file_ext, ".py") == 0) {
         return tree_sitter_python();
+    } else if (strcmp(file_ext, ".cpp") == 0) {
+        return tree_sitter_cpp();
     }
 
     return NULL;
