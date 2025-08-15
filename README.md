@@ -1,7 +1,7 @@
 # Tomo
 
-![Static Badge](https://img.shields.io/badge/release-v2.0.0-blue)
-![Static Badge](https://img.shields.io/badge/licence-MIT-blue)
+![GitHub Release](https://img.shields.io/github/v/release/Dasdron15/Tomo?color=blue)
+![GitHub License](https://img.shields.io/github/license/Dasdron15/Tomo?color=blue)
 
 **Tomo** is a terminal-based code editor focused on simplicity and working out of the box without any configuration. Inspired by the lightweight nature of Helix and the intuitiveness of VS Code, it uses `ncurses` for terminal UI and `tree-sitter` for fast syntax highlighting.
 
@@ -22,6 +22,8 @@ Image of Tomo code editor in action:
 - <kbd>Ctrl + G</kbd> - Go to line
 - <kbd>Ctrl + Q</kbd> - Quit the editor
 - <kbd>Ctrl + S</kbd> - Save the file
+- <kbd>Ctrl + T</kbd> - Change theme
+- <kbd>Ctrl + P</kbd> - Open command palette
 - <kbd>Arrow keys</kbd> - Move cursor
 - <kbd>Arrow keys + Shift</kbd> - Start text selection
 
@@ -51,7 +53,6 @@ Currently, folder/project opening is not supported but planned for future releas
 - Mouse support
 - Syntax highlighting for more languages
 - Auto-completion
-- Theme support
 - Vim mode
 
 ## Contribution
