@@ -24,7 +24,7 @@ Image of Tomo code editor in action:
 
 Each theme is a simple `.ini` file with the following format:
 
-```sh
+```
 default = "#d0d0d0"
 keyword = "#ff5555"
 type = "#87cefa"
