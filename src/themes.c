@@ -116,6 +116,8 @@ void load_theme(const char *filename) {
                 set_theme_color(COLOR_KEYWORD, hex);
             } else if (key_len == strlen("type") && strncmp(src + key_start, "type", key_len) == 0) {
                 set_theme_color(COLOR_TYPE, hex);
+            } else if (key_len == strlen("custom_type") && strncmp(src + key_start, "custom_type", key_len) == 0) {
+                set_theme_color(COLOR_CUSTOM_TYPE, hex);
             } else if (key_len == strlen("string") && strncmp(src + key_start, "string", key_len) == 0) {
                 set_theme_color(COLOR_STRING, hex);
             } else if (key_len == strlen("number") && strncmp(src + key_start, "number", key_len) == 0) {
