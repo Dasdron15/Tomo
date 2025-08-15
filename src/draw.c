@@ -76,7 +76,7 @@ void draw_line_content(int index, char *line, int y) {
 
         int color = get_color_for_pos(index, symb);
 
-        int select_offset = 15;
+        int select_offset = PAIR_SELECT + 1;
         int color_pair = is_selected(file_y, file_x) ? color + select_offset : color;
 
         attron(COLOR_PAIR(color_pair));

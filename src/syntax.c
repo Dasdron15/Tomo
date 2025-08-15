@@ -105,10 +105,11 @@ static char *get_node_text(TSNode node) {
 }
 
 static int color_for_node_type_c(const char *type) {
-    if (strcmp(type, "primitive_type") == 0)
+    if (strcmp(type, "primitive_type") == 0) {
         return PAIR_TYPE;
-    if (strcmp(type, "type_identifier") == 0)
+    } else if (strcmp(type, "type_identifier") == 0) {
         return PAIR_CUSTOM_TYPE;
+    }
     if (strcmp(type, "preproc_directive") == 0 ||
         strcmp(type, "preproc_call") == 0)
         return PAIR_PREPROCESSOR;
@@ -122,6 +123,9 @@ static int color_for_node_type_c(const char *type) {
         return PAIR_CHAR;
     if (strcmp(type, "comment") == 0)
         return PAIR_COMMENT;
+    if (strcmp(type, "identifier") == 0) {
+        return PAIR_IDENTIFIER;
+    }
 
     return PAIR_DEFAULT;
 }

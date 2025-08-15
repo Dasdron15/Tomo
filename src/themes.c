@@ -26,6 +26,7 @@ enum {
     COLOR_STRING,
     COLOR_NUM,
     COLOR_CHAR,
+    COLOR_IDENTIFIER,
     COLOR_FUNCTION,
     COLOR_PREPROCESSOR,
     COLOR_COMMENT,
@@ -126,6 +127,8 @@ void load_theme(const char *filename) {
                 set_theme_color(COLOR_CHAR, hex);
             } else if (key_len == strlen("function") && strncmp(src + key_start, "function", key_len) == 0) {
                 set_theme_color(COLOR_FUNCTION, hex);
+            } else if (key_len == strlen("identifier") && strncmp(src + key_start, "identifier", key_len) == 0) {
+                set_theme_color(COLOR_IDENTIFIER, hex);
             } else if (key_len == strlen("preprocessor") && strncmp(src + key_start, "preprocessor", key_len) == 0) {
                 set_theme_color(COLOR_PREPROCESSOR, hex);
             } else if (key_len == strlen("comment") && strncmp(src + key_start, "comment", key_len) == 0) {
@@ -168,6 +171,7 @@ void init_colors(void) {
     set_theme_color(COLOR_NUM, 0xf0e68c);
     set_theme_color(COLOR_CHAR, 0x98fb98);
     set_theme_color(COLOR_FUNCTION, 0xdda0dd);
+    set_theme_color(COLOR_IDENTIFIER, 0xb0c4de); // Needs an update
     set_theme_color(COLOR_PREPROCESSOR, 0x7fffd4);
     set_theme_color(COLOR_COMMENT, 0x808080);
     set_theme_color(COLOR_UNACTIVE, 0x555555);
@@ -185,6 +189,7 @@ void init_colors(void) {
     init_pair(PAIR_NUM, COLOR_NUM, COLOR_BACKGROUND);
     init_pair(PAIR_CHAR, COLOR_CHAR, COLOR_BACKGROUND);
     init_pair(PAIR_FUNCTION, COLOR_FUNCTION, COLOR_BACKGROUND);
+    init_pair(PAIR_IDENTIFIER, COLOR_IDENTIFIER, COLOR_BACKGROUND);
     init_pair(PAIR_PREPROCESSOR, COLOR_PREPROCESSOR, COLOR_BACKGROUND);
     init_pair(PAIR_UNACTIVE, COLOR_UNACTIVE, COLOR_BACKGROUND);
     init_pair(PAIR_STATUS_BAR, COLOR_DEFAULT, COLOR_STATUS_BAR);
@@ -200,6 +205,7 @@ void init_colors(void) {
     init_pair(PAIR_SELECT_NUM, COLOR_NUM, COLOR_SELECT);
     init_pair(PAIR_SELECT_CHAR, COLOR_CHAR, COLOR_SELECT);
     init_pair(PAIR_SELECT_FUNCTION, COLOR_FUNCTION, COLOR_SELECT);
+    init_pair(PAIR_SELECT_IDENTIFIER, COLOR_IDENTIFIER, COLOR_SELECT);
     init_pair(PAIR_SELECT_PREPROCESSOR, COLOR_PREPROCESSOR, COLOR_SELECT);
     init_pair(PAIR_SELECT_UNACTIVE, COLOR_UNACTIVE, COLOR_SELECT);
     init_pair(PAIR_SELECT_COMMENT, COLOR_COMMENT, COLOR_SELECT);
