@@ -11,8 +11,55 @@ Image of Tomo code editor in action:
 
 ## Features
 
-- Syntax highlighting (basic support for Python and C)  
+- Syntax highlighting
 - Smart indentation
+- Custom themes
+- Command palette
+
+## Themes
+
+**Tomo** supports custom themes via `.ini` files. Place your theme files in `~/.config/tomo/themes` directory.
+
+### Theme file format
+
+Each theme is a simple `.ini` file with the following format:
+
+```sh
+default = "#d0d0d0"
+keyword = "#ff5555"
+type = "#87cefa"
+custom_type = "#ffa500"
+string = "#98fb98"
+number = "#f0e68c"
+char = "#98fb98"
+function = "#dda0dd"
+identifier = "#b0c4de"
+preprocessor = "#7fffd4"
+comment = "#808080"
+unactive = "#555555"
+status_bar_bg = "#202020"
+status_bar_text = "#d0d0d0"
+background = "#121212"
+select = "#333333"
+```
+
+- Colors should be in hexadecimal format (`#RRGGBB`).
+- `default` – text default color  
+- `keyword` – programming language keywords  
+- `type` – built-in types (like `int`, `float`)  
+- `custom_type` – user-defined types (like structs, classes)  
+- `string` – string literals  
+- `number` – numeric literals  
+- `char` – character literals  
+- `function` – function names  
+- `identifier` – variable and parameter names  
+- `preprocessor` – preprocessor directives (C/C++)  
+- `comment` – comments  
+- `unactive` – inactive elements  
+- `status_bar_bg` – status bar background  
+- `status_bar_text` – status bar text color  
+- `background` – editor background  
+- `select` – selected text background
 
 ## Shortcuts
 
