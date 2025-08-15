@@ -44,22 +44,22 @@ select = "#333333"
 ```
 
 - Colors should be in hexadecimal format (`#RRGGBB`).
-- `default` – text default color  
-- `keyword` – programming language keywords  
-- `type` – built-in types (like `int`, `float`)  
-- `custom_type` – user-defined types (like structs, classes)  
-- `string` – string literals  
-- `number` – numeric literals  
-- `char` – character literals  
-- `function` – function names  
-- `identifier` – variable and parameter names  
-- `preprocessor` – preprocessor directives (C/C++)  
-- `comment` – comments  
-- `unactive` – inactive elements  
-- `status_bar_bg` – status bar background  
-- `status_bar_text` – status bar text color  
-- `background` – editor background  
-- `select` – selected text background
+- `default` - text default color  
+- `keyword` - programming language keywords  
+- `type` - built-in types (like `int`, `float`)  
+- `custom_type` - user-defined types (like structs, classes)  
+- `string` - string literals  
+- `number` - numeric literals  
+- `char` - character literals  
+- `function` - function names  
+- `identifier` - variable and parameter names  
+- `preprocessor` - preprocessor directives (C/C++)  
+- `comment` - Comments
+- `unactive` - Unactive line numbers 
+- `status_bar_bg` - status bar background  
+- `status_bar_text` - status bar text color  
+- `background` - editor background  
+- `select` - selected text background
 
 ## Shortcuts
 
