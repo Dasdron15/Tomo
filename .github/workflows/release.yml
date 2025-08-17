@@ -35,12 +35,12 @@ jobs:
           fi
 
       - name: Build
-        run: make
+        run: |
+          make
+          ls -l  # Debug: show binary details
 
       - name: Package Binary
-        run: |
-          chmod +x tomo
-          tar czf ${{ matrix.artifact_name }}.tar.gz tomo
+        run: tar czf ${{ matrix.artifact_name }}.tar.gz tomo
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
