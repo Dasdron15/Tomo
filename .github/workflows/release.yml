@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -19,7 +18,6 @@ jobs:
           - os: macos-latest
             artifact_name: tomo-macos
             deps: ncurses
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -35,16 +33,38 @@ jobs:
           fi
 
       - name: Build
-        run: |
-          make
-          ls -l  # Debug: show binary details
+        run: make
 
       - name: Package Binary
         run: tar czf ${{ matrix.artifact_name }}.tar.gz build/tomo
 
-      - name: Upload Release Asset
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: tomo-linux
+          path: .
+      - uses: actions/download-artifact@v3
+        with:
+          name: tomo-macos
+          path: .
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.artifact_name }}.tar.gz
+          files: "tomo-linux.tar.gz,tomo-macos.tar.gz"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
