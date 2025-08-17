@@ -110,7 +110,11 @@ void exit_editor(void) {
 }
 
 void reset(void) {
+    for (int i = 0; i < editor.total_lines; i++) {
+        free(editor.lines[i]);
+    }
     free(editor.lines);
+
     printf("\033[2 q");
     fflush(stdout);
 }

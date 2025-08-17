@@ -10,6 +10,7 @@
 typedef struct {
     char **lines;
     int total_lines;
+    int capacity;
     int margin;
     int indent_size;
     int tab_width;

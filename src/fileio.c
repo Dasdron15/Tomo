@@ -78,6 +78,7 @@ void load_file(const char *path) {
         editor.indent_size = DEFAULT_INDENT_SIZE;
     }
 
+    editor.capacity = line_capacity;
     editor.total_lines = line_count;
 }
 

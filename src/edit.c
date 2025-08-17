@@ -166,6 +166,11 @@ void new_line(void) {
     char left = (x_pos > 0) ? line[x_pos - 1] : '\0';
     char right = line[x_pos];
     
+    if (editor.total_lines + 2 > editor.capacity) {
+        editor.capacity *= 2;
+        editor.lines = realloc(editor.lines, editor.capacity);
+    }
+
     if (is_enclosing_pair(left, right)) {
         indent += editor.indent_size;
 
