@@ -244,6 +244,11 @@ void paste_text(void) {
     int clipboard_lines = count_char(clipboard, '\n');
     editor.total_lines += clipboard_lines;
 
+    if (editor.total_lines + clipboard_lines + 2 > editor.capacity) {
+        editor.capacity *= 2;
+        editor.lines = realloc(editor.lines, editor.capacity);
+    }
+
     int y_pos = cursor.y + cursor.y_offset;
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     char *current_line = editor.lines[y_pos];
@@ -255,6 +260,7 @@ void paste_text(void) {
         int index = cursor.y + cursor.y_offset;
 
         // Tokenise clipboard to an array
+        size_t line_count;
         char **lines = split(clipboard, '\n');
 
         // Merge the current line and first clipboard line
