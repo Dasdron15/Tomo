@@ -17,8 +17,12 @@ void load_file(const char *path) {
         exit(1);
     }
 
-    int line_count = 0;
+
     bool indent_measured = false;
+
+    size_t line_capacity = 128;
+    int line_count = 0;
+    editor.lines = malloc(line_capacity);
 
     size_t capacity = 128;
     size_t length = 0;
@@ -32,6 +36,11 @@ void load_file(const char *path) {
 
     int ch;
     while ((ch = fgetc(fp)) != EOF) {
+        if (line_count >= line_capacity) {
+            line_capacity *= 2;
+            editor.lines = realloc(editor.lines, line_capacity);
+        }
+
         if (length >= capacity) {
             capacity *= 2;
             line = realloc(line, capacity);
@@ -68,6 +77,12 @@ void load_file(const char *path) {
         editor.tab_indent = false;
         editor.indent_size = DEFAULT_INDENT_SIZE;
     }
+
+    for (int i = 0; i < line_count; i++) {
+        printf("%s", editor.lines[i]);
+    }
+
+    exit(0);
 
     editor.total_lines = line_count;
 }

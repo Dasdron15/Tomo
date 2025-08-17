@@ -79,6 +79,7 @@ bool is_saved(void) {
     for (int i = 0; i < editor.total_lines; i++) {
         strcat(unsaved, editor.lines[i]);
 
+        // Adds /n to every line except the last one
         if (i + 1 < editor.total_lines) {
             strcat(unsaved, "\n");
         }

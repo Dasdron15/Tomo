@@ -8,7 +8,7 @@
 #define MAX_LINE_LENGTH 1024
 
 typedef struct {
-    char *lines[MAX_LINES * MAX_LINE_LENGTH]; // MAX_LINES * MAX_LINE_LENGTH
+    char **lines;
     int total_lines;
     int margin;
     int indent_size;
