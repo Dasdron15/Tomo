@@ -116,7 +116,7 @@ char *draw_theme_palette(void) {
         while ((dir = readdir(d)) != NULL) {
             if (dir->d_type == DT_REG) {
                 char full_path[PATH_MAX];
-                sprintf(full_path, "%s/%s", path, dir->d_name);
+                snprintf(full_path, PATH_MAX, "%s/%s", path, dir->d_name);
 
                 themes = realloc(themes, sizeof(char*) * (n_themes + 1));
                 themes[n_themes] = strdup(full_path);

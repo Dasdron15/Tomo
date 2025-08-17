@@ -154,7 +154,7 @@ size_t goto_line(void) {
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 
-    mvprintw(screen_height - 1, 0, prompt);
+    mvprintw(screen_height - 1, 0, "%s", prompt);
 
     curs_set(1);
 

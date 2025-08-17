@@ -93,7 +93,13 @@ char *file_to_string(const char *filename) {
         return NULL;
     }
 
-    fread(buffer, 1, size, fp);
+    size_t bytes_read = fread(buffer, 1, size, fp);
+    if (bytes_read != size) {
+        free(buffer);
+        fclose(fp);
+        return NULL;
+    }
+
     fclose(fp);
     buffer[size] = '\0';
     return buffer;
