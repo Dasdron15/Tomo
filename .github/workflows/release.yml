@@ -34,13 +34,13 @@ jobs:
             brew install ${{ matrix.deps }}
           fi
 
-      - name: Build and Install
-        run: |
-          make
+      - name: Build
+        run: make
 
-      - name: Package
+      - name: Package Binary
         run: |
-          tar czf ${{ matrix.artifact_name }}.tar.gz /usr/local/bin/tomo
+          chmod +x tomo
+          tar czf ${{ matrix.artifact_name }}.tar.gz tomo
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
@@ -48,4 +48,3 @@ jobs:
           files: ${{ matrix.artifact_name }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
