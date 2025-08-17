@@ -1,1 +1,51 @@
-# Too lazy to implement it right now
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: tomo-linux
+            deps: libncurses5-dev
+          - os: macos-latest
+            artifact_name: tomo-macos
+            deps: ncurses
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            sudo apt-get update
+            sudo apt-get install -y ${{ matrix.deps }}
+          else
+            brew install ${{ matrix.deps }}
+          fi
+
+      - name: Build and Install
+        run: |
+          make
+
+      - name: Package
+        run: |
+          tar czf ${{ matrix.artifact_name }}.tar.gz /usr/local/bin/tomo
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.artifact_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
