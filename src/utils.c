@@ -83,6 +83,7 @@ char **split(char *str, char delim) {
 char *file_to_string(const char *filename) {
     FILE *fp = fopen(filename, "rb");
     if (!fp) return NULL;
+    
     fseek(fp, 0, SEEK_END);
     size_t size = ftell(fp);
     rewind(fp);

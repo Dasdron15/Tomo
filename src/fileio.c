@@ -12,35 +12,64 @@
 
 void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
-    char buffer[1024];
-    int i = 0;
-
-    if (fp == NULL) {
-        fprintf(stderr, "Error: File not found\n");
+    if (!fp) {
+        fprintf(stderr, "Error: Can't open file");
         exit(1);
     }
 
+    int line_count = 0;
     bool indent_measured = false;
 
-    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') {
-            buffer[len - 1] = '\0';
+    size_t capacity = 128;
+    size_t length = 0;
+    char *line = malloc(capacity);
+
+    if (!line) {
+        fclose(fp);
+        fprintf(stderr, "Error: memory not allocated");
+        exit(1);
+    }
+
+    int ch;
+    while ((ch = fgetc(fp)) != EOF) {
+        if (length >= capacity) {
+            capacity *= 2;
+            line = realloc(line, capacity);
         }
 
-        editor.lines[i++] = strdup(buffer);
-        if (!indent_measured) {
-            init_indent(buffer, &indent_measured);
+        if (ch == '\n') {
+            line[length] = '\0';
+
+            if (!indent_measured) {
+                init_indent(line, &indent_measured);
+            }
+
+            editor.lines[line_count++] = strdup(line);
+            length = 0;
+            continue;
         }
+
+        line[length++] = (char)ch;
     }
+
+    if (length > 0) {
+        line[length] = '\0';
+        editor.lines[line_count++] = strdup(line);
+    }
+
+    if (ch == EOF && length == 0) {
+        editor.lines[line_count++] = strdup("");
+    }
+
+    free(line);
+    fclose(fp);
 
     if (!indent_measured) {
         editor.tab_indent = false;
         editor.indent_size = DEFAULT_INDENT_SIZE;
     }
-    
-    fclose(fp);
-    editor.total_lines = i;
+
+    editor.total_lines = line_count;
 }
 
 bool save_file(void) {
@@ -54,14 +83,14 @@ bool save_file(void) {
         endwin();
         reset();
         fprintf(stderr, "Error: file was not found");
-        exit(0);
+        exit(1);
     }
 
-    for (int i = 0; i < editor.total_lines && editor.lines[i] != NULL; i++) {
+    for (int i = 0; i < editor.total_lines && editor.lines[i]; i++) {
         if (i != editor.total_lines - 1) {
             fprintf(fp, "%s\n", editor.lines[i]);
         } else {
-            fprintf(fp, "%s\n", editor.lines[i]);
+            fprintf(fp, "%s", editor.lines[i]);
         }
     }
     fclose(fp);

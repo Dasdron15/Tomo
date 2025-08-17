@@ -6,6 +6,7 @@
 
 #include "draw.h"
 #include "fileio.h"
+#include "utils.h"
 
 EditorState editor;
 
@@ -66,59 +67,35 @@ void ask_for_save(void) {
 }
 
 bool is_saved(void) {
-    // Extract code from the opened file
-    
-    FILE *fp = fopen(editor.filename, "r");
-    if (!fp) {
-        endwin();
-        reset();
-        fprintf(stderr, "Error: Cannot open file\n");
-        exit(1);
+    int unsaved_len = 1;
+    for (int i = 0; i < editor.total_lines; i++) {
+        unsaved_len += strlen(editor.lines[i]) + 1;
     }
 
-    fseek(fp, 0, SEEK_END);
-    long length = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    char *unsaved = malloc(unsaved_len);
+    if (!unsaved) return false;
+    unsaved[0] = '\0';
 
-    char *saved_code = malloc(length + 1);
-    if (!saved_code) {
-        fclose(fp);
-        endwin();
-        reset();
-        fprintf(stderr, "Error: Memory not allocated\n");
-        exit(0);
-    }
+    for (int i = 0; i < editor.total_lines; i++) {
+        strcat(unsaved, editor.lines[i]);
 
-    fread(saved_code, 1, length, fp);
-    saved_code[length] = '\0';
-
-    // Unsaved code
-    size_t total_len = 0;
-    for (size_t i = 0; i < editor.total_lines; i++) {
-        total_len += strlen(editor.lines[i]) + 1;
-    }
-
-    char *unsaved_code = malloc(total_len + 1);
-    if (!unsaved_code) {
-        endwin();
-        reset();
-        fprintf(stderr, "Error: Memory not allocated\n");
-        exit(0);
-    }
-
-    unsaved_code[0] = '\0';
-    for (size_t i = 0; i < editor.total_lines; i++) {
-        strcat(unsaved_code, editor.lines[i]);
-        if (editor.total_lines > 1) {
-            strcat(unsaved_code, "\n");
+        if (i + 1 < editor.total_lines) {
+            strcat(unsaved, "\n");
         }
     }
 
-    if (strcmp(saved_code, unsaved_code) == 0) {
-        return true;
+    char *saved = file_to_string(editor.filename);
+    if (!saved) {
+        free(unsaved);
+        return false;
     }
 
-    return false;
+    bool is_equal = (strcmp(unsaved, saved) == 0);
+
+    free(unsaved);
+    free(saved);
+
+    return is_equal;
 }
 
 void exit_editor(void) {
