@@ -16,13 +16,12 @@ void load_file(const char *path) {
         fprintf(stderr, "Error: Can't open file");
         exit(1);
     }
-
-
+    
     bool indent_measured = false;
 
     size_t line_capacity = 128;
     int line_count = 0;
-    editor.lines = malloc(line_capacity);
+    editor.lines = malloc(sizeof(char*) * line_capacity);
 
     size_t capacity = 128;
     size_t length = 0;
@@ -38,7 +37,7 @@ void load_file(const char *path) {
     while ((ch = fgetc(fp)) != EOF) {
         if (line_count >= line_capacity) {
             line_capacity *= 2;
-            editor.lines = realloc(editor.lines, line_capacity);
+            editor.lines = realloc(editor.lines, sizeof(char*) * line_capacity);
         }
 
         if (length >= capacity) {
@@ -66,6 +65,7 @@ void load_file(const char *path) {
         editor.lines[line_count++] = strdup(line);
     }
 
+    // Handle empty last line
     if (ch == EOF && length == 0) {
         editor.lines[line_count++] = strdup("");
     }
@@ -77,12 +77,6 @@ void load_file(const char *path) {
         editor.tab_indent = false;
         editor.indent_size = DEFAULT_INDENT_SIZE;
     }
-
-    for (int i = 0; i < line_count; i++) {
-        printf("%s", editor.lines[i]);
-    }
-
-    exit(0);
 
     editor.total_lines = line_count;
 }
