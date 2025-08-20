@@ -11,6 +11,7 @@
 #include "fileio.h"
 #include "command_palette.h"
 #include "themes.h"
+#include "undo.h"
 
 void handle_key(int key) {
     editor.bottom_text = "";
@@ -99,6 +100,9 @@ void handle_key(int key) {
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
     }
 
+    if (key == 26) {
+        undo();
+    }
 
     if (key == 27) { // Esc
         cancel_selection();
