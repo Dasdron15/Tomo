@@ -13,6 +13,8 @@
 #include "themes.h"
 #include "undo.h"
 
+static bool was_previously_deleted = false;
+
 void handle_key(int key) {
     editor.bottom_text = "";
     
@@ -161,7 +163,9 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
-        take_snapshot();
+        take_snapshot(was_previously_deleted);
+
+        was_previously_deleted = true;
 
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);

@@ -8,25 +8,36 @@
 #include "select.h"
 #include "cursor.h"
 
-void take_snapshot(void) {
-    Snapshot snap;
+#define UNDO_DEPTH 16
+
+static struct Snapshot {
+    char **lines;
+    Point cursor_pos;
+    Point selection_start;
+    Point selection_end;
+} Snapshot;
+
+static struct Snapshot undo_buffer[UNDO_DEPTH];
+
+void take_snapshot(bool was_previously_deleted) {
+    struct Snapshot snapshot;
     
-    snap.lines = malloc(sizeof(char*) * editor.total_lines);
+    snapshot.lines = malloc(sizeof(char*) * editor.total_lines);
     
     for (int i = 0; i < editor.total_lines; i++) {
-        snap.lines[i] = malloc(strlen(editor.lines[i]) + 1);
-        strcpy(snap.lines[i], editor.lines[i]);
+        snapshot.lines[i] = malloc(strlen(editor.lines[i]) + 1);
+        strcpy(snapshot.lines[i], editor.lines[i]);
     }
 
     if (is_selecting()) {
-        snap.selection_start = get_start();
-        snap.selection_end = get_end();
+        snapshot.selection_start = get_start();
+        snapshot.selection_end = get_end();
     }
 
-    snap.cursor_pos.x = cursor.x;
-    snap.cursor_pos.y = cursor.y;
+    snapshot.cursor_pos.x = cursor.x;
+    snapshot.cursor_pos.y = cursor.y;
 
-    undo_buffer[0] = snap;
+    undo_buffer[0] = snapshot;
 }
 
 void undo(void) {
@@ -40,6 +51,6 @@ void undo(void) {
         selection_end = undo_buffer[0].selection_end;
     }
 
-    cursor.x = undo_buffer[0].cursor_pos.x;
-    cursor.y = undo_buffer[0].cursor_pos.y;
+    cursor.x = undo_buffer[0].cursor_pos.x - cursor.x_offset;
+    cursor.y = undo_buffer[0].cursor_pos.y - cursor.y_offset;
 }

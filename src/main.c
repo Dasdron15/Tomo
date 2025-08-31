@@ -10,7 +10,6 @@
 #include "init.h"
 #include "syntax.h"
 #include "themes.h"
-#include "undo.h"
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -25,8 +24,6 @@ int main(int argc, char *argv[]) {
     init_editor();
     init_colors();
     syntax_init();
-
-    take_snapshot();
 
     while (1) {
         syntax_reparse();
