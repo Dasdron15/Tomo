@@ -11,5 +11,6 @@ bool is_selected(int file_y, int file_x);
 bool is_selecting(void);
 void cancel_selection(void);
 Point get_start(void);
+Point get_end(void);
 
 #endif

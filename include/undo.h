@@ -8,12 +8,12 @@
 
 typedef struct Snapshot {
     char **lines;
-    bool was_selected;
+    Point cursor_pos;
     Point selection_start;
     Point selection_end;
 } Snapshot;
 
-Snapshot shapshots[UNDO_DEPTH];
+Snapshot undo_buffer[UNDO_DEPTH];
 
 void take_snapshot(void);
 void undo(void);

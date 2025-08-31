@@ -89,3 +89,7 @@ void cancel_selection(void) {
 Point get_start(void) {
     return selection_start;
 }
+
+Point get_end(void) {
+    return selection_end;
+}

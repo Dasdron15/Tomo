@@ -100,7 +100,7 @@ void handle_key(int key) {
         update_selection(cursor.y + cursor.y_offset, cursor.x - editor.margin + cursor.x_offset);
     }
 
-    if (key == 26) {
+    if (key == 26) { // CTRL + Z (Undo)
         undo();
     }
 
@@ -163,6 +163,7 @@ void handle_key(int key) {
 
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);
+        take_snapshot();
     }
 
     if (key == KEY_ENTER || key == 10) {
@@ -246,4 +247,3 @@ void handle_key(int key) {
         editor.bottom_text = "Clipboard pasted";
     }
 }
-

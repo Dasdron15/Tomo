@@ -1,9 +1,34 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <curses.h>
+
 #include "undo.h"
+#include "editor.h"
+#include "select.h"
+#include "cursor.h"
 
 void take_snapshot(void) {
+    Snapshot snap;
+    
+    snap.lines = malloc(sizeof(char*) * editor.total_lines);
+    
+    for (int i = 0; i < editor.total_lines; i++) {
+        snap.lines[i] = malloc(strlen(editor.lines[i]) + 1);
+        strcpy(snap.lines[i], editor.lines[i]);
+    }
 
+    if (is_selecting()) {
+        snap.selection_start = get_start();
+        snap.selection_end = get_end();
+    }
+
+    snap.cursor_pos.x = cursor.x;
+    snap.cursor_pos.y = cursor.y;
+
+    undo_buffer[0] = snap;
 }
 
 void undo(void) {
-    
+
 }
