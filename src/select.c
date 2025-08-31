@@ -3,8 +3,6 @@
 #include "cursor.h"
 #include "editor.h"
 
-static Point selection_start;
-static Point selection_end;
 static bool selecting = false;
 
 void start_selection(int y, int x) {

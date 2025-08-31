@@ -161,9 +161,10 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
+        take_snapshot();
+
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);
-        take_snapshot();
     }
 
     if (key == KEY_ENTER || key == 10) {

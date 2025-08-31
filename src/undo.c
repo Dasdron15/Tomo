@@ -30,5 +30,16 @@ void take_snapshot(void) {
 }
 
 void undo(void) {
+    for (int i = 0; i < editor.total_lines; i++) {
+        editor.lines[i] = realloc(editor.lines[i], strlen(undo_buffer[0].lines[i]) + 1);
+        editor.lines[i] = undo_buffer[0].lines[i];
+    }
 
+    if (is_selecting()) {
+        selection_start = undo_buffer[0].selection_start;
+        selection_end = undo_buffer[0].selection_end;
+    }
+
+    cursor.x = undo_buffer[0].cursor_pos.x;
+    cursor.y = undo_buffer[0].cursor_pos.y;
 }

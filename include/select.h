@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include "editor.h"
 
+Point selection_start;
+Point selection_end;
+
 void start_selection(int y, int x);
 void update_selection(int y, int x);
 void get_selection_bounds(Point* start, Point* end);
