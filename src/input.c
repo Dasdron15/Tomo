@@ -13,7 +13,7 @@
 #include "themes.h"
 #include "undo.h"
 
-static bool was_previously_deleted = false;
+static bool merge_with_previous = false;
 
 void handle_key(int key) {
     editor.bottom_text = "";
@@ -142,6 +142,8 @@ void handle_key(int key) {
     }
 
     if ((key >= 32 && key <= 126)) {
+        merge_with_previous = false;
+        
         Point start_select;
         Point end_select;
         
@@ -163,9 +165,9 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
-        take_snapshot(was_previously_deleted);
+        take_snapshot(merge_with_previous);
 
-        was_previously_deleted = true;
+        merge_with_previous = true;
 
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);
@@ -218,8 +220,9 @@ void handle_key(int key) {
     if (key == 3 && is_selecting()) { // CTRL + C (Copy)
         Point start_select;
         Point end_select;
-        
+
         get_selection_bounds(&start_select, &end_select);
+        take_snapshot(false);
         copy_text(start_select, end_select);
 
         editor.bottom_text = "Selection copied";
@@ -230,7 +233,7 @@ void handle_key(int key) {
         Point end_select;
         
         get_selection_bounds(&start_select, &end_select);        
-        
+        take_snapshot(false);
         copy_text(start_select, end_select);
         deletion(start_select, end_select);
 
@@ -247,6 +250,8 @@ void handle_key(int key) {
             cancel_selection();
         }
         
+        take_snapshot(false);
+
         paste_text();
 
         editor.bottom_text = "Clipboard pasted";

@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-void take_snapshot(bool was_previously_deleted);
+void take_snapshot(bool merge_with_previous);
 void undo(void);
 
 #endif

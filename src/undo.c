@@ -19,7 +19,11 @@ static struct Snapshot {
 
 static struct Snapshot undo_buffer[UNDO_DEPTH];
 
-void take_snapshot(bool was_previously_deleted) {
+/*
+take_snapshot function copies the whole file into Snapshot buffer and puts
+the struct to the first position of undo_buffer
+*/
+void take_snapshot(bool merge_with_previous) {
     struct Snapshot snapshot;
     
     snapshot.lines = malloc(sizeof(char*) * editor.total_lines);
@@ -37,7 +41,9 @@ void take_snapshot(bool was_previously_deleted) {
     snapshot.cursor_pos.x = cursor.x;
     snapshot.cursor_pos.y = cursor.y;
 
-    undo_buffer[0] = snapshot;
+    if (!merge_with_previous) {
+        undo_buffer[0] = snapshot;
+    }
 }
 
 void undo(void) {
@@ -51,6 +57,6 @@ void undo(void) {
         selection_end = undo_buffer[0].selection_end;
     }
 
-    cursor.x = undo_buffer[0].cursor_pos.x - cursor.x_offset;
-    cursor.y = undo_buffer[0].cursor_pos.y - cursor.y_offset;
+    cursor.x = undo_buffer[0].cursor_pos.x;
+    cursor.y = undo_buffer[0].cursor_pos.y;
 }
