@@ -1,62 +1,107 @@
+#include <curses.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <curses.h>
 
-#include "undo.h"
+#include "cursor.h"
 #include "editor.h"
 #include "select.h"
-#include "cursor.h"
+#include "undo.h"
 
-#define UNDO_DEPTH 16
+#define UNDO_DEPTH 64
 
-static struct Snapshot {
+typedef struct {
     char **lines;
     Point cursor_pos;
     Point selection_start;
     Point selection_end;
 } Snapshot;
 
-static struct Snapshot undo_buffer[UNDO_DEPTH];
+typedef struct {
+    Snapshot *items;
+    int top;
+    int capacity;
+} SnapshotStack;
 
-/*
-take_snapshot function copies the whole file into Snapshot buffer and puts
-the struct to the first position of undo_buffer
-*/
-void take_snapshot(bool merge_with_previous) {
-    struct Snapshot snapshot;
-    
-    snapshot.lines = malloc(sizeof(char*) * editor.total_lines);
-    
-    for (int i = 0; i < editor.total_lines; i++) {
-        snapshot.lines[i] = malloc(strlen(editor.lines[i]) + 1);
-        strcpy(snapshot.lines[i], editor.lines[i]);
-    }
+/**
+ * Creates a new snapshot of the current editor state:
+ * Cursor position, text lines, etc.
+ */
+Snapshot create_snapshot() {
+    Snapshot copy;
+    copy.cursor_pos = (Point){cursor.y, cursor.x};
+    copy.selection_start = (Point){-1, -1};
+    copy.selection_end = (Point){-1, -1};
 
     if (is_selecting()) {
-        snapshot.selection_start = get_start();
-        snapshot.selection_end = get_end();
+        copy.selection_start = get_selection_start();
+        copy.selection_end = get_selection_end();
     }
 
-    snapshot.cursor_pos.x = cursor.x;
-    snapshot.cursor_pos.y = cursor.y;
+    copy.lines = malloc(sizeof(char *) * editor.total_lines);
 
-    if (!merge_with_previous) {
-        undo_buffer[0] = snapshot;
+    return copy;
+}
+
+/**
+ * Initializes an empty snapshot stack with given capacity.
+ */
+SnapshotStack *create_stack(int capacity) {
+    SnapshotStack *stack = malloc(sizeof(SnapshotStack));
+    stack->items = malloc(sizeof(Snapshot) * capacity);
+    stack->top = -1;
+    stack->capacity = capacity;
+    return stack;
+}
+
+/* is_empty checks if provided stack is empty */
+bool is_empty(SnapshotStack *stack) {
+    return stack->top == -1; 
+}
+
+/* is_full checks if provided stack is full */
+bool is_full(SnapshotStack *stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+/* push function pushes the probided value to the top of the stack */
+void push(SnapshotStack *stack, Snapshot value) {
+    // Check if there is not enough space in the stack
+    if (is_full(stack)) {
+        stack->capacity *= 2;
+        stack->items = realloc(stack->items, sizeof(Snapshot) * stack->capacity);
     }
+    stack->items[++stack->top] = value;
+}
+
+/* Delete the last element in the stack */
+Snapshot pop(SnapshotStack *stack) {
+    // Throw an error if the stack is empty
+    if (is_empty(stack)) {
+        endwin();
+        reset();
+        fprintf(stderr, "Stack is empty\n");
+        exit(1);
+    }
+    return stack->items[stack->top--];
+}
+
+/* Returns the top value of the stack */
+Snapshot peek(SnapshotStack *stack) {
+    // Throw an error if the stack is empty
+    if (is_empty(stack)) {
+        endwin();
+        reset();
+        fprintf(stderr, "Stack is empty\n");
+        exit(1);
+    }
+    return stack->items[stack->top];
+}
+
+void take_snapshot(bool merge_with_previous) {
+
 }
 
 void undo(void) {
-    for (int i = 0; i < editor.total_lines; i++) {
-        editor.lines[i] = realloc(editor.lines[i], strlen(undo_buffer[0].lines[i]) + 1);
-        editor.lines[i] = strdup(undo_buffer[0].lines[i]);
-    }
 
-    if (is_selecting()) {
-        selection_start = undo_buffer[0].selection_start;
-        selection_end = undo_buffer[0].selection_end;
-    }
-
-    cursor.x = undo_buffer[0].cursor_pos.x;
-    cursor.y = undo_buffer[0].cursor_pos.y;
 }
