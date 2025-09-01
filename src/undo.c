@@ -49,7 +49,7 @@ void take_snapshot(bool merge_with_previous) {
 void undo(void) {
     for (int i = 0; i < editor.total_lines; i++) {
         editor.lines[i] = realloc(editor.lines[i], strlen(undo_buffer[0].lines[i]) + 1);
-        editor.lines[i] = undo_buffer[0].lines[i];
+        editor.lines[i] = strdup(undo_buffer[0].lines[i]);
     }
 
     if (is_selecting()) {
