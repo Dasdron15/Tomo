@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-void take_snapshot(bool merge_with_previous);
+void init_undo_stack(void);
+void take_snapshot(void);
 void undo(void);
 
 #endif
