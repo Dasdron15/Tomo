@@ -100,12 +100,21 @@ void init_undo_stack(void) {
     create_stack(&undo_stack, UNDO_DEPTH);
 }
 
+/*
+ * Create a new Snapshot object with current editor state
+ * and push newly created object to the top of the stack
+ */
 void take_snapshot(void) {
     Snapshot snapshot = create_snapshot();
-
     push(&undo_stack, snapshot);
 }
 
+/*
+ * Check if the undo stack is empty if not then 
+ * take the top object from undo stack and assign
+ * all the values from the object to the current editor state
+ * and remove the top object from the stack
+ */
 void undo(void) {
     if (!is_empty(&undo_stack)) {
         Snapshot top_snapshot = peek(&undo_stack);
