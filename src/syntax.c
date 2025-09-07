@@ -27,7 +27,7 @@ static const char *file_ext = NULL;
 static const TSLanguage *get_language(const char *file_ext) {
     if (!file_ext) return NULL;
 
-    if (strcmp(file_ext, ".c") == 0) {
+    if (strcmp(file_ext, ".c") == 0 || strcmp(file_ext, ".h") == 0) {
         return tree_sitter_c();
     } else if (strcmp(file_ext, ".py") == 0) {
         return tree_sitter_python();
@@ -168,7 +168,7 @@ static int color_for_node_type_ini(const char *type) {
 static int color_for_node_type_lang(const char *type) {
     if (!file_ext) return PAIR_DEFAULT;
 
-    if (strcmp(file_ext, ".c") == 0 || strcmp(file_ext, ".cpp") == 0) {
+    if (strcmp(file_ext, ".c") == 0 || strcmp(file_ext, ".cpp") == 0 || strcmp(file_ext, ".h") == 0) {
         return color_for_node_type_c(type);
     } else if (strcmp(file_ext, ".py") == 0) {
         return color_for_node_type_py(type);
@@ -197,7 +197,7 @@ int get_color_for_pos(int line, int col) {
         if (!ts_node_is_null(parent)) {
             const char *parent_type = ts_node_type(parent);
 
-            if (strcmp(file_ext, ".c") == 0 || strcmp(file_ext, ".cpp") == 0) {
+            if (strcmp(file_ext, ".c") == 0 || strcmp(file_ext, ".cpp") == 0 || strcmp(file_ext, ".h") == 0) {
                 if (strcmp(parent_type, "function_declarator") == 0 ||
                     strcmp(parent_type, "call_expression") == 0) {
                     return PAIR_FUNCTION;

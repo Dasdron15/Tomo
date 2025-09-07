@@ -22,14 +22,18 @@ void load_file(const char *path) {
     size_t line_capacity = 128;
     int line_count = 0;
     editor.lines = malloc(sizeof(char*) * line_capacity);
+    if (!editor.lines) {
+        fclose(fp);
+        fprintf(stderr, "Error: memory allocation failed");
+        exit(1);
+    }
 
     size_t capacity = 128;
     size_t length = 0;
     char *line = malloc(capacity);
-
     if (!line) {
         fclose(fp);
-        fprintf(stderr, "Error: memory not allocated");
+        fprintf(stderr, "Error: memory allocation failed");
         exit(1);
     }
 
