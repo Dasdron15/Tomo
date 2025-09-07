@@ -102,6 +102,7 @@ void handle_key(int key) {
 
     if (key == 26) { // CTRL + Z (Undo)
         undo();
+        clamp_cursor();
     }
 
     if (key == 27) { // Esc

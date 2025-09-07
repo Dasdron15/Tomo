@@ -14,6 +14,7 @@ typedef struct {
     char **lines;
     int total_lines;
     Point cursor_pos;
+    Point offset;
     Point selection_start;
     Point selection_end;
 } Snapshot;
@@ -33,6 +34,7 @@ SnapshotStack undo_stack;
 Snapshot create_snapshot(void) {
     Snapshot copy;
     copy.cursor_pos = (Point){cursor.y, cursor.x};
+    copy.offset = (Point){cursor.y_offset, cursor.x_offset};
     copy.selection_start = (Point){-1, -1};
     copy.selection_end = (Point){-1, -1};
 
@@ -108,8 +110,8 @@ void undo(void) {
     if (!is_empty(&undo_stack)) {
         Snapshot top_snapshot = peek(&undo_stack);
 
-        cursor.x = top_snapshot.cursor_pos.x;
-        cursor.y = top_snapshot.cursor_pos.y;
+        cursor.x = top_snapshot.cursor_pos.x - (cursor.x_offset - top_snapshot.offset.x);
+        cursor.y = top_snapshot.cursor_pos.y - (cursor.y_offset - top_snapshot.offset.y);
 
         if (is_selecting()) {
             
