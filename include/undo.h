@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 void init_undo_stack(void);
-void take_snapshot(void);
+void take_snapshot(bool take_snapshot);
 void undo(void);
 
 #endif
