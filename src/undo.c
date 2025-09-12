@@ -104,8 +104,8 @@ void init_undo_stack(void) {
  * Create a new Snapshot object with current editor state
  * and push newly created object to the top of the stack
  */
-void take_snapshot(bool take_snapshot) {
-    if (take_snapshot) {    
+void take_snapshot(bool need_save) {
+    if (need_save) {    
         Snapshot snapshot = create_snapshot();
         push(&undo_stack, snapshot);
     }

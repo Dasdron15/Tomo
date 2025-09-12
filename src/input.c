@@ -13,29 +13,29 @@
 #include "themes.h"
 #include "undo.h"
 
-static bool will_take_snapshot = true;
+static bool save_undo_snapshot = true;
 
 void handle_key(int key) {
     editor.bottom_text = "";
 
     if (key == KEY_UP) {
         move_up(false);
-        will_take_snapshot = true;
+        save_undo_snapshot = true;
     }
 
     if (key == KEY_DOWN) {
         move_down(false);
-        will_take_snapshot = true;
+        save_undo_snapshot = true;
     }
 
     if (key == KEY_RIGHT) {
         move_right(false);
-        will_take_snapshot = true;
+        save_undo_snapshot = true;
     }
 
     if (key == KEY_LEFT) {
         move_left(false);
-        will_take_snapshot = true;
+        save_undo_snapshot = true;
     }
 
     if (key == 402) { // Shift + RIGHT_ARROW (Right arrow selection)
@@ -163,8 +163,8 @@ void handle_key(int key) {
             cancel_selection();
         }
 
-        take_snapshot(will_take_snapshot);
-        will_take_snapshot = false;
+        take_snapshot(save_undo_snapshot);
+        save_undo_snapshot = false;
 
         insert_char((char)key);
     }
@@ -178,8 +178,8 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
-        take_snapshot(will_take_snapshot);
-        will_take_snapshot = false;
+        take_snapshot(save_undo_snapshot);
+        save_undo_snapshot = false;
 
         get_selection_bounds(&start_select, &end_select);
         deletion(start_select, end_select);
