@@ -126,13 +126,17 @@ void undo(void) {
     if (!is_empty(&undo_stack)) {
         Snapshot top_snapshot = peek(&undo_stack);
 
+        for (int i = 0; i < editor.total_lines; i++) {
+            free(editor.lines[i]);
+        }
+
         cursor.x = top_snapshot.cursor_pos.x - (cursor.x_offset - top_snapshot.offset.x);
         cursor.y = top_snapshot.cursor_pos.y - (cursor.y_offset - top_snapshot.offset.y);
         if (top_snapshot.is_selecting) {
             set_selection(top_snapshot.selection_start, top_snapshot.selection_end);
         }
 
-        editor.lines = realloc(editor.lines, sizeof(char**) * top_snapshot.total_lines);
+        editor.lines = realloc(editor.lines, sizeof(char*) * top_snapshot.total_lines);
         for (int i = 0; i < top_snapshot.total_lines; i++) {
             editor.lines[i] = strdup(top_snapshot.lines[i]);
         }
