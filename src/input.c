@@ -154,6 +154,10 @@ void handle_key(int key) {
     }
 
     if (key >= 32 && key <= 126 && !is_selecting()) { // ASCII symbols
+        if (key == ' ') {
+            save_undo_snapshot = true;
+        }
+
         take_snapshot(save_undo_snapshot);
         save_undo_snapshot = false;
 
