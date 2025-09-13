@@ -52,6 +52,7 @@ Snapshot create_snapshot(void) {
     }
 
     copy.total_lines = editor.total_lines;
+
     return copy;
 }
 
@@ -131,9 +132,13 @@ void undo(void) {
             set_selection(top_snapshot.selection_start, top_snapshot.selection_end);
         }
 
+        editor.lines = realloc(editor.lines, sizeof(char**) * top_snapshot.total_lines);
+
         for (int i = 0; i < top_snapshot.total_lines; i++) {
             editor.lines[i] = strdup(top_snapshot.lines[i]);
         }
+
+        editor.total_lines = top_snapshot.total_lines;
         pop(&undo_stack);
     }
 }
