@@ -170,6 +170,7 @@ void handle_key(int key) {
     }
 
     if (key == '\t') {
+        take_snapshot(true);
         add_tab();
         cursor.max_x = cursor.x + cursor.x_offset;
     }
