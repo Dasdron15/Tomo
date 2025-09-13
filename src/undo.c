@@ -15,6 +15,7 @@ typedef struct {
     int total_lines;
     Point cursor_pos;
     Point offset;
+    bool is_selecting;
     Point selection_start;
     Point selection_end;
 } Snapshot;
@@ -37,6 +38,8 @@ Snapshot create_snapshot(void) {
     copy.offset = (Point){cursor.y_offset, cursor.x_offset};
     copy.selection_start = (Point){-1, -1};
     copy.selection_end = (Point){-1, -1};
+
+    copy.is_selecting = is_selecting();
 
     if (is_selecting()) {
         copy.selection_start = get_selection_start();
@@ -124,8 +127,8 @@ void undo(void) {
         cursor.x = top_snapshot.cursor_pos.x - (cursor.x_offset - top_snapshot.offset.x);
         cursor.y = top_snapshot.cursor_pos.y - (cursor.y_offset - top_snapshot.offset.y);
 
-        if (is_selecting()) {
-            
+        if (top_snapshot.is_selecting) {
+            set_selection(top_snapshot.selection_start, top_snapshot.selection_end);
         }
 
         for (int i = 0; i < top_snapshot.total_lines; i++) {

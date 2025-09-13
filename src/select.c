@@ -85,6 +85,12 @@ void cancel_selection(void) {
     selecting = false;
 }
 
+void set_selection(Point start, Point end) {
+    selection_start = start;
+    selection_end = end;
+    selecting = true;
+}
+
 Point get_selection_start(void) {
     return selection_start;
 }

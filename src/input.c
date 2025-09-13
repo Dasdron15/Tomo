@@ -153,7 +153,7 @@ void handle_key(int key) {
         exit_editor();
     }
 
-    if ((key >= 32 && key <= 126)) {
+    if ((key >= 32 && key <= 126)) { // ASCII symbols
         Point start_select;
         Point end_select;
 
@@ -178,14 +178,13 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
-        take_snapshot(save_undo_snapshot);
-        save_undo_snapshot = false;
-
         get_selection_bounds(&start_select, &end_select);
+
         deletion(start_select, end_select);
     }
 
     if (key == KEY_ENTER || key == 10) {
+        take_snapshot(true);
         new_line();
     }
 

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "clip.h"
+#include "undo.h"
 #include "utils.h"
 #include "cursor.h"
 #include "editor.h"
@@ -127,6 +128,7 @@ void deletion(Point start, Point end) {
     normalize_range(&start, &end);
 
     if (is_selecting()) {
+        take_snapshot(true);
         delete_range(start, end);
     } else if (is_at_line_start() && cursor.y > 0) {
         size_t prev_len = strlen(editor.lines[start.y - 1]);
