@@ -253,10 +253,11 @@ void handle_key(int key) {
         Point start_select;
         Point end_select;
 
+        take_snapshot(true);
         if (is_selecting()) {
-        get_selection_bounds(&start_select, &end_select);
-        deletion(start_select, end_select);
-        cancel_selection();
+            get_selection_bounds(&start_select, &end_select);
+            deletion(start_select, end_select);
+            cancel_selection();
         }
 
         paste_text();

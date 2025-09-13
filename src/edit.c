@@ -126,7 +126,6 @@ void deletion(Point start, Point end) {
     if (start.y >= editor.total_lines || end.y >= editor.total_lines) return;
 
     normalize_range(&start, &end);
-
     if (is_selecting()) {
         take_snapshot(true);
         delete_range(start, end);
