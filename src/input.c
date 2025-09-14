@@ -45,6 +45,7 @@ void handle_key(int key) {
         move_right(true);
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 393) { // Shift + LEFT_ARROW (Left arrow selection)
@@ -53,6 +54,7 @@ void handle_key(int key) {
         move_left(true);
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 337) { // Shift + UP_ARROW (Up arrow selection)
@@ -61,6 +63,7 @@ void handle_key(int key) {
         move_up(true);
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 336) { // Shift + DOWN_ARROW (Down arrow selection)
@@ -69,6 +72,7 @@ void handle_key(int key) {
         move_down(true);
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 555) { // Shift + ctrl + LEFT_ARROW
@@ -78,6 +82,7 @@ void handle_key(int key) {
         cursor.x_offset = 0;
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 570) { // Shift + ctrl + LEFT_ARROW
@@ -88,6 +93,7 @@ void handle_key(int key) {
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 576) { // Shift + ctrl + UP_ARROW
@@ -98,6 +104,7 @@ void handle_key(int key) {
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 535 &&
@@ -113,6 +120,7 @@ void handle_key(int key) {
         clamp_cursor();
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
     }
 
     if (key == 26) { // CTRL + Z (Undo)
