@@ -6,8 +6,10 @@
 #include <string.h>
 #include <curses.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "editor.h"
+#include "file_tree.h"
 #include "init.h"
 
 void load_file(const char *path) {
@@ -20,7 +22,7 @@ void load_file(const char *path) {
     editor.lines = malloc(sizeof(char*) * line_capacity);
     if (!editor.lines) {
         fclose(fp);
-        fprintf(stderr, "Error: memory allocation failed");
+        fprintf(stderr, "Error: memory allocation failed\n");
         exit(1);
     }
 
@@ -29,7 +31,7 @@ void load_file(const char *path) {
     char *line = malloc(capacity);
     if (!line) {
         fclose(fp);
-        fprintf(stderr, "Error: memory allocation failed");
+        fprintf(stderr, "Error: memory allocation failed\n");
         exit(1);
     }
 
@@ -92,7 +94,7 @@ bool save_file(void) {
     if (!fp) {
         endwin();
         reset();
-        fprintf(stderr, "Error: file was not found");
+        fprintf(stderr, "Error: file was not found\n");
         exit(1);
     }
 
@@ -108,6 +110,38 @@ bool save_file(void) {
 }
 
 void open_dir(char *path) {
-    printf("%s was sucessfully opened!\n", path);
+    int capacity = 4;
+    char **elements = malloc(sizeof(char*) * capacity);
+    if (!elements) {
+        fprintf(stderr, "Error: Failed to allocate memory\n");
+        exit(1);
+    }
+
+    struct dirent *de;
+    DIR *dr = opendir(path);
+    if (dr == NULL) {
+        fprintf(stderr, "Cannot open a directory: %s\n", path);
+        exit(1);
+    }
+
+    int i = 0;
+    while ((de = readdir(dr)) != NULL) {
+        if (i >= capacity) {
+            capacity *= 2;
+            elements = realloc(elements, sizeof(char*) * capacity);
+        }
+
+        elements[i] = strdup(de->d_name);
+        i++;
+    }
+
+    draw_tree(elements, i);
+
+    for (int k = 0; k < i; k++) {
+        free(elements[k]);
+    }
+
+    free(elements);
+    closedir(dr);
     exit(0);
 }
