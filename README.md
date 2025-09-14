@@ -15,6 +15,7 @@ Image of Tomo code editor in action:
 - Smart indentation
 - Custom themes
 - Command palette
+- Undo changes
 
 ## Themes
 
