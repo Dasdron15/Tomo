@@ -140,6 +140,9 @@ void handle_key(int key) {
             save_file();
             break;
         case 3:
+            undo();
+            break;
+        case 4:
             exit_editor();
             break;
         }

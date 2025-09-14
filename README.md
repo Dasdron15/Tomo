@@ -66,6 +66,7 @@ select = "#333333"
 - <kbd>Ctrl + C</kbd> - Copy selected text
 - <kbd>Ctrl + V</kbd> - Paste selected text
 - <kbd>Ctrl + X</kbd> - Cut selected text
+- <kbd>Ctrl + Z</kbd> - Undo changes
 - <kbd>Ctrl + G</kbd> - Go to line
 - <kbd>Ctrl + Q</kbd> - Quit the editor
 - <kbd>Ctrl + S</kbd> - Save the file
@@ -95,7 +96,6 @@ Currently, folder/project opening is not supported but planned for future releas
 
 ## Planned features
 
-- Undo/Redo
 - Folder/project support
 - config file support
 - Mouse support
