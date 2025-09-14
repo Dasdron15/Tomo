@@ -14,6 +14,7 @@
 #include "undo.h"
 
 static bool save_undo_snapshot = true;
+static int same_key = 0;
 
 void handle_key(int key) {
     editor.bottom_text = "";
@@ -154,13 +155,15 @@ void handle_key(int key) {
     }
 
     if (key >= 32 && key <= 126 && !is_selecting()) { // ASCII symbols
-        if (key == ' ') {
+        if (same_key >= 32 && same_key <= 126) {
+            save_undo_snapshot = false;
+        } else if (strchr(" (\"'", key) != NULL) {
+            save_undo_snapshot = true;
+        } else {
             save_undo_snapshot = true;
         }
 
         take_snapshot(save_undo_snapshot);
-        save_undo_snapshot = false;
-
         insert_char((char)key);
     }
 
@@ -181,10 +184,18 @@ void handle_key(int key) {
     }
 
     if (key == KEY_BACKSPACE || key == 127) {
+        if (same_key == KEY_BACKSPACE || same_key == 127) {
+            save_undo_snapshot = false;
+        } else {
+            save_undo_snapshot = true;
+        }
+
         Point start_select;
         Point end_select;
 
         get_selection_bounds(&start_select, &end_select);
+
+        take_snapshot(save_undo_snapshot);
 
         deletion(start_select, end_select);
     }
@@ -270,4 +281,6 @@ void handle_key(int key) {
 
         editor.bottom_text = "Clipboard pasted";
     }
+
+    same_key = key;
 }

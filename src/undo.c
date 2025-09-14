@@ -1,4 +1,3 @@
-#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +26,19 @@ typedef struct {
 } SnapshotStack;
 
 SnapshotStack undo_stack;
+
+void free_snapshot(Snapshot *snap) {
+    if (!snap) return;
+    if (snap->lines) {
+        for (int i = 0; i < snap->total_lines; i++) {
+            free(snap->lines[i]);
+        }
+        free(snap->lines);
+        snap->lines = NULL;
+    }
+    snap->total_lines = 0;
+    snap->is_selecting = false;
+}
 
 /*
  * Creates a new snapshot of the current editor state:
@@ -60,7 +72,7 @@ Snapshot create_snapshot(void) {
  * Initializes an empty snapshot stack with given capacity.
  */
 void create_stack(SnapshotStack *stack, int capacity) {
-    stack->items = malloc(sizeof(Snapshot) * capacity);
+    stack->items = calloc(capacity, sizeof(Snapshot));
     stack->top = -1;
     stack->capacity = capacity;
 }
@@ -83,6 +95,12 @@ bool is_full(SnapshotStack *stack) {
  * Pushes a snapshot onto the stack
  */
 void push(SnapshotStack *stack, Snapshot value) {
+    if (is_full(stack)) {
+        free_snapshot(&stack->items[0]);
+
+        memmove(&stack->items[0], &stack->items[1], sizeof(Snapshot) * (stack->capacity - 1));
+        stack->top = stack->capacity - 2;
+    }
     stack->items[++stack->top] = value;
 }
 
@@ -109,10 +127,9 @@ void init_undo_stack(void) {
  * and push newly created object to the top of the stack
  */
 void take_snapshot(bool need_save) {
-    if (need_save) {    
-        Snapshot snapshot = create_snapshot();
-        push(&undo_stack, snapshot);
-    }
+    if (!need_save) return;   
+    Snapshot snapshot = create_snapshot();
+    push(&undo_stack, snapshot);
 }
 
 /*
@@ -123,25 +140,29 @@ void take_snapshot(bool need_save) {
  * from the stack
  */
 void undo(void) {
-    if (!is_empty(&undo_stack)) {
-        Snapshot top_snapshot = peek(&undo_stack);
+    if (is_empty(&undo_stack)) return;
+    
+    Snapshot snap = pop(&undo_stack);
 
+    if (editor.lines) {
         for (int i = 0; i < editor.total_lines; i++) {
             free(editor.lines[i]);
         }
-
-        cursor.x = top_snapshot.cursor_pos.x - (cursor.x_offset - top_snapshot.offset.x);
-        cursor.y = top_snapshot.cursor_pos.y - (cursor.y_offset - top_snapshot.offset.y);
-        if (top_snapshot.is_selecting) {
-            set_selection(top_snapshot.selection_start, top_snapshot.selection_end);
-        }
-
-        editor.lines = realloc(editor.lines, sizeof(char*) * top_snapshot.total_lines);
-        for (int i = 0; i < top_snapshot.total_lines; i++) {
-            editor.lines[i] = strdup(top_snapshot.lines[i]);
-        }
-
-        editor.total_lines = top_snapshot.total_lines;
-        pop(&undo_stack);
+        free(editor.lines);
+        editor.lines = NULL;
     }
+
+    editor.lines = malloc(sizeof(char*) * snap.total_lines);
+    for (int i = 0; i < snap.total_lines; i++) {
+        editor.lines[i] = strdup(snap.lines[i]);
+    }
+    editor.total_lines = snap.total_lines;
+
+    cursor.x = snap.cursor_pos.x - (cursor.x_offset - snap.offset.x);
+    cursor.y = snap.cursor_pos.y - (cursor.y_offset - snap.offset.y);
+    if (snap.is_selecting) {
+        set_selection(snap.selection_start, snap.selection_end);
+    }
+
+    free_snapshot(&snap);
 }
