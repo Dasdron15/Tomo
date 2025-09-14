@@ -12,10 +12,6 @@
 
 void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
-    if (!fp) {
-        fprintf(stderr, "Error: Can't open file");
-        exit(1);
-    }
     
     bool indent_measured = false;
 

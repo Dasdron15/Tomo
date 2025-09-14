@@ -15,14 +15,14 @@
 #include "undo.h"
 
 int main(int argc, char *argv[]) {
-    // Check if an argument is a file
-    struct stat path_stat;
-    stat(argv[1], &path_stat);
-    int type = S_ISREG(path_stat.st_mode);
-
-    if (argc < 2 || type != 1) {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         return 1;
+    }
+
+    FILE *fp = fopen(argv[1], "r");
+    if (!fp) {
+        fp = fopen(argv[1], "w");
     }
 
     char resolved_path[PATH_MAX];
