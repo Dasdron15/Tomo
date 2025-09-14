@@ -8,6 +8,7 @@ build:
 
 install:
 	sudo cmake --install build
+	cp -R themes/. ~/.config/tomo/themes
 
 uninstall:
 	sudo rm -f /usr/local/bin/tomo
