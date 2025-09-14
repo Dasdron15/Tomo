@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <curses.h>
 
@@ -13,7 +15,12 @@
 #include "undo.h"
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    // Check if an argument is a file
+    struct stat path_stat;
+    stat(argv[1], &path_stat);
+    int type = S_ISREG(path_stat.st_mode);
+
+    if (argc < 2 || type != 1) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         return 1;
     }
