@@ -4,6 +4,8 @@
 #include "editor.h"
 
 static bool selecting = false;
+Point selection_start;
+Point selection_end;
 
 void start_selection(int y, int x) {
     if (!selecting) {
