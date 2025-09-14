@@ -106,3 +106,8 @@ bool save_file(void) {
     fclose(fp);
     return true;
 }
+
+void open_dir(char *path) {
+    printf("%s was sucessfully opened!\n", path);
+    exit(0);
+}

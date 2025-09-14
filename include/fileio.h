@@ -5,5 +5,6 @@
 
 void load_file(const char *path);
 bool save_file(void);
+void open_dir(char *path);
 
 #endif

@@ -20,15 +20,22 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    FILE *fp = fopen(argv[1], "r");
-    if (!fp) {
-        fp = fopen(argv[1], "w");
+    struct stat dir_path;
+    stat(argv[1], &dir_path);
+
+    if (S_ISDIR(dir_path.st_mode)) {
+        open_dir(argv[1]);
+    } else {
+        FILE *fp = fopen(argv[1], "r");
+        if (!fp) {
+            fp = fopen(argv[1], "w");
+        }
+
+        char resolved_path[PATH_MAX];
+        editor.filename = realpath(argv[1], resolved_path);
+        load_file(editor.filename);
     }
 
-    char resolved_path[PATH_MAX];
-    editor.filename = realpath(argv[1], resolved_path);
-
-    load_file(editor.filename);
     init_editor();
     init_colors();
     syntax_init();
