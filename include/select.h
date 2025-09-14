@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include "editor.h"
 
-Point selection_start;
-Point selection_end;
+extern Point selection_start;
+extern Point selection_end;
 
 void start_selection(int y, int x);
 void update_selection(int y, int x);
