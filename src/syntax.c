@@ -41,6 +41,10 @@ static const TSLanguage *get_language(const char *file_ext) {
 }
 
 void syntax_init(void) {
+    if (editor.filename == NULL) {
+        return;
+    }
+
     parser = ts_parser_new();
     file_ext = strchr(get_filename(editor.filename), '.');
     ts_parser_set_language(parser, get_language(file_ext));

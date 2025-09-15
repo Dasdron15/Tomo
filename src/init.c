@@ -12,11 +12,6 @@
 void init_editor(void) {
     editor.bottom_text = "";
 
-    if (editor.total_lines == 0) {
-        editor.lines[0] = strdup("");
-        editor.total_lines++;
-    }
-
     editor.margin = int_len(editor.total_lines) + 2;
 
     cursor.x = editor.margin;

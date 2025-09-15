@@ -23,6 +23,11 @@ int main(int argc, char *argv[]) {
     struct stat dir_path;
     stat(argv[1], &dir_path);
 
+    init_editor();
+    init_colors();
+    syntax_init();
+    init_undo_stack();
+
     if (S_ISDIR(dir_path.st_mode)) {
         open_dir(argv[1]);
     } else {
@@ -36,10 +41,7 @@ int main(int argc, char *argv[]) {
         load_file(editor.filename);
     }
 
-    init_editor();
-    init_colors();
-    syntax_init();
-    init_undo_stack();
+
 
     while (1) {
         syntax_reparse();
