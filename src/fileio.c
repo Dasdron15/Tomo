@@ -14,7 +14,13 @@
 
 void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
-    
+    if (!fp) {
+        endwin();
+        reset();
+        fprintf(stderr, "Error: File cannot be opened\n");
+        exit(1);
+    }
+
     bool indent_measured = false;
 
     size_t line_capacity = 128;
@@ -135,7 +141,7 @@ void open_dir(char *path) {
         i++;
     }
 
-    draw_tree(elements, i);
+    draw_tree(elements, i, path);
 
     for (int k = 0; k < i; k++) {
         free(elements[k]);
@@ -143,5 +149,4 @@ void open_dir(char *path) {
 
     free(elements);
     closedir(dr);
-    exit(0);
 }

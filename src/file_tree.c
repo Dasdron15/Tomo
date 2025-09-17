@@ -3,11 +3,14 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
+#include "syntax.h"
 #include "themes.h"
+#include "fileio.h"
 #include "editor.h"
 
-void draw_tree(char **files, int el_num) {
+void draw_tree(char **files, int el_num, char *dir_path) {
     int max_x, max_y;
     getmaxyx(stdscr, max_y, max_x);
 
@@ -18,7 +21,7 @@ void draw_tree(char **files, int el_num) {
 
     int pos = 0;
     int ch = 0;
-    while (ch != 27) {
+    while (ch != '\n') {
         wclear(tree_win);
         for (int i = 0; i < el_num; i++) {
             if (i == pos) {
@@ -46,7 +49,13 @@ void draw_tree(char **files, int el_num) {
     }
 
     delwin(tree_win);
-    reset();
-    endwin();
-    exit(0);
+
+    char path[PATH_MAX];
+    snprintf(path, PATH_MAX, "%s/%s", dir_path, files[pos]);
+    char *real_path = realpath(path, NULL);
+
+    editor.filename = real_path;
+    syntax_init();
+
+    load_file(real_path);
 }

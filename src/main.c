@@ -41,8 +41,6 @@ int main(int argc, char *argv[]) {
         load_file(editor.filename);
     }
 
-
-
     while (1) {
         syntax_reparse();
         draw_editor();
