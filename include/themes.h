@@ -3,6 +3,24 @@
 
 #include <stdbool.h>
 
+/* Colors */
+#define COLOR_DEFAULT 16
+#define COLOR_KEYWORD 17
+#define COLOR_TYPE 18
+#define COLOR_CUSTOM_TYPE 19
+#define COLOR_STRING 20
+#define COLOR_NUM 21
+#define COLOR_CHAR 22
+#define COLOR_IDENTIFIER 23
+#define COLOR_FUNCTION 24
+#define COLOR_PREPROCESSOR 25
+#define COLOR_COMMENT 26
+#define COLOR_UNACTIVE 27
+#define COLOR_STATUS_BAR 28
+#define COLOR_STATUS_TEXT 29
+#define COLOR_BACKGROUND 30
+#define COLOR_SELECT 31
+
 /* Default color pairs */
 #define PAIR_DEFAULT 0
 #define PAIR_KEYWORD 1

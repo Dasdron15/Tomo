@@ -14,30 +14,7 @@
 #include "editor.h"
 #include "tree_sitter/api.h"
 
-#define NUM_COLORS 21
-
 extern const TSLanguage *tree_sitter_ini();
-
-enum {
-    COLOR_DEFAULT,
-    COLOR_KEYWORD,
-    COLOR_TYPE,
-    COLOR_CUSTOM_TYPE,
-    COLOR_STRING,
-    COLOR_NUM,
-    COLOR_CHAR,
-    COLOR_IDENTIFIER,
-    COLOR_FUNCTION,
-    COLOR_PREPROCESSOR,
-    COLOR_COMMENT,
-    COLOR_UNACTIVE,
-    COLOR_STATUS_BAR,
-    COLOR_STATUS_TEXT,
-    COLOR_BACKGROUND,
-    COLOR_SELECT,
-};
-
-static int theme_colors[NUM_COLORS];
 
 static const RGB hex_to_rgb(int hex) {
     RGB color;
@@ -53,12 +30,12 @@ static short rgb_to_ncurses(int val) {
 }
 
 static void set_theme_color(int idx, int hex) {
-    theme_colors[idx] = idx;
-
-    if (can_change_color()) {
-        RGB color = hex_to_rgb(hex);
-        init_color(idx, rgb_to_ncurses(color.r), rgb_to_ncurses(color.g), rgb_to_ncurses(color.b));
+    if (!can_change_color()) {
+        return;
     }
+
+    RGB color = hex_to_rgb(hex);
+    init_color(idx, rgb_to_ncurses(color.r), rgb_to_ncurses(color.g), rgb_to_ncurses(color.b));
 }
 
 void load_theme(const char *filename) {
@@ -171,7 +148,7 @@ void init_colors(void) {
     set_theme_color(COLOR_NUM, 0xf0e68c);
     set_theme_color(COLOR_CHAR, 0x98fb98);
     set_theme_color(COLOR_FUNCTION, 0xdda0dd);
-    set_theme_color(COLOR_IDENTIFIER, 0xb0c4de); // Needs an update
+    set_theme_color(COLOR_IDENTIFIER, 0xb0c4de);
     set_theme_color(COLOR_PREPROCESSOR, 0x7fffd4);
     set_theme_color(COLOR_COMMENT, 0x808080);
     set_theme_color(COLOR_UNACTIVE, 0x555555);
