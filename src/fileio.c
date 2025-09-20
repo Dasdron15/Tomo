@@ -14,13 +14,7 @@
 
 void load_file(const char *path) {
     FILE *fp = fopen(path, "r");
-    if (!fp) {
-        endwin();
-        reset();
-        fprintf(stderr, "Error: File cannot be opened\n");
-        exit(1);
-    }
-
+    
     bool indent_measured = false;
 
     size_t line_capacity = 128;

@@ -23,12 +23,10 @@ int main(int argc, char *argv[]) {
     struct stat dir_path;
     stat(argv[1], &dir_path);
 
-    init_editor();
-    init_colors();
-    syntax_init();
-    init_undo_stack();
-
     if (S_ISDIR(dir_path.st_mode)) {
+        init_editor();
+        init_colors();
+
         open_dir(argv[1]);
     } else {
         FILE *fp = fopen(argv[1], "r");
@@ -36,10 +34,19 @@ int main(int argc, char *argv[]) {
             fp = fopen(argv[1], "w");
         }
 
+        fclose(fp);
+
         char resolved_path[PATH_MAX];
         editor.filename = realpath(argv[1], resolved_path);
         load_file(editor.filename);
     }
+
+    if (!S_ISDIR(dir_path.st_mode)) {
+        init_editor();
+        init_colors();
+    }
+    syntax_init();
+    init_undo_stack();
 
     while (1) {
         syntax_reparse();

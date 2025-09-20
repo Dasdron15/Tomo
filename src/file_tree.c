@@ -18,6 +18,7 @@ void draw_tree(char **files, int el_num, char *dir_path) {
 
     keypad(tree_win, TRUE);
     wbkgd(tree_win, COLOR_PAIR(PAIR_BACKGROUND));
+    curs_set(0);
 
     int pos = 0;
     int ch = 0;
@@ -49,6 +50,11 @@ void draw_tree(char **files, int el_num, char *dir_path) {
     }
 
     delwin(tree_win);
+
+    endwin();
+    reset();
+    printf("idk\n");
+    exit(0);
 
     char path[PATH_MAX];
     snprintf(path, PATH_MAX, "%s/%s", dir_path, files[pos]);
