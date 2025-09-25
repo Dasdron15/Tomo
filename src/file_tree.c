@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <limits.h>
 
-#include "syntax.h"
 #include "themes.h"
 #include "fileio.h"
 #include "editor.h"
@@ -51,17 +50,11 @@ void draw_tree(char **files, int el_num, char *dir_path) {
 
     delwin(tree_win);
 
-    endwin();
-    reset();
-    printf("idk\n");
-    exit(0);
-
     char path[PATH_MAX];
     snprintf(path, PATH_MAX, "%s/%s", dir_path, files[pos]);
     char *real_path = realpath(path, NULL);
 
     editor.filename = real_path;
-    syntax_init();
 
     load_file(real_path);
 }

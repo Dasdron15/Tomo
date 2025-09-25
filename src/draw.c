@@ -14,6 +14,10 @@
 
 int calc_render_x(const char *line, int cursor_x) {
     int render_x = 0;
+    int line_len = strlen(line);
+
+    if (cursor_x > line_len) return line_len;
+
     for (int i = 0; i < cursor_x; i++) {
         if (line[i] == '\t') {
             render_x += editor.tab_width;

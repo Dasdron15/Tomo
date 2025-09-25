@@ -54,7 +54,9 @@ void load_file(const char *path) {
                 init_indent(line, &indent_measured);
             }
 
-            editor.lines[line_count++] = strdup(line);
+            editor.lines[line_count] = strdup(line);
+
+            line_count++;
             length = 0;
             continue;
         }
@@ -64,7 +66,8 @@ void load_file(const char *path) {
 
     if (length > 0) {
         line[length] = '\0';
-        editor.lines[line_count++] = strdup(line);
+        editor.lines[line_count] = strdup(line);
+        line_count++;
     }
 
     // Handle empty last line

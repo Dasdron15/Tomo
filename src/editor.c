@@ -116,5 +116,6 @@ void reset(void) {
     free(editor.lines);
 
     printf("\033[2 q");
+    curs_set(1);
     fflush(stdout);
 }

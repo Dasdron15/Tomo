@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     stat(argv[1], &dir_path);
 
     if (S_ISDIR(dir_path.st_mode)) {
-        init_editor();
+        init_curses();
         init_colors();
 
         open_dir(argv[1]);
@@ -38,16 +38,20 @@ int main(int argc, char *argv[]) {
 
         char resolved_path[PATH_MAX];
         editor.filename = realpath(argv[1], resolved_path);
+
+        init_curses();
+        init_colors();
         load_file(editor.filename);
     }
 
-    if (!S_ISDIR(dir_path.st_mode)) {
-        init_editor();
-        init_colors();
-    }
+    init_variables();
     syntax_init();
     init_undo_stack();
 
+    curs_set(1);
+
+
+    
     while (1) {
         syntax_reparse();
         draw_editor();

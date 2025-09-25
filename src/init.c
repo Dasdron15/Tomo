@@ -9,18 +9,7 @@
 #include "utils.h"
 #include "cursor.h"
 
-void init_editor(void) {
-    editor.bottom_text = "";
-
-    editor.margin = int_len(editor.total_lines) + 2;
-
-    cursor.x = editor.margin;
-    cursor.x = editor.margin;
-    cursor.max_x = editor.margin;
-    cursor.y = 0;
-    cursor.x_offset = 0;
-    cursor.y_offset = 0;
-
+void init_curses(void) {
     printf("\033[5 q"); // Set cursor to line
     initscr();
     raw();
@@ -29,7 +18,16 @@ void init_editor(void) {
     noecho();
 }
 
+void init_variables(void) {
+    editor.bottom_text = "";
+    editor.margin = int_len(editor.total_lines) + 2;
 
+    cursor.x = editor.margin;
+    cursor.max_x = cursor.x;
+    cursor.y = 0;
+    cursor.x_offset = 0;
+    cursor.y_offset = 0;
+}
 
 void init_indent(char *line, bool *indent_measured) {
     int indent_count = 0;
