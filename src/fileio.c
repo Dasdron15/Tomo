@@ -7,6 +7,7 @@
 #include <curses.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include "editor.h"
 #include "file_tree.h"
@@ -113,13 +114,6 @@ bool save_file(void) {
 }
 
 void open_dir(char *path) {
-    int capacity = 4;
-    char **elements = malloc(sizeof(char*) * capacity);
-    if (!elements) {
-        fprintf(stderr, "Error: Failed to allocate memory\n");
-        exit(1);
-    }
-
     struct dirent *de;
     DIR *dr = opendir(path);
     if (dr == NULL) {
@@ -127,23 +121,62 @@ void open_dir(char *path) {
         exit(1);
     }
 
-    int i = 0;
-    while ((de = readdir(dr)) != NULL) {
-        if (i >= capacity) {
-            capacity *= 2;
-            elements = realloc(elements, sizeof(char*) * capacity);
-        }
+    int dir_capacity = 4;
+    int file_capacity = 4;
+    int dir_count = 0;
+    int file_count = 0;
 
-        elements[i] = strdup(de->d_name);
-        i++;
+    char **directories = malloc(sizeof(char*) * dir_capacity);
+    char **files = malloc(sizeof(char*) * file_capacity);
+
+    if (!directories || !files) {
+        fprintf(stderr, "Error: Memory not allocated");
+        exit(1);
     }
 
-    draw_tree(elements, i, path);
+    while ((de = readdir(dr)) != NULL) {
+        if (dir_count >= dir_capacity) {
+            dir_capacity *= 2;
+            directories = realloc(directories, sizeof(char*) * dir_capacity);
+        }
 
-    for (int k = 0; k < i; k++) {
-        free(elements[k]);
+        if (file_count >= file_capacity) {
+            file_capacity *= 2;
+            files = realloc(files, sizeof(char*) * file_capacity);
+        }
+
+        // Check if it's a directory or a file
+        if (de->d_type == DT_DIR) {
+            directories[dir_count] = strdup(de->d_name);
+            dir_count++;
+        } else {
+            files[file_count] = strdup(de->d_name);
+            file_count++;
+        }
+    }
+
+    char **elements = malloc(sizeof(char*) * (dir_count + file_count));
+    
+    // First put directories into elements array
+    int element_count = 0;
+    for (int i = 0; i < dir_count; i++) {
+        elements[element_count++] = directories[i];
+    }
+
+    // Then put files
+    for (int i = 0; i < file_count; i++) {
+        elements[element_count++] = files[i];
+    }
+
+    draw_tree(elements, dir_count + file_count, path);
+
+    free(directories);
+    free(files);
+    for (int i = 0; i < (dir_count + file_count); i++) {
+        free(elements[i]);
     }
 
     free(elements);
+
     closedir(dr);
 }
