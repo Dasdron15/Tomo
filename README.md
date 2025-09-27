@@ -3,7 +3,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/Dasdron15/Tomo?color=blue)
 ![GitHub License](https://img.shields.io/github/license/Dasdron15/Tomo?color=blue)
 
-**Tomo** is a terminal-based code editor focused on simplicity and working out of the box without any configuration. Inspired by the lightweight nature of Helix and the intuitiveness of VS Code, it uses `ncurses` for terminal UI and `tree-sitter` for fast syntax highlighting.
+**Tomo** is a terminal-based code editor focused on simplicity and working out of the box without any configuration. Inspired by the lightweight feel of Helix and the intuitiveness of VS Code, it uses `ncurses` for terminal UI and `tree-sitter` for syntax highlighting.
 
 Image of Tomo code editor in action:
 
@@ -19,11 +19,11 @@ Image of Tomo code editor in action:
 
 ## Themes
 
-**Tomo** supports custom themes via `.ini` files. Place your theme files in `~/.config/tomo/themes` directory.
+**Tomo** supports custom themes. Place your theme files in `~/.config/tomo/themes` directory.
 
 ### Theme file format
 
-Each theme is a simple `.ini` file with the following format:
+Each theme is an `.ini` file with the following format:
 
 ```ini
 default = "#d0d0d0"
