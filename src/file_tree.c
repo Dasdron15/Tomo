@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 #include "themes.h"
 #include "fileio.h"
@@ -56,5 +59,15 @@ void draw_tree(char **files, int el_num, char *dir_path) {
 
     editor.filename = real_path;
 
-    load_file(real_path);
+    struct stat path_stat;
+    stat(editor.filename, &path_stat);
+
+    if (!S_ISREG(path_stat.st_mode)) {
+        endwin();
+        reset();
+        printf("Not implemented yet\n");
+        exit(0);
+    } else {
+        load_file(real_path);
+    }
 }
