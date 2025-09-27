@@ -22,7 +22,7 @@ void draw_tree(char **files, int el_num, char *dir_path) {
     int pos = 0;
     int ch = 0;
     while (ch != '\n') {
-        wclear(tree_win);
+        werase(tree_win);
         for (int i = 0; i < el_num; i++) {
             if (i == pos) {
                 wattron(tree_win, COLOR_PAIR(PAIR_STATUS_BAR));

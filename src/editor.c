@@ -11,7 +11,7 @@
 EditorState editor;
 
 void draw_editor() {
-    erase();
+    werase(stdscr);
 
     draw_text_area();
     draw_status_bar();

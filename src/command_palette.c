@@ -47,6 +47,11 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         werase(palette);
         box(palette, 0, 0);
 
+        draw_editor();
+        wnoutrefresh(stdscr);
+        wnoutrefresh(palette);
+        doupdate();
+
         for (int i = 0; i < filtered_count; i++) {
             if (i == highlight) {
                 wattron(palette, COLOR_PAIR(PAIR_STATUS_BAR));
@@ -72,8 +77,10 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         else if (ch == KEY_DOWN) highlight = (highlight + 1) % filtered_count;
         else if (ch == '\n') {
             delwin(palette);
-            touchwin(stdscr);
-            wrefresh(stdscr);
+            draw_editor();
+            wnoutrefresh(stdscr);
+            doupdate();
+
             if (filtered_count > 0) {
                 for (int i = 0; i < n_items; i++) {
                     if (items[i] == filtered[highlight]) return i;
@@ -82,15 +89,13 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
             return -1;
         } else if (ch == 27) {
             delwin(palette);
-            touchwin(stdscr);
-            wrefresh(stdscr);
+            draw_editor();
+            wnoutrefresh(stdscr);
+            doupdate();
             return -1;
         }
         else if (ch > 31 && ch < 127 && pos < (int)buf_size - 1) buf[pos++] = ch, buf[pos] = '\0';
         else if ((ch == 127 || ch == KEY_BACKSPACE) && pos > 0) buf[--pos] = '\0';
-
-        draw_editor();
-        refresh();
     }
 }
 
