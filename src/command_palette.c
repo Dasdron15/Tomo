@@ -47,10 +47,7 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
         werase(palette);
         box(palette, 0, 0);
 
-        draw_editor();
-        wnoutrefresh(stdscr);
-        wnoutrefresh(palette);
-        doupdate();
+
 
         for (int i = 0; i < filtered_count; i++) {
             if (i == highlight) {
@@ -71,6 +68,11 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
 
         mvwprintw(palette, 1, 1, "> ");
         mvwprintw(palette, 1, 3, "%s", buf);
+
+        draw_editor();
+        wnoutrefresh(stdscr);
+        wnoutrefresh(palette);
+        doupdate();
 
         int ch = wgetch(palette);
         if (ch == KEY_UP) highlight = (highlight - 1 + filtered_count) % filtered_count;
