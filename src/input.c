@@ -135,22 +135,26 @@ void handle_key(int key) {
     if (key == 16) {
         int command = draw_command_palette();
 
+        /* 
+        Actions defined in enum from command_palette.h
+        */
+
         switch (command) {
-        case 0: {
+        case CHANGE_THEME: {
             char *selected_theme = draw_theme_palette();
             load_theme(selected_theme);
             break;
         }
-        case 1:
+        case GO_TO_LINE:
             handle_key(7); // 7 - Ctrl + g
             break;
-        case 2:
+        case SAVE_FILE:
             save_file();
             break;
-        case 3:
+        case UNDO:
             undo();
             break;
-        case 4:
+        case EXIT:
             exit_editor();
             break;
         }
