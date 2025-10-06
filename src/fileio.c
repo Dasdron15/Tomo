@@ -168,6 +168,7 @@ void open_dir(char *path) {
         elements[element_count++] = files[i];
     }
 
+    draw_tree(elements, dir_count + file_count, path);
 
     free(directories);
     free(files);
