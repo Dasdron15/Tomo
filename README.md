@@ -16,7 +16,7 @@ Image of Tomo code editor in action:
 - Custom themes
 - Command palette
 - Undo changes
-- Directory opening
+- Open directories
 
 ## Themes
 
