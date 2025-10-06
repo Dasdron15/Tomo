@@ -28,7 +28,7 @@ typedef struct {
 
 void draw_editor(void);
 void handle_key(int key);
-void ask_for_save(void);
+void ask_for_save(bool is_quit);
 bool is_saved(void);
 void exit_editor(void);
 void reset(void);

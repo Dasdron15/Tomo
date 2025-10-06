@@ -10,7 +10,7 @@
 
 EditorState editor;
 
-void draw_editor() {
+void draw_editor(void) {
     werase(stdscr);
 
     draw_text_area();
@@ -19,7 +19,7 @@ void draw_editor() {
     place_cursor();
 }
 
-void ask_for_save(void) {
+void ask_for_save(bool is_quit) {
     move(getmaxy(stdscr) - 1, 0);
     clrtoeol();
 
@@ -48,7 +48,7 @@ void ask_for_save(void) {
     }
 
     if (strcasecmp(input, "y") == 0 || strcasecmp(input, "yes") == 0) {
-        if (!save_file()) {
+        if (!save_file() || !is_quit) {
             return;
         }
 
@@ -58,7 +58,7 @@ void ask_for_save(void) {
         return;
     }
 
-    if (strcasecmp(input, "n") == 0 || strcasecmp(input, "no")) {
+    if ((strcasecmp(input, "n") == 0 || strcasecmp(input, "no")) && is_quit) {
         reset();
         endwin();
         exit(0);
@@ -101,7 +101,7 @@ bool is_saved(void) {
 
 void exit_editor(void) {
     if (!is_saved()) {
-        ask_for_save();
+        ask_for_save(true);
         return;
     }
     endwin();

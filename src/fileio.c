@@ -149,7 +149,6 @@ void open_dir(char *path) {
         if (de->d_type == DT_DIR) {
             char dir_name[strlen(de->d_name) + 2];
             sprintf(dir_name, "%s/", de->d_name);
-            dir_name[strlen(de->d_name) + 2] = '\0';
 
             directories[dir_count] = strdup(dir_name);
             dir_count++;

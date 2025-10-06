@@ -152,7 +152,7 @@ void handle_key(int key) {
 
         case OPEN_FILE:
             if (!is_saved()) {
-                ask_for_save();
+                ask_for_save(false);
             }
 
             open_dir(dirname(editor.filename));
@@ -238,6 +238,14 @@ void handle_key(int key) {
         cursor.y = target - cursor.y_offset;
         clamp_cursor();
         }
+    }
+
+    if (key == 5) { // Ctrl + E (Open file)
+        if (!is_saved()) {
+            ask_for_save(false);
+        }
+
+        open_dir(dirname(editor.filename));
     }
 
     if (key == 534 &&
