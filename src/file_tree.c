@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <sys/stat.h>
 
 #include "themes.h"
 #include "fileio.h"
@@ -45,6 +46,12 @@ void draw_tree(char **files, int el_num, char *dir_path) {
                 if (pos < el_num - 1) pos++;
                 else pos = 0;
                 break;
+
+            case 17:
+                delwin(tree_win);
+                endwin();
+                reset();
+                exit(0);
         }
     }
 
@@ -53,6 +60,15 @@ void draw_tree(char **files, int el_num, char *dir_path) {
     char path[PATH_MAX];
     snprintf(path, PATH_MAX, "%s/%s", dir_path, files[pos]);
     char *real_path = realpath(path, NULL);
+
+    // Check if path is a directory
+    struct stat path_stat;
+    stat(real_path, &path_stat);
+
+    if (!S_ISREG(path_stat.st_mode)) {
+        open_dir(real_path);
+        return;
+    }
 
     editor.filename = real_path;
 
