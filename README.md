@@ -16,6 +16,7 @@ Image of Tomo code editor in action:
 - Custom themes
 - Command palette
 - Undo changes
+- Directory opening
 
 ## Themes
 
@@ -71,6 +72,7 @@ select = "#333333"
 - <kbd>Ctrl + G</kbd> - Go to line
 - <kbd>Ctrl + Q</kbd> - Quit the editor
 - <kbd>Ctrl + S</kbd> - Save the file
+- <kbd>Ctrl + E</kbd> - Open directory
 - <kbd>Ctrl + T</kbd> - Change theme
 - <kbd>Ctrl + P</kbd> - Open command palette
 - <kbd>Arrow keys</kbd> - Move cursor
@@ -90,14 +92,11 @@ sudo make install
 ## Usage 
 
 ```sh
-tomo <path/to/file>
+tomo <path/to/project>
 ```
-
-Currently, folder/project opening is not supported but planned for future releases.
 
 ## Planned features
 
-- Folder/project support
 - config file support
 - Mouse support
 - Syntax highlighting for more languages
