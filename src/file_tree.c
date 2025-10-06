@@ -65,6 +65,8 @@ void draw_tree(char **files, int el_num, char *dir_path) {
     struct stat path_stat;
     stat(real_path, &path_stat);
 
+    curs_set(1);
+
     if (!S_ISREG(path_stat.st_mode)) {
         open_dir(real_path);
         return;

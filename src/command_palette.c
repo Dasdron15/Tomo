@@ -102,7 +102,7 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
 }
 
 int draw_command_palette(void) {
-    char *options[] = {"Change theme", "Go to line", "Save file", "Undo", "Exit"};
+    char *options[] = {"Change theme", "Go to line", "Save file", "Open file", "Undo", "Exit"};
     char buf[64] = {0};
     return draw_palette(options, sizeof(options) / sizeof(options[0]), buf, sizeof(buf));
 }

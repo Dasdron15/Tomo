@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 #include "command_palette.h"
 #include "cursor.h"
@@ -144,12 +145,23 @@ void handle_key(int key) {
         case GO_TO_LINE:
             handle_key(7); // 7 - Ctrl + g
             break;
+
         case SAVE_FILE:
             save_file();
             break;
+
+        case OPEN_FILE:
+            if (!is_saved()) {
+                ask_for_save();
+            }
+
+            open_dir(dirname(editor.filename));
+            break;
+
         case UNDO:
             undo();
             break;
+
         case EXIT:
             exit_editor();
             break;

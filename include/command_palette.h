@@ -5,6 +5,7 @@ enum Action {
     CHANGE_THEME,
     GO_TO_LINE,
     SAVE_FILE,
+    OPEN_FILE,
     UNDO,
     EXIT,
 };
