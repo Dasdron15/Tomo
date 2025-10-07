@@ -108,6 +108,16 @@ void handle_key(int key) {
         save_undo_snapshot = true;
     }
 
+    // CTRL + L (SELECT A SINGLE LINE)
+    if (key == 12) {
+        start_selection(cursor.y + cursor.y_offset, 0);
+        int line_len = strlen(editor.lines[cursor.y + cursor.y_offset]);
+        cursor.x = editor.margin + line_len - cursor.x_offset;
+        clamp_cursor();
+        update_selection(cursor.y + cursor.y_offset,
+                        cursor.x - editor.margin + cursor.x_offset);
+        save_undo_snapshot = true;
+    }
     if (key == 535 &&
         cursor.y + cursor.y_offset <
             editor.total_lines +
