@@ -162,8 +162,21 @@ void open_dir(char *path) {
     
     // First put directories into elements array
     int element_count = 0;
-    for (int i = 0; i < dir_count; i++) {
-        elements[element_count++] = directories[i];
+    if (dir_count > 0) {
+        // put './' and '../' both at top
+        // TODO: we can sort files and directories alphabetically
+        for (int i = 0; i < dir_count; i++) {
+            if (strcmp(directories[i], "./") == 0 || strcmp(directories[i], "../") == 0) {
+                elements[element_count++] = directories[i];
+                directories[i] = NULL; // MARK AS USED
+            }
+        }
+
+        for (int i = 0; i < dir_count; i++) {
+            if (directories[i] != NULL) {
+                elements[element_count++] = directories[i];
+            }
+        }
     }
 
     // Then put files
