@@ -15,7 +15,7 @@ Image of Tomo code editor in action:
 - Smart indentation
 - Custom themes
 - Command palette
-- Undo changes
+- Undo/Redo changes
 
 ## Themes
 
@@ -68,6 +68,7 @@ select = "#333333"
 - <kbd>Ctrl + V</kbd> - Paste selected text
 - <kbd>Ctrl + X</kbd> - Cut selected text
 - <kbd>Ctrl + Z</kbd> - Undo changes
+- <kbd>Ctrl + R</kbd> - Redo changes
 - <kbd>Ctrl + G</kbd> - Go to line
 - <kbd>Ctrl + Q</kbd> - Quit the editor
 - <kbd>Ctrl + S</kbd> - Save the file
