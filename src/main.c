@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     init_variables();
     syntax_init();
-    init_undo_stack();
+    init_undo_redo_stacks();
 
     curs_set(1);
 
@@ -60,5 +60,6 @@ int main(int argc, char *argv[]) {
     }
 
     endwin();
+    destroy_undo_redo_stacks();
     return 0;
 }

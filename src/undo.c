@@ -8,6 +8,7 @@
 #include "undo.h"
 
 #define UNDO_DEPTH 64
+#define REDO_DEPTH 64
 
 typedef struct {
     char **lines;
@@ -26,6 +27,7 @@ typedef struct {
 } SnapshotStack;
 
 SnapshotStack undo_stack;
+SnapshotStack redo_stack;
 
 void free_snapshot(Snapshot *snap) {
     if (!snap) return;
@@ -78,6 +80,16 @@ void create_stack(SnapshotStack *stack, int capacity) {
 }
 
 /*
+ * Clears given snapshot stack.
+ */
+void clear_stack(SnapshotStack *stack) {
+    for (int i = 0; i <= stack->top; ++i) {
+        free_snapshot(&stack->items[i]);
+    }
+    stack->top = -1;
+}
+
+/*
  * Returns true if the stack has no snapshots
  */
 bool is_empty(SnapshotStack *stack) {
@@ -107,8 +119,8 @@ void push(SnapshotStack *stack, Snapshot value) {
 /*
  * Removes and returns the top snapshot
  */
-Snapshot pop(SnapshotStack *stack) {
-    return stack->items[stack->top--];
+Snapshot *pop(SnapshotStack *stack) {
+    return &stack->items[stack->top--];
 }
 
 /*
@@ -118,8 +130,22 @@ Snapshot peek(SnapshotStack *stack) {
     return stack->items[stack->top];
 }
 
-void init_undo_stack(void) {
+/*
+ * Initializes an empty snapshot undo and redo stacks.
+ */
+void init_undo_redo_stacks(void) {
     create_stack(&undo_stack, UNDO_DEPTH);
+    create_stack(&redo_stack, REDO_DEPTH);
+}
+
+/*
+ * Destroys snapshot undo and redo stacks.
+ */
+void destroy_undo_redo_stacks(void) {
+    clear_stack(&undo_stack);
+    clear_stack(&redo_stack);
+    free(undo_stack.items);
+    free(redo_stack.items);
 }
 
 /*
@@ -130,20 +156,15 @@ void take_snapshot(bool need_save) {
     if (!need_save) return;   
     Snapshot snapshot = create_snapshot();
     push(&undo_stack, snapshot);
+    clear_stack(&redo_stack);
 }
 
 /*
- * Check if the undo stack is empty if not then 
- * take the top object from undo stack, assign
- * all the values from the object to the current editor state,
- * resize the main lines array and remove the top object 
- * from the stack
+ * Assign all the values from the snapshot 
+ * to the current editor state and
+ * resize the main lines array
  */
-void undo(void) {
-    if (is_empty(&undo_stack)) return;
-    
-    Snapshot snap = pop(&undo_stack);
-
+void apply_snapshot(Snapshot *snap) {
     if (editor.lines) {
         for (int i = 0; i < editor.total_lines; i++) {
             free(editor.lines[i]);
@@ -152,17 +173,37 @@ void undo(void) {
         editor.lines = NULL;
     }
 
-    editor.lines = malloc(sizeof(char*) * snap.total_lines);
-    for (int i = 0; i < snap.total_lines; i++) {
-        editor.lines[i] = strdup(snap.lines[i]);
+    editor.lines = malloc(sizeof(char*) * snap->total_lines);
+    for (int i = 0; i < snap->total_lines; i++) {
+        editor.lines[i] = strdup(snap->lines[i]);
     }
-    editor.total_lines = snap.total_lines;
+    editor.total_lines = snap->total_lines;
 
-    cursor.x = snap.cursor_pos.x - (cursor.x_offset - snap.offset.x);
-    cursor.y = snap.cursor_pos.y - (cursor.y_offset - snap.offset.y);
-    if (snap.is_selecting) {
-        set_selection(snap.selection_start, snap.selection_end);
+    cursor.x = snap->cursor_pos.x - (cursor.x_offset - snap->offset.x);
+    cursor.y = snap->cursor_pos.y - (cursor.y_offset - snap->offset.y);
+    if (snap->is_selecting) {
+        set_selection(snap->selection_start, snap->selection_end);
     }
+}
 
-    free_snapshot(&snap);
+void undo(void) {
+    if (is_empty(&undo_stack)) return;
+
+    Snapshot current_state = create_snapshot();
+    push(&redo_stack, current_state);
+    
+    Snapshot *snap = pop(&undo_stack);
+    if (!snap) return;
+    apply_snapshot(snap);
+}
+
+void redo(void) {
+    if (is_empty(&redo_stack)) return;
+
+    Snapshot current_state = create_snapshot();
+    push(&undo_stack, current_state);
+
+    Snapshot *snap = pop(&redo_stack);
+    if (!snap) return;
+    apply_snapshot(snap);
 }

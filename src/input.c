@@ -139,6 +139,11 @@ void handle_key(int key) {
         clamp_cursor();
     }
 
+    if (key == 18) { // CTRL + R (Redo)
+        redo();
+        clamp_cursor();
+    }
+
     if (key == 27) { // Esc
         cancel_selection();
     }
