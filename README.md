@@ -76,6 +76,7 @@ select = "#333333"
 - <kbd>Ctrl + P</kbd> - Open command palette
 - <kbd>Arrow keys</kbd> - Move cursor
 - <kbd>Arrow keys + Shift</kbd> - Start text selection
+- <kbd>Arrow keys + Ctrl</kbd> - Jump to the start/end of the line/file
 
 ## Installation
 

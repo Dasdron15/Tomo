@@ -1,4 +1,4 @@
-#include "input.h"
+#include "input.h"inpu
 
 #include <curses.h>
 #include <stdlib.h>
@@ -204,6 +204,10 @@ void handle_key(int key) {
 
         case UNDO:
             undo();
+            break;
+
+        case REDO:
+            redo();
             break;
 
         case EXIT:
