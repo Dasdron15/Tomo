@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
     }
 
     struct stat dir_path;
-    stat(argv[1], &dir_path);
+    int stat_res = stat(argv[1], &dir_path);
 
-    if (S_ISDIR(dir_path.st_mode)) {
+    if (!stat_res && S_ISDIR(dir_path.st_mode)) {
         init_curses();
         init_colors();
 
