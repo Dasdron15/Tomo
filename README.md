@@ -105,6 +105,7 @@ Currently, folder/project opening is not supported but planned for future releas
 - Syntax highlighting for more languages
 - Auto-completion
 - Vim mode
+- Windows support
 
 ## Contribution
 
