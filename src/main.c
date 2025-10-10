@@ -13,6 +13,7 @@
 #include "syntax.h"
 #include "themes.h"
 #include "undo.h"
+#include "input.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -21,9 +22,9 @@ int main(int argc, char *argv[]) {
     }
 
     struct stat dir_path;
-    stat(argv[1], &dir_path);
+    int stat_res = stat(argv[1], &dir_path);
 
-    if (S_ISDIR(dir_path.st_mode)) {
+    if (!stat_res && S_ISDIR(dir_path.st_mode)) {
         init_curses();
         init_colors();
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
     init_variables();
     syntax_init();
     init_undo_redo_stacks();
+    define_esc_arrows();
 
     curs_set(1);
 

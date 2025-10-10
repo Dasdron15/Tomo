@@ -7,6 +7,7 @@ enum Action {
     SAVE_FILE,
     OPEN_FILE,
     UNDO,
+    REDO,
     EXIT,
 };
 
