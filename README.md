@@ -99,7 +99,6 @@ Currently, folder/project opening is not supported but planned for future releas
 
 ## Planned features
 
-- Folder/project support
 - config file support
 - Mouse support
 - Syntax highlighting for more languages
