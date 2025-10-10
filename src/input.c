@@ -1,4 +1,4 @@
-#include "input.h"inpu
+#include "input.h"
 
 #include <curses.h>
 #include <stdlib.h>
