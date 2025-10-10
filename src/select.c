@@ -22,6 +22,13 @@ void update_selection(int y, int x) {
     }
 }
 
+/*
+ * Calculates the start and end points of the current text selection.
+ * If no selection is active, both points are set to the current cursor position.
+ * Otherwise determines the correct order of start and end depending on
+ * cursor and selection_start coordinates.
+ */
+
 void get_selection_bounds(Point *start, Point *end) {
     int x_pos = cursor.x + cursor.x_offset - editor.margin;
     int y_pos = cursor.y + cursor.y_offset;
@@ -44,6 +51,10 @@ void get_selection_bounds(Point *start, Point *end) {
     }
 }
 
+/*
+ * Returns true if the given file coordinates are within the current selection range.
+ * Otherwise, returns false.
+ */
 bool is_selected(int file_y, int file_x) {
     Point start;
     Point end;
@@ -51,6 +62,7 @@ bool is_selected(int file_y, int file_x) {
     if (!selecting)
         return false;
 
+    // Ensure start is always before end in visual order
     if (selection_start.y > selection_end.y ||
         (selection_start.x > selection_end.x &&
         selection_start.y == selection_end.y)) {
