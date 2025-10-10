@@ -51,8 +51,6 @@ int main(int argc, char *argv[]) {
     define_esc_arrows();
 
     curs_set(1);
-
-
     
     while (1) {
         syntax_reparse();
