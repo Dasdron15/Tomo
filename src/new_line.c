@@ -7,6 +7,13 @@
 #include "editor.h"
 #include "cursor.h"
 
+/*
+ * Calculates indentation level of the given line.
+ * If the file uses tabs, counts the number of leading tab characters.
+ * If the file uses spaces, counts leading spaces and multiplies by editor.indent_size.
+ * If the previous character on the line is ':', increases indentation by one level.
+ */
+
 int calculate_indent(const char *line) {
     int indent = 0;
     int len = strlen(line);
@@ -34,11 +41,22 @@ int calculate_indent(const char *line) {
     return indent;
 }
 
+/*
+ * Takes characters to the left and right of the cursor as arguments.
+ * Returns true if the cursor is inside a matching pair of parentheses, brackets, or braces.
+ */
+
 bool is_enclosing_pair(char left, char right) {
     return (left == '(' && right == ')') ||
            (left == '[' && right == ']') ||
            (left == '{' && right == '}');
 }
+
+/*
+ * Creates a new line string based on the current indentation level.
+ * Takes the remaining part of the current line and appends it to the proper indentation.
+ * Used when inserting a new line after pressing Enter.
+ */
 
 char *create_right_side(const char *rest_of_line, int indent) {
     char indent_symb;
@@ -58,11 +76,4 @@ char *create_right_side(const char *rest_of_line, int indent) {
     strcat(result, rest_of_line);
     free(indent_str);
     return result;
-}
-
-void insert_line(int index, const char *text) {
-    memmove(&editor.lines[index + 1], &editor.lines[index],
-            (editor.total_lines - index) * sizeof(char *));
-    editor.lines[index] = strdup(text);
-    editor.total_lines++;
 }
