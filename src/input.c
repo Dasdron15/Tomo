@@ -26,6 +26,12 @@
 #define KEY_CUP    5703
 #define KEY_CDOWN  5704
 
+// Alt + arrow
+#define KEY_ALEFT  5801
+#define KEY_ARIGHT 5802
+#define KEY_AUP    5803
+#define KEY_ADOWN  5804
+
 #define KEY_TAB '\t'
 #define KEY_DELETE 127
 #define KEY_ESCAPE 27
@@ -48,6 +54,11 @@ void define_esc_arrows(void) {
     define_key("\033[1;5B", KEY_CDOWN);
     define_key("\033[1;5C", KEY_CRIGHT);
     define_key("\033[1;5D", KEY_CLEFT);
+
+    define_key("\033[1;3A", KEY_AUP);
+    define_key("\033[1;3B", KEY_ADOWN);
+    define_key("\033[1;3C", KEY_ARIGHT);
+    define_key("\033[1;3D", KEY_ALEFT);
 }
 
 void handle_key(int key) {
@@ -83,7 +94,7 @@ void handle_key(int key) {
                              cursor.x - editor.margin + cursor.x_offset);
         }
     }
-
+    
     if (key == KEY_CDOWN) { // (Jump to the end of the file)
         cursor.y_offset = 0;
         cursor.y = editor.total_lines;
