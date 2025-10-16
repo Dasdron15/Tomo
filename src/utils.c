@@ -1,6 +1,5 @@
 #include "utils.h"
 
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -21,7 +20,16 @@ char *mult_char(char c, int count) {
     return str;
 }
 
-int int_len(int num) { return 1 + (int)log10(num); }
+int int_len(int num) {
+    int count = 0;
+    
+    while (num > 0) {
+        num = num / 10;
+        count++;
+    }
+
+    return count;
+}
 
 char *get_filename(char *path) {
     char *ptr;
