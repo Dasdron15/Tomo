@@ -14,6 +14,9 @@
 #include "themes.h"
 #include "undo.h"
 
+#define MOVE_UP -1
+#define MOVE_DOWN 1
+
 #define CTRL(c) ((c) & 037)
 
 // Shift + arrow (left and right keys are defined by default in ncurses)
@@ -162,6 +165,28 @@ void handle_key(int key) {
         update_selection(cursor.y + cursor.y_offset,
                         cursor.x - editor.margin + cursor.x_offset);
         save_undo_snapshot = true;
+    }
+
+    if (key == KEY_AUP && cursor.y + cursor.y_offset > 0) { // (Move selected block up)
+        move_text_block(get_selection_start().y, get_selection_end().y, MOVE_UP);
+        move_up(is_selecting());
+
+        // Shift selection range up
+        if (is_selecting()) {
+            set_selection((Point) {get_selection_start().y + MOVE_UP, get_selection_start().x},
+            (Point) {get_selection_end().y + MOVE_UP, get_selection_end().x});
+        }
+    }
+
+    if (key == KEY_ADOWN && cursor.y + cursor.y_offset < editor.total_lines - 1) { // (Move selected block down)
+        move_text_block(get_selection_start().y, get_selection_end().y, MOVE_DOWN);
+        move_down(is_selecting());
+
+        // Shift selection range down
+        if (is_selecting()) {
+            set_selection((Point) {get_selection_start().y + MOVE_DOWN, get_selection_start().x},
+            (Point) {get_selection_end().y + MOVE_DOWN, get_selection_end().x});
+        }
     }
 
     if (key == CTRL('l')) { // (Select a single line)

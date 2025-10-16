@@ -312,3 +312,23 @@ void paste_text(void) {
     free(clipboard);
     clamp_cursor();
 }
+
+/* 
+ * Probably will be rewritten or refactored
+ */
+
+void move_text_block(int start, int end, int move_amount) {
+    int block_size;
+
+    if (!is_selecting()) {
+        start = cursor.y + cursor.y_offset;
+        end = start;
+    }
+
+    block_size = end - start + 1;
+
+    char *temp[1024];
+    memcpy(temp, editor.lines + start, sizeof(char*) * block_size);
+    memmove(editor.lines + start, editor.lines + start + (block_size * move_amount), sizeof(char*) * block_size);
+    memcpy(editor.lines + start + (block_size * move_amount), temp, sizeof(char*) * block_size);
+}
