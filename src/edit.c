@@ -317,18 +317,39 @@ void paste_text(void) {
  * Probably will be rewritten or refactored
  */
 
-void move_text_block(int start, int end, int move_amount) {
-    int block_size;
-
+bool move_text_block(int start, int end, int move_direction) {
+    // If no text is selected then get the current y value of cursor
     if (!is_selecting()) {
         start = cursor.y + cursor.y_offset;
         end = start;
     }
 
-    block_size = end - start + 1;
+    if (start > end) {
+        int temp = start;
+        start = end;
+        end = temp;
+    }
 
-    char *temp[1024];
-    memcpy(temp, editor.lines + start, sizeof(char*) * block_size);
-    memmove(editor.lines + start, editor.lines + start + (block_size * move_amount), sizeof(char*) * block_size);
-    memcpy(editor.lines + start + (block_size * move_amount), temp, sizeof(char*) * block_size);
+    int block_size = end - start + 1;
+
+    if (move_direction > 0 && editor.total_lines < end) return false;
+    if (move_direction < 0 && (start - 1) < 0) return false;
+
+    if (move_direction < 0) {
+        // Move up by 1
+        char *prev = editor.lines[start - 1];
+        memmove(editor.lines + start - 1,
+                editor.lines + start,
+                sizeof(char*) * block_size);
+        editor.lines[start - 1 + block_size] = prev;
+    } else if (move_direction > 0) {
+        // Move down by 1
+        char *next = editor.lines[end + 1];
+        memmove(editor.lines + start + 1,
+                editor.lines + start,
+                sizeof(char*) * block_size);
+        editor.lines[start] = next;
+    }
+
+    return true;
 }

@@ -9,9 +9,6 @@ void insert_char(char c);
 void add_tab(void);
 void copy_text(Point start, Point end);
 void paste_text(void);
-
-// Will be renamed
-
-void move_text_block(int start, int end, int move_amount);
+bool move_text_block(int start, int end, int move_direction);
 
 #endif
