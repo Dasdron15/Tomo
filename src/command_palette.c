@@ -8,6 +8,7 @@
 #include "command_palette.h"
 #include "editor.h"
 #include "themes.h"
+#include "input.h"
 
 static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
     int max_x, max_y;
@@ -89,15 +90,15 @@ static int draw_palette(char **items, int n_items, char *buf, size_t buf_size) {
                 }
             }
             return -1;
-        } else if (ch == 27) {
+        } else if (ch == KEY_ESCAPE) {
             delwin(palette);
             draw_editor();
             wnoutrefresh(stdscr);
             doupdate();
             return -1;
         }
-        else if (ch > 31 && ch < 127 && pos < (int)buf_size - 1) buf[pos++] = ch, buf[pos] = '\0';
-        else if ((ch == 127 || ch == KEY_BACKSPACE) && pos > 0) buf[--pos] = '\0';
+        else if (ch >= ' ' && ch < KEY_DELETE && pos < (int)buf_size - 1) buf[pos++] = ch, buf[pos] = '\0';
+        else if ((ch == KEY_DELETE || ch == KEY_BACKSPACE) && pos > 0) buf[--pos] = '\0';
     }
 }
 

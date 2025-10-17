@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "editor.h"
+#include "input.h"
 #include "select.h"
 #include "utils.h"
 
@@ -167,11 +168,11 @@ size_t goto_line(void) {
             exit_editor();
         }
 
-        if (ch == 27) {
+        if (ch == KEY_ESCAPE) {
             return -1;
         }
 
-        if ((ch == KEY_BACKSPACE || ch == 127 || ch == '\b') && pos > 0) {
+        if ((ch == KEY_BACKSPACE || ch == KEY_DELETE || ch == '\b') && pos > 0) {
             input[--pos] = '\0';
             mvprintw(screen_height - 1, strlen(prompt) + pos, " ");
             move(screen_height - 1, strlen(prompt) + pos);

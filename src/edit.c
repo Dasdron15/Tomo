@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "clip.h"
+#include "input.h"
 #include "undo.h"
 #include "utils.h"
 #include "cursor.h"
@@ -332,8 +333,8 @@ bool move_text_block(int start, int end, int move_direction) {
 
     int block_size = end - start + 1;
 
-    if (move_direction > 0 && editor.total_lines < end) return false;
-    if (move_direction < 0 && (start - 1) < 0) return false;
+    if (move_direction > MOVE_UP && editor.total_lines < end) return false;
+    if (move_direction < MOVE_DOWN && (start - 1) < 0) return false;
 
     if (move_direction < 0) {
         // Move up by 1

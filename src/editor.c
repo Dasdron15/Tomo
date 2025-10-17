@@ -6,6 +6,7 @@
 
 #include "draw.h"
 #include "fileio.h"
+#include "input.h"
 #include "utils.h"
 
 EditorState editor;
@@ -32,10 +33,10 @@ void ask_for_save(bool is_quit) {
 
     int ch;
     while ((ch = wgetch(stdscr)) != '\n') {
-        if (ch == 27) {
+        if (ch == KEY_ESCAPE) {
             editor.bottom_text = "";
             return;
-        } else if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0) {
+        } else if ((ch == KEY_BACKSPACE || ch == KEY_DELETE) && pos > 0) {
             input[--pos] = '\0';
             mvwprintw(stdscr, getmaxy(stdscr) - 1, 21 + pos, " ");
             wmove(stdscr, getmaxy(stdscr) - 1, 21 + pos);
